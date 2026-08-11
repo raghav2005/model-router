@@ -11,6 +11,7 @@ from .learned import default_artifact_path
 from .live_eval import load_cases as load_live_eval_cases
 from .live_eval import run_benchmark as run_live_benchmark
 from .router import ModelRouter, NoEligibleModel
+from .readiness import evaluate_release_gates
 from .switchyard import (
     DELEGATED_PROFILES,
     SwitchyardClient,
@@ -212,6 +213,17 @@ def build_parser() -> argparse.ArgumentParser:
     live_eval.add_argument("--concurrency", type=int, default=4)
     live_eval.add_argument("--store-content", action="store_true")
     live_eval.add_argument("--no-resume", action="store_true")
+
+    release_gates = subparsers.add_parser(
+        "release-gates", help="Evaluate production-enforcement release gates"
+    )
+    release_gates.add_argument("--policy", default="config/release_policy.json")
+    release_gates.add_argument(
+        "--training-report", default="reports/complexity_router_v1.json"
+    )
+    release_gates.add_argument(
+        "--live-summary", default="reports/live_eval_summary.json"
+    )
     return parser
 
 
@@ -219,6 +231,17 @@ def main() -> None:
     parser = build_parser()
     args = parser.parse_args()
     try:
+        if args.command == "release-gates":
+            report = evaluate_release_gates(
+                policy_path=args.policy,
+                training_report_path=args.training_report,
+                live_summary_path=args.live_summary,
+            )
+            print(json.dumps(report, indent=2))
+            if not report["ready_for_enforcement"]:
+                parser.exit(3)
+            return
+
         if args.command == "train":
             report = train_and_evaluate(
                 args.dataset,

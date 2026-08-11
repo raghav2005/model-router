@@ -1,0 +1,16 @@
+{
+  "schema_version": "model-router-release-policy-v1",
+  "deployment_mode": "shadow",
+  "maximum_pricing_age_days": 30,
+  "minimum_external_examples": 1000,
+  "minimum_external_accuracy": 0.75,
+  "maximum_external_tier_underroute_rate": 0.05,
+  "minimum_live_cases_per_target": 100,
+  "minimum_live_all_validators_pass_rate": 0.9,
+  "require_workload_measured_quality": true,
+  "require_workload_measured_latency": true,
+  "switchyard": {
+    "tested_version_or_commit": null,
+    "trusted_direct_provider_fallback_configured": false
+  }
+}
