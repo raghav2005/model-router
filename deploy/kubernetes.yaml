@@ -1,0 +1,109 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: model-router-config
+data:
+  MODEL_ROUTER_MODE: "shadow"
+  MODEL_ROUTER_SHADOW_TARGET: "capable"
+  MODEL_ROUTER_MAX_BODY_BYTES: "1048576"
+  MODEL_ROUTER_FALLBACK_ON_ERROR: "0"
+  MODEL_ROUTER_AUDIT_PATH: "-"
+  SWITCHYARD_URL: "http://switchyard:4000"
+  SWITCHYARD_TIMEOUT_SECONDS: "120"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: model-router
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: model-router
+  template:
+    metadata:
+      labels:
+        app: model-router
+    spec:
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: model-router
+          image: ghcr.io/replace-owner/model-router:replace-with-immutable-tag
+          imagePullPolicy: IfNotPresent
+          envFrom:
+            - configMapRef:
+                name: model-router-config
+          env:
+            - name: MODEL_ROUTER_API_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: model-router-secrets
+                  key: api-token
+            - name: MODEL_ROUTER_METRICS_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: model-router-secrets
+                  key: metrics-token
+            - name: MODEL_ROUTER_AUDIT_HMAC_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: model-router-secrets
+                  key: audit-hmac-key
+            - name: SWITCHYARD_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: model-router-secrets
+                  key: switchyard-api-key
+          ports:
+            - name: http
+              containerPort: 8080
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 10
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 20
+            timeoutSeconds: 2
+            failureThreshold: 3
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: "1"
+              memory: 512Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+            readOnlyRootFilesystem: true
+          volumeMounts:
+            - name: temporary-files
+              mountPath: /tmp
+      volumes:
+        - name: temporary-files
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: model-router
+spec:
+  selector:
+    app: model-router
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http

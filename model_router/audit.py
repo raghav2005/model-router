@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import hmac
 import json
+import sys
 import threading
 import uuid
 from datetime import UTC, datetime
@@ -93,6 +94,10 @@ class DecisionAuditLogger:
     def _append(self, event: dict[str, object]) -> None:
         encoded = json.dumps(event, sort_keys=True, separators=(",", ":")) + "\n"
         with self._lock:
+            if str(self.path) == "-":
+                sys.stdout.write(encoded)
+                sys.stdout.flush()
+                return
             self.path.parent.mkdir(parents=True, exist_ok=True)
             with self.path.open("a", encoding="utf-8") as handle:
                 handle.write(encoded)

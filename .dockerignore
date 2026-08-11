@@ -1,0 +1,14 @@
+.git
+.github
+.venv
+.ruff_cache
+__pycache__
+*.pyc
+*.egg-info
+build
+dist
+reports/live_eval_results.jsonl
+reports/live_eval_summary.json
+*.env
+*.key
+*.pem
