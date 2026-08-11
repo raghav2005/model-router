@@ -12,7 +12,6 @@ from typing import Literal
 
 import numpy as np
 
-
 MODEL_SCHEMA_VERSION = "complexity-router-nb-v1"
 VECTORIZER_VERSION = "hashed-word-ngram-v1"
 DEFAULT_FEATURE_DIMENSION = 32_768

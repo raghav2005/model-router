@@ -16,7 +16,6 @@ from .catalog import load_catalog
 from .router import ModelRouter
 from .types import ModelProfile, RouteDecision, RoutingRequest
 
-
 JSON = dict[str, Any]
 Message = Mapping[str, Any]
 
@@ -264,8 +263,7 @@ class SwitchyardClient:
                 details = error.read().decode("utf-8", errors="replace")
                 retryable = error.code in {408, 429, 500, 502, 503, 504}
                 last_error = SwitchyardError(
-                    f"Switchyard returned HTTP {error.code}: "
-                    f"{details or error.reason}",
+                    f"Switchyard returned HTTP {error.code}: {details or error.reason}",
                     status_code=error.code,
                     retryable=retryable,
                 )

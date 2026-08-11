@@ -17,7 +17,6 @@ from .router import ModelRouter, NoEligibleModel
 from .switchyard import SwitchyardClient, SwitchyardError, SwitchyardExecutor
 from .types import RoutingRequest
 
-
 StartResponse = Callable[[str, list[tuple[str, str]]], None]
 
 

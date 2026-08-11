@@ -8,7 +8,6 @@ from typing import Literal
 from .learned import DecisionPolicy, NaiveBayesComplexityModel
 from .types import RequestFeatures, RoutingRequest
 
-
 CODE_TERMS = re.compile(
     r"\b(code|coding|function|class|api|sql|regex|debug|bug|refactor|repository|"
     r"unit tests?|typescript|javascript|python|java|rust|golang|compiler|database|"

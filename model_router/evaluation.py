@@ -6,7 +6,6 @@ from typing import Sequence
 
 import numpy as np
 
-
 LEVEL_TO_TIER = {1: 1, 2: 1, 3: 2, 4: 3, 5: 3}
 TIER_COST_INDEX = {1: 1.0, 2: 2.5, 3: 5.0}
 

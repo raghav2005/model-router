@@ -5,8 +5,8 @@ import json
 import tempfile
 import unittest
 from pathlib import Path
-from urllib.error import HTTPError
 from unittest.mock import patch
+from urllib.error import HTTPError
 
 from model_router.audit import DecisionAuditLogger
 from model_router.catalog import catalog_sha256

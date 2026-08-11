@@ -10,8 +10,8 @@ from .benchmark import run_benchmark
 from .learned import default_artifact_path
 from .live_eval import load_cases as load_live_eval_cases
 from .live_eval import run_benchmark as run_live_benchmark
-from .router import ModelRouter, NoEligibleModel
 from .readiness import evaluate_release_gates
+from .router import ModelRouter, NoEligibleModel
 from .switchyard import (
     DELEGATED_PROFILES,
     SwitchyardClient,
@@ -19,9 +19,8 @@ from .switchyard import (
     SwitchyardExecutor,
     UnsafeDelegatedRoute,
 )
-from .types import RoutingRequest
 from .training import TrainingConfig, train_and_evaluate
-
+from .types import RoutingRequest
 
 ROUTING_MODES = ("policy", *DELEGATED_PROFILES)
 

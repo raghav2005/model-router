@@ -13,12 +13,12 @@ from typing import Iterator
 
 import numpy as np
 
-from .classifier import classify_request
 from .catalog import load_catalog
+from .classifier import classify_request
 from .evaluation import (
     LEVEL_TO_TIER,
-    classification_metrics,
     choose_temperature,
+    classification_metrics,
     relative_cost_saving,
     slice_metrics,
     softmax,

@@ -7,7 +7,6 @@ from typing import Iterable
 
 from .types import RouteDecision
 
-
 LATENCY_BUCKETS_MS = (10, 25, 50, 100, 250, 500, 1_000, 2_500, 5_000, 10_000)
 
 

@@ -9,7 +9,6 @@ from .classifier import classify_request, classify_request_with_model
 from .learned import DecisionPolicy, NaiveBayesComplexityModel
 from .types import CandidateScore, ModelProfile, RouteDecision, RoutingRequest
 
-
 WEIGHTS = {
     "balanced": (0.55, 0.25, 0.20),
     "cost": (0.35, 0.50, 0.15),

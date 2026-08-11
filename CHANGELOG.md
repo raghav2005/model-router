@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.4.2 — 2026-08-11
+
+- Pinned Ruff and declared the CI lint rules explicitly so local and hosted
+  verification use the same toolchain and policy.
+
 ## 0.4.1 — 2026-08-11
 
 - Made live-evaluation summaries deterministic across checkpoint and resume by
