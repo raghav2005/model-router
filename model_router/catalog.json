@@ -1,0 +1,43 @@
+{
+  "as_of": "2026-07-24",
+  "notes": {
+    "pricing": "Illustrative planning inputs. Replace these values with the exact deployed target prices before making cost decisions.",
+    "quality_and_latency": "Illustrative priors for demonstrating the router; replace with workload measurements before production.",
+    "aliases": "Policy IDs are stable roles. switchyard_target maps each role to a target in config/switchyard_profiles.yaml."
+  },
+  "models": [
+    {
+      "id": "capable",
+      "switchyard_target": "capable",
+      "tier": 3,
+      "input_price_per_million": 5.0,
+      "output_price_per_million": 30.0,
+      "latency_p95_ms": 2600,
+      "context_window": 1050000,
+      "capabilities": ["text", "vision", "tools", "web", "structured_output"],
+      "skills": {"general_qa": 0.95, "coding": 0.97, "reasoning": 0.98}
+    },
+    {
+      "id": "balanced",
+      "switchyard_target": "balanced",
+      "tier": 2,
+      "input_price_per_million": 2.5,
+      "output_price_per_million": 15.0,
+      "latency_p95_ms": 1500,
+      "context_window": 1050000,
+      "capabilities": ["text", "vision", "tools", "web", "structured_output"],
+      "skills": {"general_qa": 0.87, "coding": 0.89, "reasoning": 0.89}
+    },
+    {
+      "id": "efficient",
+      "switchyard_target": "efficient",
+      "tier": 1,
+      "input_price_per_million": 1.0,
+      "output_price_per_million": 6.0,
+      "latency_p95_ms": 800,
+      "context_window": 1050000,
+      "capabilities": ["text", "vision", "tools", "web", "structured_output"],
+      "skills": {"general_qa": 0.76, "coding": 0.80, "reasoning": 0.73}
+    }
+  ]
+}

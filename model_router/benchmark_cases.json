@@ -1,0 +1,14 @@
+[
+  {"id":"q1","prompt":"What is the capital of Japan?","output_tokens":40,"min_tier":1},
+  {"id":"q2","prompt":"Translate 'good morning' into French.","output_tokens":40,"min_tier":1},
+  {"id":"q3","prompt":"Extract the person's name and city and return valid JSON: Ada lives in London.","output_tokens":80,"min_tier":1},
+  {"id":"q4","prompt":"Summarize this short customer note in one sentence: The package arrived one day late but the item works well.","output_tokens":80,"min_tier":1},
+  {"id":"c1","prompt":"Write a Python function that groups records by category and include unit tests.","output_tokens":650,"min_tier":2},
+  {"id":"c2","prompt":"Refactor this API handler for clear error handling, structured output, and testability.","output_tokens":900,"min_tier":2},
+  {"id":"c3","prompt":"Compare SQL indexes for this reporting query and explain the trade-offs.","output_tokens":700,"min_tier":2},
+  {"id":"r1","prompt":"Compare three onboarding strategies, evaluate trade-offs, and recommend one using five stated constraints.","output_tokens":900,"min_tier":2},
+  {"id":"x1","prompt":"Debug a distributed race condition across a queue, database transaction, and retry worker; find the root cause and propose tests.","output_tokens":1400,"min_tier":3},
+  {"id":"x2","prompt":"Design a multi-region payment architecture, compare consistency trade-offs, failure recovery, compliance, and then produce a migration plan.","output_tokens":1900,"min_tier":3},
+  {"id":"x3","prompt":"Prove the probability result step-by-step, evaluate two alternative derivations, and identify hidden assumptions.","output_tokens":1300,"min_tier":3},
+  {"id":"x4","prompt":"Perform a production security audit of this authentication design, analyze vulnerabilities, exploit paths, mitigations, and verification tests.","output_tokens":1800,"min_tier":3}
+]

@@ -1,0 +1,3838 @@
+{
+  "dataset": {
+    "categories": 29,
+    "conflicting_duplicate_labels": 0,
+    "duplicate_rows": 0,
+    "file": "routing_dataset_100k_valid_only.jsonl",
+    "levels": {
+      "1": 13312,
+      "2": 16043,
+      "3": 19023,
+      "4": 19931,
+      "5": 18658
+    },
+    "rows": 86967,
+    "sha256": "bca11574006fac48d17f1efb67cd471822911e366b9a580755b68964499aa30e",
+    "split_counts": {
+      "test": 8522,
+      "train": 69841,
+      "validation": 8604
+    },
+    "split_level_counts": {
+      "test": {
+        "1": 1291,
+        "2": 1550,
+        "3": 1897,
+        "4": 1985,
+        "5": 1799
+      },
+      "train": {
+        "1": 10748,
+        "2": 12865,
+        "3": 15244,
+        "4": 15928,
+        "5": 15056
+      },
+      "validation": {
+        "1": 1273,
+        "2": 1628,
+        "3": 1882,
+        "4": 2018,
+        "5": 1803
+      }
+    },
+    "statuses": {
+      "appropriate": 44208,
+      "borderline": 42759
+    },
+    "unique_normalized_prompts": 86967
+  },
+  "evaluation": {
+    "classifier_latency_us": {
+      "median_us": 72.896,
+      "note": "Single-process local measurement; rerun in the deployment environment.",
+      "p95_us": 108.417,
+      "p99_us": 126.458,
+      "samples": 1000
+    },
+    "end_to_end_router": {
+      "always_capable_reference": {
+        "average_estimated_cost_usd": 0.01556493,
+        "average_latency_prior_ms": 2600,
+        "count": 8522,
+        "estimated_cost_saving_vs_always_capable": 0.0,
+        "route_counts": {
+          "capable": 8522
+        },
+        "route_errors": 0,
+        "tier_overroute_rate": 0.555973,
+        "tier_success_proxy": 1.0,
+        "tier_underroute_rate": 0.0
+      },
+      "heuristic": {
+        "average_estimated_cost_usd": 0.00532662,
+        "average_latency_prior_ms": 1129.793,
+        "count": 8522,
+        "estimated_cost_saving_vs_always_capable": 0.657781,
+        "route_counts": {
+          "balanced": 3655,
+          "capable": 140,
+          "efficient": 4727
+        },
+        "route_errors": 0,
+        "tier_overroute_rate": 0.09141,
+        "tier_success_proxy": 0.448956,
+        "tier_underroute_rate": 0.551044
+      },
+      "hybrid_argmax": {
+        "average_estimated_cost_usd": 0.01008841,
+        "average_latency_prior_ms": 1811.136,
+        "count": 8522,
+        "estimated_cost_saving_vs_always_capable": 0.35185,
+        "route_counts": {
+          "balanced": 2613,
+          "capable": 3771,
+          "efficient": 2138
+        },
+        "route_errors": 0,
+        "tier_overroute_rate": 0.100211,
+        "tier_success_proxy": 0.971134,
+        "tier_underroute_rate": 0.028866
+      },
+      "hybrid_conservative_p80": {
+        "average_estimated_cost_usd": 0.01044894,
+        "average_latency_prior_ms": 1862.626,
+        "count": 8522,
+        "estimated_cost_saving_vs_always_capable": 0.328687,
+        "route_counts": {
+          "balanced": 2345,
+          "capable": 4119,
+          "efficient": 2058
+        },
+        "route_errors": 0,
+        "tier_overroute_rate": 0.123915,
+        "tier_success_proxy": 0.987092,
+        "tier_underroute_rate": 0.012908
+      },
+      "learned_argmax": {
+        "average_estimated_cost_usd": 0.01035022,
+        "average_latency_prior_ms": 1850.681,
+        "count": 8522,
+        "estimated_cost_saving_vs_always_capable": 0.33503,
+        "route_counts": {
+          "balanced": 3097,
+          "capable": 3770,
+          "efficient": 1655
+        },
+        "route_errors": 0,
+        "tier_overroute_rate": 0.155128,
+        "tier_success_proxy": 0.972894,
+        "tier_underroute_rate": 0.027106
+      }
+    },
+    "slices": {
+      "audit_status": {
+        "appropriate": {
+          "accuracy": 0.94425,
+          "average_relative_cost_index": 3.406228,
+          "confusion_matrix": [
+            [
+              534,
+              16,
+              0,
+              6,
+              1
+            ],
+            [
+              34,
+              526,
+              8,
+              9,
+              3
+            ],
+            [
+              9,
+              39,
+              794,
+              12,
+              5
+            ],
+            [
+              2,
+              10,
+              41,
+              958,
+              15
+            ],
+            [
+              3,
+              2,
+              10,
+              14,
+              1236
+            ]
+          ],
+          "count": 4287,
+          "macro_f1": 0.937453,
+          "mean_absolute_error": 0.074644,
+          "over_level_rate": 0.017495,
+          "per_class": {
+            "1": {
+              "f1": 0.937665,
+              "precision": 0.917526,
+              "recall": 0.958707,
+              "support": 557
+            },
+            "2": {
+              "f1": 0.896846,
+              "precision": 0.887015,
+              "recall": 0.906897,
+              "support": 580
+            },
+            "3": {
+              "f1": 0.92757,
+              "precision": 0.930832,
+              "recall": 0.924331,
+              "support": 859
+            },
+            "4": {
+              "f1": 0.946173,
+              "precision": 0.958959,
+              "recall": 0.933723,
+              "support": 1026
+            },
+            "5": {
+              "f1": 0.97901,
+              "precision": 0.980952,
+              "recall": 0.977075,
+              "support": 1265
+            }
+          },
+          "severe_error_rate": 0.013996,
+          "tier_accuracy": 0.962678,
+          "tier_overroute_rate": 0.010264,
+          "tier_success_proxy": 0.972941,
+          "tier_underroute_rate": 0.027059,
+          "under_level_rate": 0.038255,
+          "weighted_f1": 0.944356,
+          "within_one_level_rate": 0.986004
+        },
+        "borderline": {
+          "accuracy": 0.873908,
+          "average_relative_cost_index": 2.791263,
+          "confusion_matrix": [
+            [
+              648,
+              45,
+              16,
+              19,
+              6
+            ],
+            [
+              33,
+              848,
+              45,
+              36,
+              8
+            ],
+            [
+              13,
+              45,
+              904,
+              52,
+              24
+            ],
+            [
+              6,
+              26,
+              49,
+              854,
+              24
+            ],
+            [
+              4,
+              13,
+              38,
+              32,
+              447
+            ]
+          ],
+          "count": 4235,
+          "macro_f1": 0.87391,
+          "mean_absolute_error": 0.191027,
+          "over_level_rate": 0.064935,
+          "per_class": {
+            "1": {
+              "f1": 0.901252,
+              "precision": 0.920455,
+              "recall": 0.882834,
+              "support": 734
+            },
+            "2": {
+              "f1": 0.871084,
+              "precision": 0.867963,
+              "recall": 0.874227,
+              "support": 970
+            },
+            "3": {
+              "f1": 0.865072,
+              "precision": 0.859316,
+              "recall": 0.870906,
+              "support": 1038
+            },
+            "4": {
+              "f1": 0.875,
+              "precision": 0.86002,
+              "recall": 0.890511,
+              "support": 959
+            },
+            "5": {
+              "f1": 0.857143,
+              "precision": 0.878193,
+              "recall": 0.837079,
+              "support": 534
+            }
+          },
+          "severe_error_rate": 0.049351,
+          "tier_accuracy": 0.905549,
+          "tier_overroute_rate": 0.048642,
+          "tier_success_proxy": 0.954191,
+          "tier_underroute_rate": 0.045809,
+          "under_level_rate": 0.061157,
+          "weighted_f1": 0.873968,
+          "within_one_level_rate": 0.950649
+        }
+      },
+      "category": {
+        "Algorithm": {
+          "accuracy": 0.900356,
+          "average_relative_cost_index": 3.163701,
+          "confusion_matrix": [
+            [
+              29,
+              1,
+              3,
+              0,
+              2
+            ],
+            [
+              1,
+              40,
+              0,
+              1,
+              1
+            ],
+            [
+              1,
+              6,
+              64,
+              0,
+              1
+            ],
+            [
+              1,
+              2,
+              2,
+              63,
+              0
+            ],
+            [
+              3,
+              0,
+              3,
+              0,
+              57
+            ]
+          ],
+          "count": 281,
+          "macro_f1": 0.892185,
+          "mean_absolute_error": 0.206406,
+          "over_level_rate": 0.032028,
+          "per_class": {
+            "1": {
+              "f1": 0.828571,
+              "precision": 0.828571,
+              "recall": 0.828571,
+              "support": 35
+            },
+            "2": {
+              "f1": 0.869565,
+              "precision": 0.816327,
+              "recall": 0.930233,
+              "support": 43
+            },
+            "3": {
+              "f1": 0.888889,
+              "precision": 0.888889,
+              "recall": 0.888889,
+              "support": 72
+            },
+            "4": {
+              "f1": 0.954545,
+              "precision": 0.984375,
+              "recall": 0.926471,
+              "support": 68
+            },
+            "5": {
+              "f1": 0.919355,
+              "precision": 0.934426,
+              "recall": 0.904762,
+              "support": 63
+            }
+          },
+          "severe_error_rate": 0.064057,
+          "tier_accuracy": 0.907473,
+          "tier_overroute_rate": 0.02847,
+          "tier_success_proxy": 0.935943,
+          "tier_underroute_rate": 0.064057,
+          "under_level_rate": 0.067616,
+          "weighted_f1": 0.901138,
+          "within_one_level_rate": 0.935943
+        },
+        "Astrology": {
+          "accuracy": 0.942373,
+          "average_relative_cost_index": 3.40339,
+          "confusion_matrix": [
+            [
+              41,
+              2,
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              41,
+              2,
+              4,
+              0
+            ],
+            [
+              0,
+              0,
+              51,
+              6,
+              0
+            ],
+            [
+              0,
+              0,
+              1,
+              73,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              2,
+              72
+            ]
+          ],
+          "count": 295,
+          "macro_f1": 0.942152,
+          "mean_absolute_error": 0.071186,
+          "over_level_rate": 0.047458,
+          "per_class": {
+            "1": {
+              "f1": 0.97619,
+              "precision": 1.0,
+              "recall": 0.953488,
+              "support": 43
+            },
+            "2": {
+              "f1": 0.911111,
+              "precision": 0.953488,
+              "recall": 0.87234,
+              "support": 47
+            },
+            "3": {
+              "f1": 0.918919,
+              "precision": 0.944444,
+              "recall": 0.894737,
+              "support": 57
+            },
+            "4": {
+              "f1": 0.918239,
+              "precision": 0.858824,
+              "recall": 0.986486,
+              "support": 74
+            },
+            "5": {
+              "f1": 0.986301,
+              "precision": 1.0,
+              "recall": 0.972973,
+              "support": 74
+            }
+          },
+          "severe_error_rate": 0.013559,
+          "tier_accuracy": 0.955932,
+          "tier_overroute_rate": 0.040678,
+          "tier_success_proxy": 0.99661,
+          "tier_underroute_rate": 0.00339,
+          "under_level_rate": 0.010169,
+          "weighted_f1": 0.942755,
+          "within_one_level_rate": 0.986441
+        },
+        "Biology": {
+          "accuracy": 0.92029,
+          "average_relative_cost_index": 2.940217,
+          "confusion_matrix": [
+            [
+              43,
+              1,
+              1,
+              0,
+              0
+            ],
+            [
+              4,
+              45,
+              3,
+              1,
+              1
+            ],
+            [
+              1,
+              1,
+              63,
+              0,
+              0
+            ],
+            [
+              2,
+              2,
+              1,
+              48,
+              3
+            ],
+            [
+              0,
+              0,
+              1,
+              0,
+              55
+            ]
+          ],
+          "count": 276,
+          "macro_f1": 0.918031,
+          "mean_absolute_error": 0.123188,
+          "over_level_rate": 0.036232,
+          "per_class": {
+            "1": {
+              "f1": 0.905263,
+              "precision": 0.86,
+              "recall": 0.955556,
+              "support": 45
+            },
+            "2": {
+              "f1": 0.873786,
+              "precision": 0.918367,
+              "recall": 0.833333,
+              "support": 54
+            },
+            "3": {
+              "f1": 0.940299,
+              "precision": 0.913043,
+              "recall": 0.969231,
+              "support": 65
+            },
+            "4": {
+              "f1": 0.914286,
+              "precision": 0.979592,
+              "recall": 0.857143,
+              "support": 56
+            },
+            "5": {
+              "f1": 0.956522,
+              "precision": 0.932203,
+              "recall": 0.982143,
+              "support": 56
+            }
+          },
+          "severe_error_rate": 0.032609,
+          "tier_accuracy": 0.949275,
+          "tier_overroute_rate": 0.021739,
+          "tier_success_proxy": 0.971014,
+          "tier_underroute_rate": 0.028986,
+          "under_level_rate": 0.043478,
+          "weighted_f1": 0.919587,
+          "within_one_level_rate": 0.967391
+        },
+        "Business": {
+          "accuracy": 0.961938,
+          "average_relative_cost_index": 3.434256,
+          "confusion_matrix": [
+            [
+              41,
+              0,
+              0,
+              1,
+              0
+            ],
+            [
+              2,
+              42,
+              0,
+              2,
+              0
+            ],
+            [
+              0,
+              0,
+              44,
+              2,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              99,
+              0
+            ],
+            [
+              0,
+              0,
+              1,
+              3,
+              52
+            ]
+          ],
+          "count": 289,
+          "macro_f1": 0.962082,
+          "mean_absolute_error": 0.055363,
+          "over_level_rate": 0.017301,
+          "per_class": {
+            "1": {
+              "f1": 0.964706,
+              "precision": 0.953488,
+              "recall": 0.97619,
+              "support": 42
+            },
+            "2": {
+              "f1": 0.954545,
+              "precision": 1.0,
+              "recall": 0.913043,
+              "support": 46
+            },
+            "3": {
+              "f1": 0.967033,
+              "precision": 0.977778,
+              "recall": 0.956522,
+              "support": 46
+            },
+            "4": {
+              "f1": 0.961165,
+              "precision": 0.925234,
+              "recall": 1.0,
+              "support": 99
+            },
+            "5": {
+              "f1": 0.962963,
+              "precision": 1.0,
+              "recall": 0.928571,
+              "support": 56
+            }
+          },
+          "severe_error_rate": 0.013841,
+          "tier_accuracy": 0.979239,
+          "tier_overroute_rate": 0.017301,
+          "tier_success_proxy": 0.99654,
+          "tier_underroute_rate": 0.00346,
+          "under_level_rate": 0.020761,
+          "weighted_f1": 0.961908,
+          "within_one_level_rate": 0.986159
+        },
+        "Chemistry": {
+          "accuracy": 0.896667,
+          "average_relative_cost_index": 2.87,
+          "confusion_matrix": [
+            [
+              41,
+              4,
+              0,
+              0,
+              0
+            ],
+            [
+              1,
+              60,
+              0,
+              3,
+              0
+            ],
+            [
+              1,
+              6,
+              60,
+              2,
+              1
+            ],
+            [
+              0,
+              1,
+              10,
+              53,
+              0
+            ],
+            [
+              0,
+              2,
+              0,
+              0,
+              55
+            ]
+          ],
+          "count": 300,
+          "macro_f1": 0.901435,
+          "mean_absolute_error": 0.136667,
+          "over_level_rate": 0.033333,
+          "per_class": {
+            "1": {
+              "f1": 0.931818,
+              "precision": 0.953488,
+              "recall": 0.911111,
+              "support": 45
+            },
+            "2": {
+              "f1": 0.875912,
+              "precision": 0.821918,
+              "recall": 0.9375,
+              "support": 64
+            },
+            "3": {
+              "f1": 0.857143,
+              "precision": 0.857143,
+              "recall": 0.857143,
+              "support": 70
+            },
+            "4": {
+              "f1": 0.868852,
+              "precision": 0.913793,
+              "recall": 0.828125,
+              "support": 64
+            },
+            "5": {
+              "f1": 0.973451,
+              "precision": 0.982143,
+              "recall": 0.964912,
+              "support": 57
+            }
+          },
+          "severe_error_rate": 0.026667,
+          "tier_accuracy": 0.913333,
+          "tier_overroute_rate": 0.02,
+          "tier_success_proxy": 0.933333,
+          "tier_underroute_rate": 0.066667,
+          "under_level_rate": 0.07,
+          "weighted_f1": 0.896945,
+          "within_one_level_rate": 0.973333
+        },
+        "Code Explanation": {
+          "accuracy": 0.884462,
+          "average_relative_cost_index": 2.878486,
+          "confusion_matrix": [
+            [
+              32,
+              2,
+              0,
+              1,
+              0
+            ],
+            [
+              3,
+              45,
+              6,
+              0,
+              0
+            ],
+            [
+              1,
+              2,
+              61,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              7,
+              38,
+              0
+            ],
+            [
+              0,
+              0,
+              3,
+              4,
+              46
+            ]
+          ],
+          "count": 251,
+          "macro_f1": 0.886674,
+          "mean_absolute_error": 0.139442,
+          "over_level_rate": 0.035857,
+          "per_class": {
+            "1": {
+              "f1": 0.901408,
+              "precision": 0.888889,
+              "recall": 0.914286,
+              "support": 35
+            },
+            "2": {
+              "f1": 0.873786,
+              "precision": 0.918367,
+              "recall": 0.833333,
+              "support": 54
+            },
+            "3": {
+              "f1": 0.865248,
+              "precision": 0.792208,
+              "recall": 0.953125,
+              "support": 64
+            },
+            "4": {
+              "f1": 0.863636,
+              "precision": 0.883721,
+              "recall": 0.844444,
+              "support": 45
+            },
+            "5": {
+              "f1": 0.929293,
+              "precision": 1.0,
+              "recall": 0.867925,
+              "support": 53
+            }
+          },
+          "severe_error_rate": 0.01992,
+          "tier_accuracy": 0.920319,
+          "tier_overroute_rate": 0.027888,
+          "tier_success_proxy": 0.948207,
+          "tier_underroute_rate": 0.051793,
+          "under_level_rate": 0.079681,
+          "weighted_f1": 0.885362,
+          "within_one_level_rate": 0.98008
+        },
+        "Code Generation": {
+          "accuracy": 0.872727,
+          "average_relative_cost_index": 3.281818,
+          "confusion_matrix": [
+            [
+              32,
+              4,
+              0,
+              0,
+              0
+            ],
+            [
+              3,
+              26,
+              5,
+              2,
+              1
+            ],
+            [
+              0,
+              2,
+              54,
+              0,
+              0
+            ],
+            [
+              1,
+              4,
+              6,
+              60,
+              0
+            ],
+            [
+              0,
+              3,
+              4,
+              0,
+              68
+            ]
+          ],
+          "count": 275,
+          "macro_f1": 0.85676,
+          "mean_absolute_error": 0.2,
+          "over_level_rate": 0.043636,
+          "per_class": {
+            "1": {
+              "f1": 0.888889,
+              "precision": 0.888889,
+              "recall": 0.888889,
+              "support": 36
+            },
+            "2": {
+              "f1": 0.684211,
+              "precision": 0.666667,
+              "recall": 0.702703,
+              "support": 37
+            },
+            "3": {
+              "f1": 0.864,
+              "precision": 0.782609,
+              "recall": 0.964286,
+              "support": 56
+            },
+            "4": {
+              "f1": 0.902256,
+              "precision": 0.967742,
+              "recall": 0.84507,
+              "support": 71
+            },
+            "5": {
+              "f1": 0.944444,
+              "precision": 0.985507,
+              "recall": 0.906667,
+              "support": 75
+            }
+          },
+          "severe_error_rate": 0.054545,
+          "tier_accuracy": 0.898182,
+          "tier_overroute_rate": 0.029091,
+          "tier_success_proxy": 0.927273,
+          "tier_underroute_rate": 0.072727,
+          "under_level_rate": 0.083636,
+          "weighted_f1": 0.874885,
+          "within_one_level_rate": 0.945455
+        },
+        "Computer Science": {
+          "accuracy": 0.909699,
+          "average_relative_cost_index": 3.023411,
+          "confusion_matrix": [
+            [
+              48,
+              4,
+              1,
+              0,
+              1
+            ],
+            [
+              3,
+              43,
+              4,
+              0,
+              0
+            ],
+            [
+              0,
+              2,
+              63,
+              0,
+              0
+            ],
+            [
+              0,
+              3,
+              2,
+              54,
+              5
+            ],
+            [
+              0,
+              1,
+              0,
+              1,
+              64
+            ]
+          ],
+          "count": 299,
+          "macro_f1": 0.906262,
+          "mean_absolute_error": 0.120401,
+          "over_level_rate": 0.050167,
+          "per_class": {
+            "1": {
+              "f1": 0.914286,
+              "precision": 0.941176,
+              "recall": 0.888889,
+              "support": 54
+            },
+            "2": {
+              "f1": 0.834951,
+              "precision": 0.811321,
+              "recall": 0.86,
+              "support": 50
+            },
+            "3": {
+              "f1": 0.933333,
+              "precision": 0.9,
+              "recall": 0.969231,
+              "support": 65
+            },
+            "4": {
+              "f1": 0.907563,
+              "precision": 0.981818,
+              "recall": 0.84375,
+              "support": 64
+            },
+            "5": {
+              "f1": 0.941176,
+              "precision": 0.914286,
+              "recall": 0.969697,
+              "support": 66
+            }
+          },
+          "severe_error_rate": 0.020067,
+          "tier_accuracy": 0.953177,
+          "tier_overroute_rate": 0.020067,
+          "tier_success_proxy": 0.973244,
+          "tier_underroute_rate": 0.026756,
+          "under_level_rate": 0.040134,
+          "weighted_f1": 0.909657,
+          "within_one_level_rate": 0.979933
+        },
+        "Creative Writing": {
+          "accuracy": 0.969072,
+          "average_relative_cost_index": 3.104811,
+          "confusion_matrix": [
+            [
+              33,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              61,
+              0,
+              0,
+              2
+            ],
+            [
+              0,
+              0,
+              65,
+              1,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              61,
+              2
+            ],
+            [
+              0,
+              2,
+              2,
+              0,
+              62
+            ]
+          ],
+          "count": 291,
+          "macro_f1": 0.972218,
+          "mean_absolute_error": 0.065292,
+          "over_level_rate": 0.017182,
+          "per_class": {
+            "1": {
+              "f1": 1.0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "support": 33
+            },
+            "2": {
+              "f1": 0.968254,
+              "precision": 0.968254,
+              "recall": 0.968254,
+              "support": 63
+            },
+            "3": {
+              "f1": 0.977444,
+              "precision": 0.970149,
+              "recall": 0.984848,
+              "support": 66
+            },
+            "4": {
+              "f1": 0.976,
+              "precision": 0.983871,
+              "recall": 0.968254,
+              "support": 63
+            },
+            "5": {
+              "f1": 0.939394,
+              "precision": 0.939394,
+              "recall": 0.939394,
+              "support": 66
+            }
+          },
+          "severe_error_rate": 0.020619,
+          "tier_accuracy": 0.975945,
+          "tier_overroute_rate": 0.010309,
+          "tier_success_proxy": 0.986254,
+          "tier_underroute_rate": 0.013746,
+          "under_level_rate": 0.013746,
+          "weighted_f1": 0.96907,
+          "within_one_level_rate": 0.979381
+        },
+        "Debugging Assistance": {
+          "accuracy": 0.901887,
+          "average_relative_cost_index": 3.090566,
+          "confusion_matrix": [
+            [
+              17,
+              3,
+              3,
+              0,
+              0
+            ],
+            [
+              0,
+              56,
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              2,
+              60,
+              0,
+              0
+            ],
+            [
+              1,
+              0,
+              7,
+              55,
+              0
+            ],
+            [
+              0,
+              0,
+              6,
+              4,
+              51
+            ]
+          ],
+          "count": 265,
+          "macro_f1": 0.89369,
+          "mean_absolute_error": 0.139623,
+          "over_level_rate": 0.022642,
+          "per_class": {
+            "1": {
+              "f1": 0.829268,
+              "precision": 0.944444,
+              "recall": 0.73913,
+              "support": 23
+            },
+            "2": {
+              "f1": 0.957265,
+              "precision": 0.918033,
+              "recall": 1.0,
+              "support": 56
+            },
+            "3": {
+              "f1": 0.869565,
+              "precision": 0.789474,
+              "recall": 0.967742,
+              "support": 62
+            },
+            "4": {
+              "f1": 0.901639,
+              "precision": 0.932203,
+              "recall": 0.873016,
+              "support": 63
+            },
+            "5": {
+              "f1": 0.910714,
+              "precision": 1.0,
+              "recall": 0.836066,
+              "support": 61
+            }
+          },
+          "severe_error_rate": 0.037736,
+          "tier_accuracy": 0.928302,
+          "tier_overroute_rate": 0.011321,
+          "tier_success_proxy": 0.939623,
+          "tier_underroute_rate": 0.060377,
+          "under_level_rate": 0.075472,
+          "weighted_f1": 0.901698,
+          "within_one_level_rate": 0.962264
+        },
+        "Economics": {
+          "accuracy": 0.937107,
+          "average_relative_cost_index": 3.215409,
+          "confusion_matrix": [
+            [
+              51,
+              3,
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              44,
+              2,
+              4,
+              0
+            ],
+            [
+              0,
+              7,
+              57,
+              3,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              73,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              73
+            ]
+          ],
+          "count": 318,
+          "macro_f1": 0.932246,
+          "mean_absolute_error": 0.081761,
+          "over_level_rate": 0.040881,
+          "per_class": {
+            "1": {
+              "f1": 0.962264,
+              "precision": 1.0,
+              "recall": 0.927273,
+              "support": 55
+            },
+            "2": {
+              "f1": 0.846154,
+              "precision": 0.814815,
+              "recall": 0.88,
+              "support": 50
+            },
+            "3": {
+              "f1": 0.904762,
+              "precision": 0.966102,
+              "recall": 0.850746,
+              "support": 67
+            },
+            "4": {
+              "f1": 0.948052,
+              "precision": 0.901235,
+              "recall": 1.0,
+              "support": 73
+            },
+            "5": {
+              "f1": 1.0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "support": 73
+            }
+          },
+          "severe_error_rate": 0.015723,
+          "tier_accuracy": 0.946541,
+          "tier_overroute_rate": 0.031447,
+          "tier_success_proxy": 0.977987,
+          "tier_underroute_rate": 0.022013,
+          "under_level_rate": 0.022013,
+          "weighted_f1": 0.937293,
+          "within_one_level_rate": 0.984277
+        },
+        "Engineering": {
+          "accuracy": 0.932331,
+          "average_relative_cost_index": 3.109023,
+          "confusion_matrix": [
+            [
+              30,
+              1,
+              0,
+              0,
+              0
+            ],
+            [
+              1,
+              50,
+              2,
+              1,
+              0
+            ],
+            [
+              0,
+              0,
+              58,
+              1,
+              0
+            ],
+            [
+              0,
+              0,
+              8,
+              61,
+              0
+            ],
+            [
+              0,
+              0,
+              2,
+              2,
+              49
+            ]
+          ],
+          "count": 266,
+          "macro_f1": 0.938116,
+          "mean_absolute_error": 0.078947,
+          "over_level_rate": 0.018797,
+          "per_class": {
+            "1": {
+              "f1": 0.967742,
+              "precision": 0.967742,
+              "recall": 0.967742,
+              "support": 31
+            },
+            "2": {
+              "f1": 0.952381,
+              "precision": 0.980392,
+              "recall": 0.925926,
+              "support": 54
+            },
+            "3": {
+              "f1": 0.899225,
+              "precision": 0.828571,
+              "recall": 0.983051,
+              "support": 59
+            },
+            "4": {
+              "f1": 0.910448,
+              "precision": 0.938462,
+              "recall": 0.884058,
+              "support": 69
+            },
+            "5": {
+              "f1": 0.960784,
+              "precision": 1.0,
+              "recall": 0.924528,
+              "support": 53
+            }
+          },
+          "severe_error_rate": 0.011278,
+          "tier_accuracy": 0.947368,
+          "tier_overroute_rate": 0.015038,
+          "tier_success_proxy": 0.962406,
+          "tier_underroute_rate": 0.037594,
+          "under_level_rate": 0.048872,
+          "weighted_f1": 0.933178,
+          "within_one_level_rate": 0.988722
+        },
+        "Facts": {
+          "accuracy": 0.922581,
+          "average_relative_cost_index": 3.185484,
+          "confusion_matrix": [
+            [
+              44,
+              3,
+              0,
+              0,
+              0
+            ],
+            [
+              5,
+              43,
+              2,
+              5,
+              0
+            ],
+            [
+              1,
+              2,
+              61,
+              1,
+              0
+            ],
+            [
+              0,
+              2,
+              2,
+              79,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              1,
+              59
+            ]
+          ],
+          "count": 310,
+          "macro_f1": 0.918247,
+          "mean_absolute_error": 0.103226,
+          "over_level_rate": 0.035484,
+          "per_class": {
+            "1": {
+              "f1": 0.907216,
+              "precision": 0.88,
+              "recall": 0.93617,
+              "support": 47
+            },
+            "2": {
+              "f1": 0.819048,
+              "precision": 0.86,
+              "recall": 0.781818,
+              "support": 55
+            },
+            "3": {
+              "f1": 0.938462,
+              "precision": 0.938462,
+              "recall": 0.938462,
+              "support": 65
+            },
+            "4": {
+              "f1": 0.934911,
+              "precision": 0.918605,
+              "recall": 0.951807,
+              "support": 83
+            },
+            "5": {
+              "f1": 0.991597,
+              "precision": 1.0,
+              "recall": 0.983333,
+              "support": 60
+            }
+          },
+          "severe_error_rate": 0.025806,
+          "tier_accuracy": 0.951613,
+          "tier_overroute_rate": 0.025806,
+          "tier_success_proxy": 0.977419,
+          "tier_underroute_rate": 0.022581,
+          "under_level_rate": 0.041935,
+          "weighted_f1": 0.921872,
+          "within_one_level_rate": 0.974194
+        },
+        "General Knowledge": {
+          "accuracy": 0.866667,
+          "average_relative_cost_index": 3.06,
+          "confusion_matrix": [
+            [
+              43,
+              0,
+              0,
+              2,
+              0
+            ],
+            [
+              6,
+              47,
+              5,
+              0,
+              0
+            ],
+            [
+              3,
+              12,
+              45,
+              4,
+              3
+            ],
+            [
+              0,
+              2,
+              0,
+              59,
+              1
+            ],
+            [
+              0,
+              0,
+              2,
+              0,
+              66
+            ]
+          ],
+          "count": 300,
+          "macro_f1": 0.863694,
+          "mean_absolute_error": 0.18,
+          "over_level_rate": 0.05,
+          "per_class": {
+            "1": {
+              "f1": 0.886598,
+              "precision": 0.826923,
+              "recall": 0.955556,
+              "support": 45
+            },
+            "2": {
+              "f1": 0.789916,
+              "precision": 0.770492,
+              "recall": 0.810345,
+              "support": 58
+            },
+            "3": {
+              "f1": 0.756303,
+              "precision": 0.865385,
+              "recall": 0.671642,
+              "support": 67
+            },
+            "4": {
+              "f1": 0.929134,
+              "precision": 0.907692,
+              "recall": 0.951613,
+              "support": 62
+            },
+            "5": {
+              "f1": 0.956522,
+              "precision": 0.942857,
+              "recall": 0.970588,
+              "support": 68
+            }
+          },
+          "severe_error_rate": 0.04,
+          "tier_accuracy": 0.89,
+          "tier_overroute_rate": 0.046667,
+          "tier_success_proxy": 0.936667,
+          "tier_underroute_rate": 0.063333,
+          "under_level_rate": 0.083333,
+          "weighted_f1": 0.863447,
+          "within_one_level_rate": 0.96
+        },
+        "Geography": {
+          "accuracy": 0.927171,
+          "average_relative_cost_index": 2.854342,
+          "confusion_matrix": [
+            [
+              65,
+              1,
+              0,
+              0,
+              0
+            ],
+            [
+              3,
+              80,
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              8,
+              41,
+              3,
+              0
+            ],
+            [
+              0,
+              4,
+              0,
+              76,
+              0
+            ],
+            [
+              1,
+              2,
+              3,
+              1,
+              69
+            ]
+          ],
+          "count": 357,
+          "macro_f1": 0.923546,
+          "mean_absolute_error": 0.112045,
+          "over_level_rate": 0.011204,
+          "per_class": {
+            "1": {
+              "f1": 0.962963,
+              "precision": 0.942029,
+              "recall": 0.984848,
+              "support": 66
+            },
+            "2": {
+              "f1": 0.898876,
+              "precision": 0.842105,
+              "recall": 0.963855,
+              "support": 83
+            },
+            "3": {
+              "f1": 0.854167,
+              "precision": 0.931818,
+              "recall": 0.788462,
+              "support": 52
+            },
+            "4": {
+              "f1": 0.95,
+              "precision": 0.95,
+              "recall": 0.95,
+              "support": 80
+            },
+            "5": {
+              "f1": 0.951724,
+              "precision": 1.0,
+              "recall": 0.907895,
+              "support": 76
+            }
+          },
+          "severe_error_rate": 0.028011,
+          "tier_accuracy": 0.941176,
+          "tier_overroute_rate": 0.008403,
+          "tier_success_proxy": 0.94958,
+          "tier_underroute_rate": 0.05042,
+          "under_level_rate": 0.061625,
+          "weighted_f1": 0.926919,
+          "within_one_level_rate": 0.971989
+        },
+        "Health": {
+          "accuracy": 0.928571,
+          "average_relative_cost_index": 2.972857,
+          "confusion_matrix": [
+            [
+              33,
+              3,
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              77,
+              2,
+              4,
+              0
+            ],
+            [
+              0,
+              6,
+              84,
+              2,
+              0
+            ],
+            [
+              0,
+              3,
+              1,
+              77,
+              0
+            ],
+            [
+              0,
+              1,
+              0,
+              2,
+              54
+            ]
+          ],
+          "count": 350,
+          "macro_f1": 0.933341,
+          "mean_absolute_error": 0.102857,
+          "over_level_rate": 0.034286,
+          "per_class": {
+            "1": {
+              "f1": 0.942857,
+              "precision": 1.0,
+              "recall": 0.891892,
+              "support": 37
+            },
+            "2": {
+              "f1": 0.890173,
+              "precision": 0.855556,
+              "recall": 0.927711,
+              "support": 83
+            },
+            "3": {
+              "f1": 0.938547,
+              "precision": 0.965517,
+              "recall": 0.913043,
+              "support": 92
+            },
+            "4": {
+              "f1": 0.922156,
+              "precision": 0.895349,
+              "recall": 0.950617,
+              "support": 81
+            },
+            "5": {
+              "f1": 0.972973,
+              "precision": 1.0,
+              "recall": 0.947368,
+              "support": 57
+            }
+          },
+          "severe_error_rate": 0.025714,
+          "tier_accuracy": 0.942857,
+          "tier_overroute_rate": 0.025714,
+          "tier_success_proxy": 0.968571,
+          "tier_underroute_rate": 0.031429,
+          "under_level_rate": 0.037143,
+          "weighted_f1": 0.929344,
+          "within_one_level_rate": 0.974286
+        },
+        "History": {
+          "accuracy": 0.901695,
+          "average_relative_cost_index": 3.242373,
+          "confusion_matrix": [
+            [
+              43,
+              1,
+              0,
+              0,
+              0
+            ],
+            [
+              1,
+              49,
+              0,
+              4,
+              0
+            ],
+            [
+              0,
+              2,
+              48,
+              6,
+              0
+            ],
+            [
+              0,
+              1,
+              0,
+              75,
+              0
+            ],
+            [
+              0,
+              2,
+              1,
+              11,
+              51
+            ]
+          ],
+          "count": 295,
+          "macro_f1": 0.908409,
+          "mean_absolute_error": 0.132203,
+          "over_level_rate": 0.037288,
+          "per_class": {
+            "1": {
+              "f1": 0.977273,
+              "precision": 0.977273,
+              "recall": 0.977273,
+              "support": 44
+            },
+            "2": {
+              "f1": 0.899083,
+              "precision": 0.890909,
+              "recall": 0.907407,
+              "support": 54
+            },
+            "3": {
+              "f1": 0.914286,
+              "precision": 0.979592,
+              "recall": 0.857143,
+              "support": 56
+            },
+            "4": {
+              "f1": 0.872093,
+              "precision": 0.78125,
+              "recall": 0.986842,
+              "support": 76
+            },
+            "5": {
+              "f1": 0.87931,
+              "precision": 1.0,
+              "recall": 0.784615,
+              "support": 65
+            }
+          },
+          "severe_error_rate": 0.027119,
+          "tier_accuracy": 0.945763,
+          "tier_overroute_rate": 0.033898,
+          "tier_success_proxy": 0.979661,
+          "tier_underroute_rate": 0.020339,
+          "under_level_rate": 0.061017,
+          "weighted_f1": 0.902321,
+          "within_one_level_rate": 0.972881
+        },
+        "Language Translation": {
+          "accuracy": 0.908046,
+          "average_relative_cost_index": 3.408046,
+          "confusion_matrix": [
+            [
+              42,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              1,
+              27,
+              1,
+              4,
+              0
+            ],
+            [
+              1,
+              0,
+              44,
+              3,
+              1
+            ],
+            [
+              0,
+              1,
+              4,
+              68,
+              5
+            ],
+            [
+              0,
+              0,
+              2,
+              1,
+              56
+            ]
+          ],
+          "count": 261,
+          "macro_f1": 0.910145,
+          "mean_absolute_error": 0.126437,
+          "over_level_rate": 0.05364,
+          "per_class": {
+            "1": {
+              "f1": 0.976744,
+              "precision": 0.954545,
+              "recall": 1.0,
+              "support": 42
+            },
+            "2": {
+              "f1": 0.885246,
+              "precision": 0.964286,
+              "recall": 0.818182,
+              "support": 33
+            },
+            "3": {
+              "f1": 0.88,
+              "precision": 0.862745,
+              "recall": 0.897959,
+              "support": 49
+            },
+            "4": {
+              "f1": 0.883117,
+              "precision": 0.894737,
+              "recall": 0.871795,
+              "support": 78
+            },
+            "5": {
+              "f1": 0.92562,
+              "precision": 0.903226,
+              "recall": 0.949153,
+              "support": 59
+            }
+          },
+          "severe_error_rate": 0.034483,
+          "tier_accuracy": 0.934866,
+          "tier_overroute_rate": 0.034483,
+          "tier_success_proxy": 0.969349,
+          "tier_underroute_rate": 0.030651,
+          "under_level_rate": 0.038314,
+          "weighted_f1": 0.907475,
+          "within_one_level_rate": 0.965517
+        },
+        "Law": {
+          "accuracy": 0.915858,
+          "average_relative_cost_index": 3.092233,
+          "confusion_matrix": [
+            [
+              53,
+              1,
+              1,
+              0,
+              1
+            ],
+            [
+              1,
+              44,
+              6,
+              1,
+              1
+            ],
+            [
+              0,
+              0,
+              59,
+              2,
+              1
+            ],
+            [
+              0,
+              4,
+              5,
+              48,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              2,
+              79
+            ]
+          ],
+          "count": 309,
+          "macro_f1": 0.91113,
+          "mean_absolute_error": 0.122977,
+          "over_level_rate": 0.045307,
+          "per_class": {
+            "1": {
+              "f1": 0.963636,
+              "precision": 0.981481,
+              "recall": 0.946429,
+              "support": 56
+            },
+            "2": {
+              "f1": 0.862745,
+              "precision": 0.897959,
+              "recall": 0.830189,
+              "support": 53
+            },
+            "3": {
+              "f1": 0.887218,
+              "precision": 0.830986,
+              "recall": 0.951613,
+              "support": 62
+            },
+            "4": {
+              "f1": 0.872727,
+              "precision": 0.90566,
+              "recall": 0.842105,
+              "support": 57
+            },
+            "5": {
+              "f1": 0.969325,
+              "precision": 0.963415,
+              "recall": 0.975309,
+              "support": 81
+            }
+          },
+          "severe_error_rate": 0.029126,
+          "tier_accuracy": 0.928803,
+          "tier_overroute_rate": 0.042071,
+          "tier_success_proxy": 0.970874,
+          "tier_underroute_rate": 0.029126,
+          "under_level_rate": 0.038835,
+          "weighted_f1": 0.91572,
+          "within_one_level_rate": 0.970874
+        },
+        "Logic": {
+          "accuracy": 0.867159,
+          "average_relative_cost_index": 2.905904,
+          "confusion_matrix": [
+            [
+              33,
+              12,
+              3,
+              2,
+              2
+            ],
+            [
+              0,
+              45,
+              5,
+              0,
+              0
+            ],
+            [
+              0,
+              2,
+              62,
+              0,
+              0
+            ],
+            [
+              1,
+              2,
+              2,
+              44,
+              1
+            ],
+            [
+              0,
+              0,
+              3,
+              1,
+              51
+            ]
+          ],
+          "count": 271,
+          "macro_f1": 0.862667,
+          "mean_absolute_error": 0.206642,
+          "over_level_rate": 0.092251,
+          "per_class": {
+            "1": {
+              "f1": 0.767442,
+              "precision": 0.970588,
+              "recall": 0.634615,
+              "support": 52
+            },
+            "2": {
+              "f1": 0.810811,
+              "precision": 0.737705,
+              "recall": 0.9,
+              "support": 50
+            },
+            "3": {
+              "f1": 0.892086,
+              "precision": 0.826667,
+              "recall": 0.96875,
+              "support": 64
+            },
+            "4": {
+              "f1": 0.907216,
+              "precision": 0.93617,
+              "recall": 0.88,
+              "support": 50
+            },
+            "5": {
+              "f1": 0.93578,
+              "precision": 0.944444,
+              "recall": 0.927273,
+              "support": 55
+            }
+          },
+          "severe_error_rate": 0.04797,
+          "tier_accuracy": 0.918819,
+          "tier_overroute_rate": 0.04428,
+          "tier_success_proxy": 0.9631,
+          "tier_underroute_rate": 0.0369,
+          "under_level_rate": 0.04059,
+          "weighted_f1": 0.864833,
+          "within_one_level_rate": 0.95203
+        },
+        "Mathematics": {
+          "accuracy": 0.887681,
+          "average_relative_cost_index": 2.797101,
+          "confusion_matrix": [
+            [
+              41,
+              3,
+              0,
+              3,
+              0
+            ],
+            [
+              1,
+              52,
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              13,
+              56,
+              0,
+              0
+            ],
+            [
+              0,
+              2,
+              7,
+              43,
+              0
+            ],
+            [
+              0,
+              0,
+              1,
+              0,
+              53
+            ]
+          ],
+          "count": 276,
+          "macro_f1": 0.892301,
+          "mean_absolute_error": 0.148551,
+          "over_level_rate": 0.025362,
+          "per_class": {
+            "1": {
+              "f1": 0.921348,
+              "precision": 0.97619,
+              "recall": 0.87234,
+              "support": 47
+            },
+            "2": {
+              "f1": 0.83871,
+              "precision": 0.742857,
+              "recall": 0.962963,
+              "support": 54
+            },
+            "3": {
+              "f1": 0.842105,
+              "precision": 0.875,
+              "recall": 0.811594,
+              "support": 69
+            },
+            "4": {
+              "f1": 0.868687,
+              "precision": 0.914894,
+              "recall": 0.826923,
+              "support": 52
+            },
+            "5": {
+              "f1": 0.990654,
+              "precision": 1.0,
+              "recall": 0.981481,
+              "support": 54
+            }
+          },
+          "severe_error_rate": 0.025362,
+          "tier_accuracy": 0.902174,
+          "tier_overroute_rate": 0.014493,
+          "tier_success_proxy": 0.916667,
+          "tier_underroute_rate": 0.083333,
+          "under_level_rate": 0.086957,
+          "weighted_f1": 0.889007,
+          "within_one_level_rate": 0.974638
+        },
+        "Miscellaneous": {
+          "accuracy": 0.917219,
+          "average_relative_cost_index": 3.180464,
+          "confusion_matrix": [
+            [
+              41,
+              0,
+              0,
+              1,
+              0
+            ],
+            [
+              1,
+              44,
+              2,
+              0,
+              0
+            ],
+            [
+              2,
+              0,
+              77,
+              8,
+              3
+            ],
+            [
+              0,
+              0,
+              0,
+              73,
+              8
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              42
+            ]
+          ],
+          "count": 302,
+          "macro_f1": 0.922336,
+          "mean_absolute_error": 0.10596,
+          "over_level_rate": 0.072848,
+          "per_class": {
+            "1": {
+              "f1": 0.953488,
+              "precision": 0.931818,
+              "recall": 0.97619,
+              "support": 42
+            },
+            "2": {
+              "f1": 0.967033,
+              "precision": 1.0,
+              "recall": 0.93617,
+              "support": 47
+            },
+            "3": {
+              "f1": 0.911243,
+              "precision": 0.974684,
+              "recall": 0.855556,
+              "support": 90
+            },
+            "4": {
+              "f1": 0.895706,
+              "precision": 0.890244,
+              "recall": 0.901235,
+              "support": 81
+            },
+            "5": {
+              "f1": 0.884211,
+              "precision": 0.792453,
+              "recall": 1.0,
+              "support": 42
+            }
+          },
+          "severe_error_rate": 0.019868,
+          "tier_accuracy": 0.94702,
+          "tier_overroute_rate": 0.046358,
+          "tier_success_proxy": 0.993377,
+          "tier_underroute_rate": 0.006623,
+          "under_level_rate": 0.009934,
+          "weighted_f1": 0.917874,
+          "within_one_level_rate": 0.980132
+        },
+        "Philosophy": {
+          "accuracy": 0.863014,
+          "average_relative_cost_index": 3.232877,
+          "confusion_matrix": [
+            [
+              42,
+              0,
+              0,
+              1,
+              1
+            ],
+            [
+              11,
+              34,
+              1,
+              0,
+              1
+            ],
+            [
+              7,
+              0,
+              53,
+              5,
+              5
+            ],
+            [
+              0,
+              0,
+              2,
+              54,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              6,
+              69
+            ]
+          ],
+          "count": 292,
+          "macro_f1": 0.857524,
+          "mean_absolute_error": 0.202055,
+          "over_level_rate": 0.047945,
+          "per_class": {
+            "1": {
+              "f1": 0.807692,
+              "precision": 0.7,
+              "recall": 0.954545,
+              "support": 44
+            },
+            "2": {
+              "f1": 0.839506,
+              "precision": 1.0,
+              "recall": 0.723404,
+              "support": 47
+            },
+            "3": {
+              "f1": 0.84127,
+              "precision": 0.946429,
+              "recall": 0.757143,
+              "support": 70
+            },
+            "4": {
+              "f1": 0.885246,
+              "precision": 0.818182,
+              "recall": 0.964286,
+              "support": 56
+            },
+            "5": {
+              "f1": 0.913907,
+              "precision": 0.907895,
+              "recall": 0.92,
+              "support": 75
+            }
+          },
+          "severe_error_rate": 0.05137,
+          "tier_accuracy": 0.921233,
+          "tier_overroute_rate": 0.047945,
+          "tier_success_proxy": 0.969178,
+          "tier_underroute_rate": 0.030822,
+          "under_level_rate": 0.089041,
+          "weighted_f1": 0.863017,
+          "within_one_level_rate": 0.94863
+        },
+        "Physics": {
+          "accuracy": 0.88255,
+          "average_relative_cost_index": 3.181208,
+          "confusion_matrix": [
+            [
+              43,
+              0,
+              0,
+              2,
+              0
+            ],
+            [
+              2,
+              47,
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              4,
+              50,
+              2,
+              2
+            ],
+            [
+              0,
+              3,
+              2,
+              54,
+              9
+            ],
+            [
+              2,
+              2,
+              0,
+              4,
+              69
+            ]
+          ],
+          "count": 298,
+          "macro_f1": 0.886815,
+          "mean_absolute_error": 0.184564,
+          "over_level_rate": 0.053691,
+          "per_class": {
+            "1": {
+              "f1": 0.934783,
+              "precision": 0.914894,
+              "recall": 0.955556,
+              "support": 45
+            },
+            "2": {
+              "f1": 0.886792,
+              "precision": 0.839286,
+              "recall": 0.94,
+              "support": 50
+            },
+            "3": {
+              "f1": 0.909091,
+              "precision": 0.961538,
+              "recall": 0.862069,
+              "support": 58
+            },
+            "4": {
+              "f1": 0.824427,
+              "precision": 0.857143,
+              "recall": 0.794118,
+              "support": 68
+            },
+            "5": {
+              "f1": 0.878981,
+              "precision": 0.8625,
+              "recall": 0.896104,
+              "support": 77
+            }
+          },
+          "severe_error_rate": 0.040268,
+          "tier_accuracy": 0.932886,
+          "tier_overroute_rate": 0.02349,
+          "tier_success_proxy": 0.956376,
+          "tier_underroute_rate": 0.043624,
+          "under_level_rate": 0.063758,
+          "weighted_f1": 0.88213,
+          "within_one_level_rate": 0.959732
+        },
+        "Sociology": {
+          "accuracy": 0.928358,
+          "average_relative_cost_index": 3.285075,
+          "confusion_matrix": [
+            [
+              55,
+              0,
+              0,
+              3,
+              0
+            ],
+            [
+              4,
+              44,
+              1,
+              5,
+              2
+            ],
+            [
+              0,
+              0,
+              63,
+              4,
+              4
+            ],
+            [
+              0,
+              0,
+              0,
+              88,
+              0
+            ],
+            [
+              0,
+              0,
+              1,
+              0,
+              61
+            ]
+          ],
+          "count": 335,
+          "macro_f1": 0.92571,
+          "mean_absolute_error": 0.131343,
+          "over_level_rate": 0.056716,
+          "per_class": {
+            "1": {
+              "f1": 0.940171,
+              "precision": 0.932203,
+              "recall": 0.948276,
+              "support": 58
+            },
+            "2": {
+              "f1": 0.88,
+              "precision": 1.0,
+              "recall": 0.785714,
+              "support": 56
+            },
+            "3": {
+              "f1": 0.926471,
+              "precision": 0.969231,
+              "recall": 0.887324,
+              "support": 71
+            },
+            "4": {
+              "f1": 0.93617,
+              "precision": 0.88,
+              "recall": 1.0,
+              "support": 88
+            },
+            "5": {
+              "f1": 0.945736,
+              "precision": 0.910448,
+              "recall": 0.983871,
+              "support": 62
+            }
+          },
+          "severe_error_rate": 0.044776,
+          "tier_accuracy": 0.940299,
+          "tier_overroute_rate": 0.056716,
+          "tier_success_proxy": 0.997015,
+          "tier_underroute_rate": 0.002985,
+          "under_level_rate": 0.014925,
+          "weighted_f1": 0.927188,
+          "within_one_level_rate": 0.955224
+        },
+        "Summarization": {
+          "accuracy": 0.86859,
+          "average_relative_cost_index": 3.052885,
+          "confusion_matrix": [
+            [
+              51,
+              0,
+              1,
+              2,
+              0
+            ],
+            [
+              9,
+              35,
+              0,
+              1,
+              1
+            ],
+            [
+              4,
+              4,
+              70,
+              7,
+              5
+            ],
+            [
+              1,
+              0,
+              4,
+              64,
+              1
+            ],
+            [
+              1,
+              0,
+              0,
+              0,
+              51
+            ]
+          ],
+          "count": 312,
+          "macro_f1": 0.867635,
+          "mean_absolute_error": 0.201923,
+          "over_level_rate": 0.057692,
+          "per_class": {
+            "1": {
+              "f1": 0.85,
+              "precision": 0.772727,
+              "recall": 0.944444,
+              "support": 54
+            },
+            "2": {
+              "f1": 0.823529,
+              "precision": 0.897436,
+              "recall": 0.76087,
+              "support": 46
+            },
+            "3": {
+              "f1": 0.848485,
+              "precision": 0.933333,
+              "recall": 0.777778,
+              "support": 90
+            },
+            "4": {
+              "f1": 0.888889,
+              "precision": 0.864865,
+              "recall": 0.914286,
+              "support": 70
+            },
+            "5": {
+              "f1": 0.927273,
+              "precision": 0.87931,
+              "recall": 0.980769,
+              "support": 52
+            }
+          },
+          "severe_error_rate": 0.051282,
+          "tier_accuracy": 0.900641,
+          "tier_overroute_rate": 0.054487,
+          "tier_success_proxy": 0.955128,
+          "tier_underroute_rate": 0.044872,
+          "under_level_rate": 0.073718,
+          "weighted_f1": 0.867264,
+          "within_one_level_rate": 0.948718
+        },
+        "Syntax Check": {
+          "accuracy": 0.857708,
+          "average_relative_cost_index": 2.62253,
+          "confusion_matrix": [
+            [
+              41,
+              4,
+              0,
+              0,
+              0
+            ],
+            [
+              3,
+              55,
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              3,
+              49,
+              1,
+              2
+            ],
+            [
+              0,
+              0,
+              14,
+              36,
+              0
+            ],
+            [
+              0,
+              0,
+              7,
+              1,
+              36
+            ]
+          ],
+          "count": 253,
+          "macro_f1": 0.86089,
+          "mean_absolute_error": 0.177866,
+          "over_level_rate": 0.031621,
+          "per_class": {
+            "1": {
+              "f1": 0.921348,
+              "precision": 0.931818,
+              "recall": 0.911111,
+              "support": 45
+            },
+            "2": {
+              "f1": 0.909091,
+              "precision": 0.887097,
+              "recall": 0.932203,
+              "support": 59
+            },
+            "3": {
+              "f1": 0.777778,
+              "precision": 0.690141,
+              "recall": 0.890909,
+              "support": 55
+            },
+            "4": {
+              "f1": 0.818182,
+              "precision": 0.947368,
+              "recall": 0.72,
+              "support": 50
+            },
+            "5": {
+              "f1": 0.878049,
+              "precision": 0.947368,
+              "recall": 0.818182,
+              "support": 44
+            }
+          },
+          "severe_error_rate": 0.035573,
+          "tier_accuracy": 0.889328,
+          "tier_overroute_rate": 0.01581,
+          "tier_success_proxy": 0.905138,
+          "tier_underroute_rate": 0.094862,
+          "under_level_rate": 0.110672,
+          "weighted_f1": 0.85936,
+          "within_one_level_rate": 0.964427
+        },
+        "System Design": {
+          "accuracy": 0.911197,
+          "average_relative_cost_index": 3.272201,
+          "confusion_matrix": [
+            [
+              26,
+              7,
+              3,
+              2,
+              0
+            ],
+            [
+              0,
+              42,
+              3,
+              1,
+              1
+            ],
+            [
+              0,
+              0,
+              52,
+              1,
+              1
+            ],
+            [
+              0,
+              0,
+              1,
+              62,
+              3
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              54
+            ]
+          ],
+          "count": 259,
+          "macro_f1": 0.9006,
+          "mean_absolute_error": 0.131274,
+          "over_level_rate": 0.084942,
+          "per_class": {
+            "1": {
+              "f1": 0.8125,
+              "precision": 1.0,
+              "recall": 0.684211,
+              "support": 38
+            },
+            "2": {
+              "f1": 0.875,
+              "precision": 0.857143,
+              "recall": 0.893617,
+              "support": 47
+            },
+            "3": {
+              "f1": 0.920354,
+              "precision": 0.881356,
+              "recall": 0.962963,
+              "support": 54
+            },
+            "4": {
+              "f1": 0.939394,
+              "precision": 0.939394,
+              "recall": 0.939394,
+              "support": 66
+            },
+            "5": {
+              "f1": 0.955752,
+              "precision": 0.915254,
+              "recall": 1.0,
+              "support": 54
+            }
+          },
+          "severe_error_rate": 0.030888,
+          "tier_accuracy": 0.949807,
+          "tier_overroute_rate": 0.046332,
+          "tier_success_proxy": 0.996139,
+          "tier_underroute_rate": 0.003861,
+          "under_level_rate": 0.003861,
+          "weighted_f1": 0.908532,
+          "within_one_level_rate": 0.969112
+        },
+        "Text Formatting & Editing": {
+          "accuracy": 0.955357,
+          "average_relative_cost_index": 3.041667,
+          "confusion_matrix": [
+            [
+              48,
+              1,
+              0,
+              3,
+              0
+            ],
+            [
+              1,
+              56,
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              84,
+              0,
+              0
+            ],
+            [
+              1,
+              0,
+              2,
+              74,
+              1
+            ],
+            [
+              0,
+              0,
+              6,
+              0,
+              59
+            ]
+          ],
+          "count": 336,
+          "macro_f1": 0.955403,
+          "mean_absolute_error": 0.08631,
+          "over_level_rate": 0.014881,
+          "per_class": {
+            "1": {
+              "f1": 0.941176,
+              "precision": 0.96,
+              "recall": 0.923077,
+              "support": 52
+            },
+            "2": {
+              "f1": 0.982456,
+              "precision": 0.982456,
+              "recall": 0.982456,
+              "support": 57
+            },
+            "3": {
+              "f1": 0.954545,
+              "precision": 0.913043,
+              "recall": 1.0,
+              "support": 84
+            },
+            "4": {
+              "f1": 0.954839,
+              "precision": 0.961039,
+              "recall": 0.948718,
+              "support": 78
+            },
+            "5": {
+              "f1": 0.944,
+              "precision": 0.983333,
+              "recall": 0.907692,
+              "support": 65
+            }
+          },
+          "severe_error_rate": 0.029762,
+          "tier_accuracy": 0.964286,
+          "tier_overroute_rate": 0.008929,
+          "tier_success_proxy": 0.973214,
+          "tier_underroute_rate": 0.026786,
+          "under_level_rate": 0.029762,
+          "weighted_f1": 0.955239,
+          "within_one_level_rate": 0.970238
+        }
+      },
+      "user_turn_count": {
+        "2": {
+          "accuracy": 0.898891,
+          "average_relative_cost_index": 2.982906,
+          "confusion_matrix": [
+            [
+              853,
+              45,
+              13,
+              12,
+              2
+            ],
+            [
+              56,
+              925,
+              44,
+              36,
+              6
+            ],
+            [
+              17,
+              55,
+              1089,
+              52,
+              21
+            ],
+            [
+              7,
+              26,
+              58,
+              1110,
+              27
+            ],
+            [
+              5,
+              9,
+              36,
+              29,
+              966
+            ]
+          ],
+          "count": 5499,
+          "macro_f1": 0.900084,
+          "mean_absolute_error": 0.14439,
+          "over_level_rate": 0.046918,
+          "per_class": {
+            "1": {
+              "f1": 0.915727,
+              "precision": 0.909382,
+              "recall": 0.922162,
+              "support": 925
+            },
+            "2": {
+              "f1": 0.86977,
+              "precision": 0.872642,
+              "recall": 0.866917,
+              "support": 1067
+            },
+            "3": {
+              "f1": 0.880356,
+              "precision": 0.878226,
+              "recall": 0.882496,
+              "support": 1234
+            },
+            "4": {
+              "f1": 0.899878,
+              "precision": 0.895884,
+              "recall": 0.903909,
+              "support": 1228
+            },
+            "5": {
+              "f1": 0.934688,
+              "precision": 0.945205,
+              "recall": 0.924402,
+              "support": 1045
+            }
+          },
+          "severe_error_rate": 0.034552,
+          "tier_accuracy": 0.927441,
+          "tier_overroute_rate": 0.033824,
+          "tier_success_proxy": 0.961266,
+          "tier_underroute_rate": 0.038734,
+          "under_level_rate": 0.054192,
+          "weighted_f1": 0.898936,
+          "within_one_level_rate": 0.965448
+        },
+        "3": {
+          "accuracy": 0.929189,
+          "average_relative_cost_index": 3.309342,
+          "confusion_matrix": [
+            [
+              328,
+              16,
+              3,
+              13,
+              5
+            ],
+            [
+              11,
+              449,
+              9,
+              9,
+              5
+            ],
+            [
+              5,
+              29,
+              607,
+              12,
+              8
+            ],
+            [
+              1,
+              10,
+              32,
+              698,
+              12
+            ],
+            [
+              2,
+              6,
+              12,
+              13,
+              713
+            ]
+          ],
+          "count": 3008,
+          "macro_f1": 0.926439,
+          "mean_absolute_error": 0.11004,
+          "over_level_rate": 0.030585,
+          "per_class": {
+            "1": {
+              "f1": 0.921348,
+              "precision": 0.945245,
+              "recall": 0.89863,
+              "support": 365
+            },
+            "2": {
+              "f1": 0.90433,
+              "precision": 0.880392,
+              "recall": 0.929607,
+              "support": 483
+            },
+            "3": {
+              "f1": 0.916918,
+              "precision": 0.915535,
+              "recall": 0.918306,
+              "support": 661
+            },
+            "4": {
+              "f1": 0.931909,
+              "precision": 0.936913,
+              "recall": 0.926959,
+              "support": 753
+            },
+            "5": {
+              "f1": 0.95769,
+              "precision": 0.959623,
+              "recall": 0.955764,
+              "support": 746
+            }
+          },
+          "severe_error_rate": 0.026263,
+          "tier_accuracy": 0.946476,
+          "tier_overroute_rate": 0.021277,
+          "tier_success_proxy": 0.967753,
+          "tier_underroute_rate": 0.032247,
+          "under_level_rate": 0.040226,
+          "weighted_f1": 0.929299,
+          "within_one_level_rate": 0.973737
+        }
+      }
+    },
+    "split": "test",
+    "strategies": {
+      "always_balanced_tier": {
+        "accuracy": 0.2226,
+        "average_relative_cost_index": 2.5,
+        "confusion_matrix": [
+          [
+            0,
+            0,
+            1291,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            1550,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            1897,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            1985,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            1799,
+            0,
+            0
+          ]
+        ],
+        "count": 8522,
+        "macro_f1": 0.072828,
+        "mean_absolute_error": 1.139991,
+        "over_level_rate": 0.333372,
+        "per_class": {
+          "1": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "support": 1291
+          },
+          "2": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "support": 1550
+          },
+          "3": {
+            "f1": 0.364142,
+            "precision": 0.2226,
+            "recall": 1.0,
+            "support": 1897
+          },
+          "4": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "support": 1985
+          },
+          "5": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "support": 1799
+          }
+        },
+        "relative_cost_saving_vs_always_capable": 0.5,
+        "severe_error_rate": 0.362591,
+        "tier_accuracy": 0.2226,
+        "tier_overroute_rate": 0.333372,
+        "tier_success_proxy": 0.555973,
+        "tier_underroute_rate": 0.444027,
+        "under_level_rate": 0.444027,
+        "weighted_f1": 0.081058,
+        "within_one_level_rate": 0.637409
+      },
+      "always_capable_tier": {
+        "accuracy": 0.211101,
+        "average_relative_cost_index": 5.0,
+        "confusion_matrix": [
+          [
+            0,
+            0,
+            0,
+            0,
+            1291
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            1550
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            1897
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            1985
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            1799
+          ]
+        ],
+        "count": 8522,
+        "macro_f1": 0.069722,
+        "mean_absolute_error": 1.829735,
+        "over_level_rate": 0.788899,
+        "per_class": {
+          "1": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "support": 1291
+          },
+          "2": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "support": 1550
+          },
+          "3": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "support": 1897
+          },
+          "4": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "support": 1985
+          },
+          "5": {
+            "f1": 0.34861,
+            "precision": 0.211101,
+            "recall": 1.0,
+            "support": 1799
+          }
+        },
+        "relative_cost_saving_vs_always_capable": 0.0,
+        "severe_error_rate": 0.555973,
+        "tier_accuracy": 0.444027,
+        "tier_overroute_rate": 0.555973,
+        "tier_success_proxy": 1.0,
+        "tier_underroute_rate": 0.0,
+        "under_level_rate": 0.0,
+        "weighted_f1": 0.073592,
+        "within_one_level_rate": 0.444027
+      },
+      "always_efficient_tier": {
+        "accuracy": 0.181882,
+        "average_relative_cost_index": 1.0,
+        "confusion_matrix": [
+          [
+            0,
+            1291,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            1550,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            1897,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            1985,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            1799,
+            0,
+            0,
+            0
+          ]
+        ],
+        "count": 8522,
+        "macro_f1": 0.061557,
+        "mean_absolute_error": 1.473246,
+        "over_level_rate": 0.15149,
+        "per_class": {
+          "1": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "support": 1291
+          },
+          "2": {
+            "f1": 0.307784,
+            "precision": 0.181882,
+            "recall": 1.0,
+            "support": 1550
+          },
+          "3": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "support": 1897
+          },
+          "4": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "support": 1985
+          },
+          "5": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "support": 1799
+          }
+        },
+        "relative_cost_saving_vs_always_capable": 0.8,
+        "severe_error_rate": 0.444027,
+        "tier_accuracy": 0.333372,
+        "tier_overroute_rate": 0.0,
+        "tier_success_proxy": 0.333372,
+        "tier_underroute_rate": 0.666628,
+        "under_level_rate": 0.666628,
+        "weighted_f1": 0.05598,
+        "within_one_level_rate": 0.555973
+      },
+      "heuristic": {
+        "accuracy": 0.255691,
+        "average_relative_cost_index": 1.699718,
+        "confusion_matrix": [
+          [
+            473,
+            636,
+            170,
+            12,
+            0
+          ],
+          [
+            373,
+            864,
+            297,
+            14,
+            2
+          ],
+          [
+            225,
+            972,
+            633,
+            64,
+            3
+          ],
+          [
+            133,
+            731,
+            916,
+            195,
+            10
+          ],
+          [
+            113,
+            830,
+            674,
+            168,
+            14
+          ]
+        ],
+        "count": 8522,
+        "macro_f1": 0.224705,
+        "mean_absolute_error": 1.22659,
+        "over_level_rate": 0.141751,
+        "per_class": {
+          "1": {
+            "f1": 0.36273,
+            "precision": 0.35915,
+            "recall": 0.366383,
+            "support": 1291
+          },
+          "2": {
+            "f1": 0.309511,
+            "precision": 0.214233,
+            "recall": 0.557419,
+            "support": 1550
+          },
+          "3": {
+            "f1": 0.275997,
+            "precision": 0.235316,
+            "recall": 0.333685,
+            "support": 1897
+          },
+          "4": {
+            "f1": 0.159967,
+            "precision": 0.430464,
+            "recall": 0.098237,
+            "support": 1985
+          },
+          "5": {
+            "f1": 0.015317,
+            "precision": 0.482759,
+            "recall": 0.007782,
+            "support": 1799
+          }
+        },
+        "relative_cost_saving_vs_always_capable": 0.660056,
+        "severe_error_rate": 0.341117,
+        "tier_accuracy": 0.394978,
+        "tier_overroute_rate": 0.065947,
+        "tier_success_proxy": 0.460925,
+        "tier_underroute_rate": 0.539075,
+        "under_level_rate": 0.602558,
+        "weighted_f1": 0.213176,
+        "within_one_level_rate": 0.658883
+      },
+      "learned_argmax": {
+        "accuracy": 0.909294,
+        "average_relative_cost_index": 3.100622,
+        "confusion_matrix": [
+          [
+            1182,
+            61,
+            16,
+            25,
+            7
+          ],
+          [
+            67,
+            1374,
+            53,
+            45,
+            11
+          ],
+          [
+            22,
+            84,
+            1698,
+            64,
+            29
+          ],
+          [
+            8,
+            36,
+            90,
+            1812,
+            39
+          ],
+          [
+            7,
+            15,
+            48,
+            46,
+            1683
+          ]
+        ],
+        "count": 8522,
+        "expected_calibration_error": 0.018194,
+        "macro_f1": 0.909191,
+        "mean_absolute_error": 0.132481,
+        "negative_log_likelihood": 0.26792,
+        "over_level_rate": 0.04107,
+        "per_class": {
+          "1": {
+            "f1": 0.917346,
+            "precision": 0.919129,
+            "recall": 0.915569,
+            "support": 1291
+          },
+          "2": {
+            "f1": 0.880769,
+            "precision": 0.875159,
+            "recall": 0.886452,
+            "support": 1550
+          },
+          "3": {
+            "f1": 0.893214,
+            "precision": 0.891339,
+            "recall": 0.895098,
+            "support": 1897
+          },
+          "4": {
+            "f1": 0.91124,
+            "precision": 0.909639,
+            "recall": 0.912846,
+            "support": 1985
+          },
+          "5": {
+            "f1": 0.943386,
+            "precision": 0.951385,
+            "recall": 0.93552,
+            "support": 1799
+          }
+        },
+        "relative_cost_saving_vs_always_capable": 0.379876,
+        "severe_error_rate": 0.031565,
+        "tier_accuracy": 0.934288,
+        "tier_overroute_rate": 0.029336,
+        "tier_success_proxy": 0.963624,
+        "tier_underroute_rate": 0.036376,
+        "under_level_rate": 0.049636,
+        "weighted_f1": 0.909396,
+        "within_one_level_rate": 0.968435
+      },
+      "learned_conservative_p80": {
+        "accuracy": 0.874795,
+        "average_relative_cost_index": 3.261676,
+        "confusion_matrix": [
+          [
+            984,
+            193,
+            55,
+            49,
+            10
+          ],
+          [
+            23,
+            1278,
+            134,
+            83,
+            32
+          ],
+          [
+            9,
+            25,
+            1621,
+            174,
+            68
+          ],
+          [
+            0,
+            16,
+            46,
+            1833,
+            90
+          ],
+          [
+            1,
+            2,
+            20,
+            37,
+            1739
+          ]
+        ],
+        "count": 8522,
+        "macro_f1": 0.871527,
+        "mean_absolute_error": 0.17801,
+        "over_level_rate": 0.104201,
+        "per_class": {
+          "1": {
+            "f1": 0.852686,
+            "precision": 0.967552,
+            "recall": 0.7622,
+            "support": 1291
+          },
+          "2": {
+            "f1": 0.834204,
+            "precision": 0.844122,
+            "recall": 0.824516,
+            "support": 1550
+          },
+          "3": {
+            "f1": 0.859263,
+            "precision": 0.864072,
+            "recall": 0.854507,
+            "support": 1897
+          },
+          "4": {
+            "f1": 0.881038,
+            "precision": 0.842371,
+            "recall": 0.923426,
+            "support": 1985
+          },
+          "5": {
+            "f1": 0.930444,
+            "precision": 0.896854,
+            "recall": 0.966648,
+            "support": 1799
+          }
+        },
+        "relative_cost_saving_vs_always_capable": 0.347665,
+        "severe_error_rate": 0.040483,
+        "tier_accuracy": 0.915043,
+        "tier_overroute_rate": 0.070993,
+        "tier_success_proxy": 0.986036,
+        "tier_underroute_rate": 0.013964,
+        "under_level_rate": 0.021004,
+        "weighted_f1": 0.873807,
+        "within_one_level_rate": 0.959517
+      },
+      "learned_expected": {
+        "accuracy": 0.870336,
+        "average_relative_cost_index": 3.08965,
+        "confusion_matrix": [
+          [
+            1089,
+            153,
+            35,
+            9,
+            5
+          ],
+          [
+            54,
+            1339,
+            124,
+            30,
+            3
+          ],
+          [
+            12,
+            121,
+            1639,
+            106,
+            19
+          ],
+          [
+            0,
+            29,
+            169,
+            1751,
+            36
+          ],
+          [
+            2,
+            6,
+            57,
+            135,
+            1599
+          ]
+        ],
+        "count": 8522,
+        "macro_f1": 0.871828,
+        "mean_absolute_error": 0.157709,
+        "over_level_rate": 0.061019,
+        "per_class": {
+          "1": {
+            "f1": 0.889706,
+            "precision": 0.941227,
+            "recall": 0.843532,
+            "support": 1291
+          },
+          "2": {
+            "f1": 0.837398,
+            "precision": 0.8125,
+            "recall": 0.863871,
+            "support": 1550
+          },
+          "3": {
+            "f1": 0.836011,
+            "precision": 0.809783,
+            "recall": 0.863996,
+            "support": 1897
+          },
+          "4": {
+            "f1": 0.872012,
+            "precision": 0.862137,
+            "recall": 0.882116,
+            "support": 1985
+          },
+          "5": {
+            "f1": 0.92401,
+            "precision": 0.962094,
+            "recall": 0.888827,
+            "support": 1799
+          }
+        },
+        "relative_cost_saving_vs_always_capable": 0.38207,
+        "severe_error_rate": 0.02429,
+        "tier_accuracy": 0.914691,
+        "tier_overroute_rate": 0.038841,
+        "tier_success_proxy": 0.953532,
+        "tier_underroute_rate": 0.046468,
+        "under_level_rate": 0.068646,
+        "weighted_f1": 0.87136,
+        "within_one_level_rate": 0.97571
+      },
+      "majority_level": {
+        "accuracy": 0.232927,
+        "average_relative_cost_index": 5.0,
+        "confusion_matrix": [
+          [
+            0,
+            0,
+            0,
+            1291,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            1550,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            1897,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            1985,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            1799,
+            0
+          ]
+        ],
+        "count": 8522,
+        "macro_f1": 0.075569,
+        "mean_absolute_error": 1.251936,
+        "over_level_rate": 0.555973,
+        "per_class": {
+          "1": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "support": 1291
+          },
+          "2": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "support": 1550
+          },
+          "3": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "support": 1897
+          },
+          "4": {
+            "f1": 0.377843,
+            "precision": 0.232927,
+            "recall": 1.0,
+            "support": 1985
+          },
+          "5": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "support": 1799
+          }
+        },
+        "relative_cost_saving_vs_always_capable": 0.0,
+        "severe_error_rate": 0.333372,
+        "tier_accuracy": 0.444027,
+        "tier_overroute_rate": 0.555973,
+        "tier_success_proxy": 1.0,
+        "tier_underroute_rate": 0.0,
+        "under_level_rate": 0.211101,
+        "weighted_f1": 0.08801,
+        "within_one_level_rate": 0.666628
+      }
+    }
+  },
+  "external_context_slice": {
+    "metrics": {
+      "accuracy": 0.571429,
+      "average_relative_cost_index": 3.426374,
+      "confusion_matrix": [
+        [
+          20,
+          7,
+          7,
+          4,
+          4
+        ],
+        [
+          3,
+          30,
+          14,
+          23,
+          7
+        ],
+        [
+          1,
+          1,
+          58,
+          9,
+          16
+        ],
+        [
+          6,
+          15,
+          22,
+          67,
+          2
+        ],
+        [
+          8,
+          13,
+          19,
+          14,
+          85
+        ]
+      ],
+      "count": 455,
+      "expected_calibration_error": 0.177426,
+      "macro_f1": 0.548505,
+      "mean_absolute_error": 0.817582,
+      "negative_log_likelihood": 1.619091,
+      "over_level_rate": 0.204396,
+      "per_class": {
+        "1": {
+          "f1": 0.5,
+          "precision": 0.526316,
+          "recall": 0.47619,
+          "support": 42
+        },
+        "2": {
+          "f1": 0.41958,
+          "precision": 0.454545,
+          "recall": 0.38961,
+          "support": 77
+        },
+        "3": {
+          "f1": 0.565854,
+          "precision": 0.483333,
+          "recall": 0.682353,
+          "support": 85
+        },
+        "4": {
+          "f1": 0.585153,
+          "precision": 0.57265,
+          "recall": 0.598214,
+          "support": 112
+        },
+        "5": {
+          "f1": 0.671937,
+          "precision": 0.745614,
+          "recall": 0.611511,
+          "support": 139
+        }
+      },
+      "severe_error_rate": 0.27033,
+      "tier_accuracy": 0.628571,
+      "tier_overroute_rate": 0.184615,
+      "tier_success_proxy": 0.813187,
+      "tier_underroute_rate": 0.186813,
+      "under_level_rate": 0.224176,
+      "weighted_f1": 0.572179,
+      "within_one_level_rate": 0.72967
+    },
+    "novel_rows": 455,
+    "overlap_with_primary_dataset": 7829,
+    "source_rows": 8284,
+    "warning": "This slice is generated from the same synthetic process and is not a production-distribution benchmark. Overlapping rows were excluded."
+  },
+  "generated_at": "2026-08-11T08:27:23.654416+00:00",
+  "limitations": [
+    "Labels represent synthetic prompt complexity, not measured candidate-model success.",
+    "Prompts were generated to fit the label rubric and may contain learnable stylistic cues.",
+    "An LLM audit is not equivalent to expert or task-outcome ground truth.",
+    "The cost index is illustrative and is not provider billing."
+  ],
+  "schema_version": "router-training-report-v1",
+  "training": {
+    "algorithm": "weighted multinomial naive Bayes",
+    "appropriate_weight": 1.0,
+    "borderline_weight": 0.65,
+    "class_prior": "uniform",
+    "feature_dimension": 32768,
+    "smoothing": 1.0,
+    "temperature": 5.656854249492381,
+    "vectorizer": "stable hashed word unigrams, bigrams, and structural features"
+  },
+  "validation": {
+    "accuracy": 0.904928,
+    "average_relative_cost_index": 3.096641,
+    "confusion_matrix": [
+      [
+        1145,
+        81,
+        18,
+        21,
+        8
+      ],
+      [
+        56,
+        1460,
+        52,
+        41,
+        19
+      ],
+      [
+        33,
+        92,
+        1653,
+        64,
+        40
+      ],
+      [
+        7,
+        42,
+        71,
+        1854,
+        44
+      ],
+      [
+        13,
+        17,
+        43,
+        56,
+        1674
+      ]
+    ],
+    "count": 8604,
+    "expected_calibration_error": 0.013772,
+    "macro_f1": 0.904488,
+    "mean_absolute_error": 0.142492,
+    "negative_log_likelihood": 0.283616,
+    "over_level_rate": 0.045095,
+    "per_class": {
+      "1": {
+        "f1": 0.906213,
+        "precision": 0.913078,
+        "recall": 0.89945,
+        "support": 1273
+      },
+      "2": {
+        "f1": 0.879518,
+        "precision": 0.862884,
+        "recall": 0.896806,
+        "support": 1628
+      },
+      "3": {
+        "f1": 0.888949,
+        "precision": 0.899837,
+        "recall": 0.878321,
+        "support": 1882
+      },
+      "4": {
+        "f1": 0.914652,
+        "precision": 0.910609,
+        "recall": 0.918731,
+        "support": 2018
+      },
+      "5": {
+        "f1": 0.93311,
+        "precision": 0.937815,
+        "recall": 0.928453,
+        "support": 1803
+      }
+    },
+    "severe_error_rate": 0.0351,
+    "tier_accuracy": 0.932473,
+    "tier_overroute_rate": 0.030567,
+    "tier_success_proxy": 0.96304,
+    "tier_underroute_rate": 0.03696,
+    "under_level_rate": 0.049977,
+    "weighted_f1": 0.905001,
+    "within_one_level_rate": 0.9649
+  }
+}

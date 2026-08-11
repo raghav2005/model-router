@@ -1,0 +1,66 @@
+# Switchyard 0.1 standalone profile configuration.
+#
+# The upstream model IDs below are an example OpenRouter deployment. Before a
+# live evaluation, choose the approved models and make catalog.json match their
+# exact capabilities, context limits, prices, and measured latency/quality.
+endpoints:
+  openrouter:
+    api_key: ${OPENROUTER_API_KEY}
+    base_url: https://openrouter.ai/api/v1
+
+targets:
+  capable:
+    endpoint: openrouter
+    model: openai/o3
+    format: openai
+
+  balanced:
+    endpoint: openrouter
+    model: openai/gpt-4o
+    format: openai
+
+  efficient:
+    endpoint: openrouter
+    model: openai/gpt-4o-mini
+    format: openai
+
+  classifier:
+    endpoint: openrouter
+    model: nvidia/nemotron-3-nano-30b-a3b
+    format: openai
+    extra_body:
+      reasoning:
+        enabled: false
+
+profiles:
+  # Content-aware profile for mixed chat and API traffic.
+  smart-general:
+    type: llm-routing
+    profile_name: general
+    strong: capable
+    weak: efficient
+    classifier: classifier
+    fallback_target_on_evict: capable
+    classifier_min_confidence: 0.6
+    classifier_fail_open: true
+    classifier_recent_turn_window: 4
+
+  # Content-aware profile tuned for coding-agent requests.
+  smart-coding:
+    type: llm-routing
+    profile_name: coding_agent
+    strong: capable
+    weak: efficient
+    classifier: classifier
+    fallback_target_on_evict: capable
+    classifier_min_confidence: 0.6
+    classifier_fail_open: true
+    classifier_recent_turn_window: 4
+
+  # Reproducible traffic split for measuring the gateway and model pair.
+  benchmark-random:
+    type: random-routing
+    strong: capable
+    weak: efficient
+    strong_probability: 0.5
+    rng_seed: 42

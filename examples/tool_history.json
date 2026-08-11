@@ -1,0 +1,25 @@
+[
+  {
+    "role": "user",
+    "content": "Inspect the existing handler before adding validation."
+  },
+  {
+    "role": "assistant",
+    "content": null,
+    "tool_calls": [
+      {
+        "id": "call-1",
+        "type": "function",
+        "function": {
+          "name": "read_file",
+          "arguments": "{\"path\":\"handler.py\"}"
+        }
+      }
+    ]
+  },
+  {
+    "role": "tool",
+    "tool_call_id": "call-1",
+    "content": "def handle(payload):\n    return save(payload)"
+  }
+]

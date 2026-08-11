@@ -1,0 +1,32 @@
+# Stage-router preview configuration for the current Switchyard main branch.
+#
+# The published nemo-switchyard==0.1.0 package does not yet accept
+# `type: stage_router` in a standalone profile config. The feature is documented
+# on Switchyard's main branch. Use this file only with a source build that
+# includes that profile type.
+endpoints:
+  openrouter:
+    api_key: ${OPENROUTER_API_KEY}
+    base_url: https://openrouter.ai/api/v1
+
+targets:
+  capable:
+    endpoint: openrouter
+    model: openai/o3
+    format: openai
+
+  efficient:
+    endpoint: openrouter
+    model: openai/gpt-4o-mini
+    format: openai
+
+profiles:
+  smart-agent-stage:
+    type: stage_router
+    picker: capable_first
+    confidence_threshold: 0.5
+    signal_recent_window: 3
+    fallback_target_on_evict: capable
+    capable: capable
+    efficient: efficient
+    enable_stats: true
