@@ -36,6 +36,8 @@ def _add_request_options(
     )
     parser.add_argument("--output-tokens", type=int, default=500)
     parser.add_argument("--input-tokens", type=int)
+    parser.add_argument("--cached-input-tokens", type=int, default=0)
+    parser.add_argument("--cache-write-tokens", type=int, default=0)
     parser.add_argument("--max-cost", type=float)
     parser.add_argument("--max-latency", type=int)
     parser.add_argument("--capability", action="append", default=[])
@@ -55,6 +57,8 @@ def _add_request_options(
         default="argmax",
     )
     parser.add_argument("--underroute-tolerance", type=float, default=0.20)
+    parser.add_argument("--require-measured-quality", action="store_true")
+    parser.add_argument("--require-measured-latency", action="store_true")
 
 
 def _load_messages(path: str | None, prompt: str | None) -> list[dict[str, Any]]:
@@ -86,6 +90,8 @@ def _routing_request(args: argparse.Namespace, prompt: str) -> RoutingRequest:
     return RoutingRequest(
         prompt=prompt,
         input_tokens=args.input_tokens,
+        cached_input_tokens=args.cached_input_tokens,
+        cache_write_tokens=args.cache_write_tokens,
         expected_output_tokens=args.output_tokens,
         required_capabilities=frozenset(args.capability),
         priority=args.priority,
@@ -97,12 +103,17 @@ def _routing_request(args: argparse.Namespace, prompt: str) -> RoutingRequest:
 
 def _model_router(args: argparse.Namespace) -> ModelRouter:
     if args.classifier_mode == "heuristic":
-        return ModelRouter()
+        return ModelRouter(
+            require_measured_quality=args.require_measured_quality,
+            require_measured_latency=args.require_measured_latency,
+        )
     return ModelRouter.from_artifact(
         args.model_artifact,
         classifier_mode=args.classifier_mode,
         decision_policy=args.complexity_policy,
         underroute_tolerance=args.underroute_tolerance,
+        require_measured_quality=args.require_measured_quality,
+        require_measured_latency=args.require_measured_latency,
     )
 
 
@@ -158,6 +169,8 @@ def build_parser() -> argparse.ArgumentParser:
         default="argmax",
     )
     benchmark.add_argument("--underroute-tolerance", type=float, default=0.20)
+    benchmark.add_argument("--require-measured-quality", action="store_true")
+    benchmark.add_argument("--require-measured-latency", action="store_true")
 
     train = subparsers.add_parser(
         "train", help="Train and evaluate a learned complexity router"

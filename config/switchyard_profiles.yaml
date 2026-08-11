@@ -1,36 +1,32 @@
-# Switchyard 0.1 standalone profile configuration.
+# Legacy Switchyard 0.1 Python-server profile configuration.
 #
-# The upstream model IDs below are an example OpenRouter deployment. Before a
-# live evaluation, choose the approved models and make catalog.json match their
-# exact capabilities, context limits, prices, and measured latency/quality.
+# New deployments should prefer switchyard_routes.toml and the current Rust
+# server. This file remains only for reproducibility of the tested 0.1 package.
 endpoints:
-  openrouter:
-    api_key: ${OPENROUTER_API_KEY}
-    base_url: https://openrouter.ai/api/v1
+  openai:
+    api_key: ${OPENAI_API_KEY}
+    base_url: https://api.openai.com/v1
 
 targets:
   capable:
-    endpoint: openrouter
-    model: openai/o3
+    endpoint: openai
+    model: gpt-5.6-sol
     format: openai
 
   balanced:
-    endpoint: openrouter
-    model: openai/gpt-4o
+    endpoint: openai
+    model: gpt-5.6-terra
     format: openai
 
   efficient:
-    endpoint: openrouter
-    model: openai/gpt-4o-mini
+    endpoint: openai
+    model: gpt-5.6-luna
     format: openai
 
   classifier:
-    endpoint: openrouter
-    model: nvidia/nemotron-3-nano-30b-a3b
+    endpoint: openai
+    model: gpt-5.6-luna
     format: openai
-    extra_body:
-      reasoning:
-        enabled: false
 
 profiles:
   # Content-aware profile for mixed chat and API traffic.

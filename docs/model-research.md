@@ -1,0 +1,81 @@
+# Model research and catalogue rationale
+
+**Research date:** 11 August 2026  
+**Scope:** Initial OpenAI deployment candidate behind NVIDIA NeMo Switchyard
+
+## Decision
+
+The first controlled deployment uses one model family across three stable routing roles:
+
+| Router role | Upstream model | Intended workload | Standard input / output per 1M tokens |
+|---|---|---|---:|
+| `efficient` | `gpt-5.6-luna` | High-volume and straightforward work | $1 / $6 |
+| `balanced` | `gpt-5.6-terra` | Everyday professional work | $2.50 / $15 |
+| `capable` | `gpt-5.6-sol` | Complex reasoning, coding, and high-risk work | $5 / $30 |
+
+Using one provider family simplifies the first evaluation: formats, tool behaviour, context limits, and billing semantics are comparable. A second provider should be added later for resilience, but only after its models have been run through the same response-level benchmark.
+
+The prices, model IDs, context windows, and feature claims above come from the official [OpenAI model catalogue](https://developers.openai.com/api/docs/models) and [API pricing page](https://openai.com/api/pricing/). The production catalogue records an exact source URL and verification date for every role.
+
+## Pricing details implemented
+
+All three models have a 1,050,000-token context window and a 128,000-token maximum output. The router also accounts for:
+
+- the 90% cached-input discount;
+- cache writes billed at 1.25 times ordinary input;
+- prompts over 272,000 input tokens billed at twice the input rate; and
+- output on those long-context requests billed at 1.5 times the ordinary output rate.
+
+These details come from the official model pages for [Sol](https://developers.openai.com/api/docs/models/gpt-5.6-sol), [Terra](https://developers.openai.com/api/docs/models/gpt-5.6-terra), and [Luna](https://developers.openai.com/api/docs/models/gpt-5.6-luna). Tool-specific charges are not yet estimated because they depend on which hosted tools the application enables. Actual provider usage and invoices remain the source of truth.
+
+## Published quality evidence
+
+The [GPT-5.6 launch report](https://openai.com/index/gpt-5-6/) provides useful directional evidence:
+
+| Benchmark | Sol | Terra | Luna |
+|---|---:|---:|---:|
+| Agents' Last Exam | 52.7% | 50.4% | 50.3% |
+| GPQA Diamond | 94.6% | 92.9% | 92.3% |
+| FrontierMath Tier 1–3 | 89.0% | 84.9% | 78.6% |
+| Toolathlon | 58.0% | 53.1% | 53.4% |
+
+These are vendor-published benchmark results, not probabilities that a model will satisfy our requests. They should not be inserted directly into the utility formula. The catalogue's `skills` values remain explicitly marked as heuristic priors until our response-level harness produces workload-specific success rates.
+
+The production quality table should ultimately be estimated per model, use case, complexity band, tool configuration, prompt version, and reasoning setting. Confidence intervals and sample counts should be stored alongside every estimate.
+
+## Latency evidence
+
+OpenAI describes Luna as the fastest tier and Terra as a balance of capability, speed, and cost, but does not publish a p95 end-to-end completion latency that is valid for our prompts, region, account tier, concurrency, output length, or reasoning configuration.
+
+The existing latency numbers are therefore retained only as bootstrap priors and marked `unmeasured_bootstrap_prior`. The router refuses to claim that it can meet an explicit latency SLA while this marker is present.
+
+Before enforcement, the live harness must measure at least:
+
+- time to first token and total completion latency;
+- p50, p95, and p99 by target and workload slice;
+- output tokens per second;
+- cold and warm behaviour;
+- concurrent-load behaviour at expected and peak traffic;
+- 429, timeout, and 5xx rates; and
+- the effect of reasoning effort and long context.
+
+Measurements must be repeated in the intended deployment region and provider service tier. Published relative-speed descriptions are not sufficient for an SLA.
+
+## Switchyard production position
+
+[NVIDIA NeMo Switchyard](https://github.com/NVIDIA-NeMo/Switchyard) supplies protocol translation, routing algorithms, operational metrics, and context-overflow fallback. Its upstream README currently labels the project pre-alpha, warns that APIs may change before v1.0, and says it is not for production use.
+
+For that reason, the architecture keeps Switchyard behind a narrow OpenAI-compatible adapter. A deployment should:
+
+1. pin the exact tested Switchyard release or commit;
+2. validate its TOML configuration during CI and startup;
+3. run it as an isolated service with resource limits;
+4. monitor `/health`, `/v1/stats`, errors, latency, and selected-model headers;
+5. keep a trusted direct-provider fail-open path outside Switchyard; and
+6. load-test and fault-inject the pinned build before production approval.
+
+The current `config/switchyard_routes.toml` follows the current Rust-server schema. The legacy YAML remains only to reproduce the earlier `nemo-switchyard==0.1.0` prototype.
+
+## Remaining research and measurement
+
+The OpenAI family is an initial controlled candidate, not a permanent provider decision. Before multi-provider routing, benchmark approved Anthropic, Google, NVIDIA NIM, or self-hosted candidates under identical prompts, validators, reasoning budgets, and concurrency. Include contractual data retention, regional availability, quotas, support, deprecation policy, and incident history in the selection—not only token price.

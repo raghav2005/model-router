@@ -1,43 +1,106 @@
 {
-  "as_of": "2026-07-24",
+  "schema_version": "model-router-catalog-v2",
+  "as_of": "2026-08-11",
   "notes": {
-    "pricing": "Illustrative planning inputs. Replace these values with the exact deployed target prices before making cost decisions.",
-    "quality_and_latency": "Illustrative priors for demonstrating the router; replace with workload measurements before production.",
-    "aliases": "Policy IDs are stable roles. switchyard_target maps each role to a target in config/switchyard_profiles.yaml."
+    "pricing": "Standard OpenAI API list prices verified from official model pages. Cached-input, cache-write, and long-context prices are represented explicitly.",
+    "quality": "The skills fields remain conservative routing priors. Published benchmark results are useful context but are not a substitute for response-level evaluation on the intended workload.",
+    "latency": "OpenAI describes relative speed but does not publish workload-specific p95 completion latency for these targets. latency_p95_ms remains a bootstrap prior and is marked unmeasured.",
+    "aliases": "Policy IDs are stable roles. provider_model is the upstream OpenAI model and switchyard_target is the stable route exposed by Switchyard."
+  },
+  "published_benchmarks": {
+    "source": "https://openai.com/index/gpt-5-6/",
+    "as_of": "2026-07-09",
+    "caveat": "Vendor-published benchmarks are directional evidence. Routing thresholds must be calibrated with application-specific response outcomes.",
+    "agents_last_exam_percent": {
+      "capable": 52.7,
+      "balanced": 50.4,
+      "efficient": 50.3
+    },
+    "gpqa_diamond_percent": {
+      "capable": 94.6,
+      "balanced": 92.9,
+      "efficient": 92.3
+    },
+    "frontier_math_tier_1_3_percent": {
+      "capable": 89.0,
+      "balanced": 84.9,
+      "efficient": 78.6
+    },
+    "toolathlon_percent": {
+      "capable": 58.0,
+      "balanced": 53.1,
+      "efficient": 53.4
+    }
   },
   "models": [
     {
       "id": "capable",
       "switchyard_target": "capable",
+      "provider": "openai",
+      "provider_model": "gpt-5.6-sol",
       "tier": 3,
       "input_price_per_million": 5.0,
+      "cached_input_price_per_million": 0.5,
+      "cache_write_price_per_million": 6.25,
       "output_price_per_million": 30.0,
+      "long_context_threshold_tokens": 272000,
+      "long_context_input_multiplier": 2.0,
+      "long_context_output_multiplier": 1.5,
       "latency_p95_ms": 2600,
       "context_window": 1050000,
+      "max_output_tokens": 128000,
       "capabilities": ["text", "vision", "tools", "web", "structured_output"],
-      "skills": {"general_qa": 0.95, "coding": 0.97, "reasoning": 0.98}
+      "skills": {"general_qa": 0.95, "coding": 0.97, "reasoning": 0.98},
+      "pricing_source": "https://developers.openai.com/api/docs/models/gpt-5.6-sol",
+      "pricing_as_of": "2026-08-11",
+      "quality_evidence": "heuristic_prior_pending_workload_eval",
+      "latency_evidence": "unmeasured_bootstrap_prior"
     },
     {
       "id": "balanced",
       "switchyard_target": "balanced",
+      "provider": "openai",
+      "provider_model": "gpt-5.6-terra",
       "tier": 2,
       "input_price_per_million": 2.5,
+      "cached_input_price_per_million": 0.25,
+      "cache_write_price_per_million": 3.125,
       "output_price_per_million": 15.0,
+      "long_context_threshold_tokens": 272000,
+      "long_context_input_multiplier": 2.0,
+      "long_context_output_multiplier": 1.5,
       "latency_p95_ms": 1500,
       "context_window": 1050000,
+      "max_output_tokens": 128000,
       "capabilities": ["text", "vision", "tools", "web", "structured_output"],
-      "skills": {"general_qa": 0.87, "coding": 0.89, "reasoning": 0.89}
+      "skills": {"general_qa": 0.87, "coding": 0.89, "reasoning": 0.89},
+      "pricing_source": "https://developers.openai.com/api/docs/models/gpt-5.6-terra",
+      "pricing_as_of": "2026-08-11",
+      "quality_evidence": "heuristic_prior_pending_workload_eval",
+      "latency_evidence": "unmeasured_bootstrap_prior"
     },
     {
       "id": "efficient",
       "switchyard_target": "efficient",
+      "provider": "openai",
+      "provider_model": "gpt-5.6-luna",
       "tier": 1,
       "input_price_per_million": 1.0,
+      "cached_input_price_per_million": 0.1,
+      "cache_write_price_per_million": 1.25,
       "output_price_per_million": 6.0,
+      "long_context_threshold_tokens": 272000,
+      "long_context_input_multiplier": 2.0,
+      "long_context_output_multiplier": 1.5,
       "latency_p95_ms": 800,
       "context_window": 1050000,
+      "max_output_tokens": 128000,
       "capabilities": ["text", "vision", "tools", "web", "structured_output"],
-      "skills": {"general_qa": 0.76, "coding": 0.80, "reasoning": 0.73}
+      "skills": {"general_qa": 0.76, "coding": 0.80, "reasoning": 0.73},
+      "pricing_source": "https://developers.openai.com/api/docs/models/gpt-5.6-luna",
+      "pricing_as_of": "2026-08-11",
+      "quality_evidence": "heuristic_prior_pending_workload_eval",
+      "latency_evidence": "unmeasured_bootstrap_prior"
     }
   ]
 }

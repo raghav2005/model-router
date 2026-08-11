@@ -78,7 +78,22 @@ class RouterTests(unittest.TestCase):
 
     def test_cost_formula(self) -> None:
         efficient = next(model for model in load_catalog() if model.id == "efficient")
-        self.assertAlmostEqual(efficient.estimate_cost(1_000_000, 1_000_000), 7.0)
+        self.assertAlmostEqual(efficient.estimate_cost(100_000, 100_000), 0.7)
+
+    def test_cached_and_long_context_pricing(self) -> None:
+        efficient = next(model for model in load_catalog() if model.id == "efficient")
+        cached = efficient.estimate_cost(100_000, 10_000, cached_input_tokens=80_000)
+        self.assertAlmostEqual(cached, 0.088)
+        long_context = efficient.estimate_cost(300_000, 10_000)
+        self.assertAlmostEqual(long_context, 0.69)
+
+    def test_latency_sla_rejects_unmeasured_priors(self) -> None:
+        with self.assertRaises(NoEligibleModel):
+            self.router.route(RoutingRequest("Hello", max_latency_ms=5_000))
+
+    def test_output_limit_is_enforced(self) -> None:
+        with self.assertRaises(NoEligibleModel):
+            self.router.route(RoutingRequest("Hello", expected_output_tokens=128_001))
 
 
 if __name__ == "__main__":

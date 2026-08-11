@@ -16,7 +16,7 @@ WEIGHTS = {
     "quality": (0.90, 0.05, 0.05),
     "latency": (0.35, 0.10, 0.55),
 }
-POLICY_VERSION = "hybrid-utility-policy-v2"
+POLICY_VERSION = "hybrid-utility-policy-v3"
 
 
 class NoEligibleModel(RuntimeError):
@@ -34,6 +34,8 @@ class ModelRouter:
         classifier_mode: Literal["heuristic", "learned", "hybrid"] = "heuristic",
         decision_policy: DecisionPolicy = "argmax",
         underroute_tolerance: float = 0.20,
+        require_measured_quality: bool = False,
+        require_measured_latency: bool = False,
     ) -> None:
         self.models = models or load_catalog()
         if classifier_mode != "heuristic" and complexity_model is None:
@@ -44,6 +46,8 @@ class ModelRouter:
         self.classifier_mode = classifier_mode
         self.decision_policy = decision_policy
         self.underroute_tolerance = underroute_tolerance
+        self.require_measured_quality = require_measured_quality
+        self.require_measured_latency = require_measured_latency
 
     @classmethod
     def from_artifact(
@@ -54,6 +58,8 @@ class ModelRouter:
         classifier_mode: Literal["learned", "hybrid"] = "hybrid",
         decision_policy: DecisionPolicy = "argmax",
         underroute_tolerance: float = 0.20,
+        require_measured_quality: bool = False,
+        require_measured_latency: bool = False,
     ) -> ModelRouter:
         return cls(
             models,
@@ -61,6 +67,8 @@ class ModelRouter:
             classifier_mode=classifier_mode,
             decision_policy=decision_policy,
             underroute_tolerance=underroute_tolerance,
+            require_measured_quality=require_measured_quality,
+            require_measured_latency=require_measured_latency,
         )
 
     @staticmethod
@@ -91,7 +99,10 @@ class ModelRouter:
         for model in self.models:
             rejection_reasons: list[str] = []
             cost = model.estimate_cost(
-                features.input_tokens, features.expected_output_tokens
+                features.input_tokens,
+                features.expected_output_tokens,
+                cached_input_tokens=request.cached_input_tokens,
+                cache_write_tokens=request.cache_write_tokens,
             )
             if not model.enabled or model.health < 0.8:
                 rejection_reasons.append("model disabled or unhealthy")
@@ -104,6 +115,8 @@ class ModelRouter:
                 > model.context_window
             ):
                 rejection_reasons.append("context window exceeded")
+            if features.expected_output_tokens > model.max_output_tokens:
+                rejection_reasons.append("requested output exceeds model maximum")
             missing = features.inferred_capabilities - model.capabilities
             if missing:
                 rejection_reasons.append(
@@ -113,9 +126,26 @@ class ModelRouter:
                 rejection_reasons.append("estimated cost exceeds request budget")
             if (
                 request.max_latency_ms is not None
+                and model.latency_evidence != "workload_measured"
+            ):
+                rejection_reasons.append(
+                    "latency SLA requested but model latency is not workload-measured"
+                )
+            elif (
+                request.max_latency_ms is not None
                 and model.latency_p95_ms > request.max_latency_ms
             ):
                 rejection_reasons.append("p95 latency exceeds request SLA")
+            if (
+                self.require_measured_latency
+                and model.latency_evidence != "workload_measured"
+            ):
+                rejection_reasons.append("production policy requires measured latency")
+            if (
+                self.require_measured_quality
+                and model.quality_evidence != "workload_measured"
+            ):
+                rejection_reasons.append("production policy requires measured quality")
 
             quality = self._predicted_quality(
                 model, features.use_case, features.complexity
@@ -127,10 +157,15 @@ class ModelRouter:
                     model,
                     CandidateScore(
                         model_id=model.id,
+                        provider=model.provider,
+                        provider_model=model.provider_model,
                         utility=float("-inf"),
                         predicted_quality=quality,
                         estimated_cost_usd=cost,
                         latency_p95_ms=model.latency_p95_ms,
+                        pricing_source=model.pricing_source,
+                        quality_evidence=model.quality_evidence,
+                        latency_evidence=model.latency_evidence,
                         eligible=not rejection_reasons,
                         rejection_reasons=tuple(rejection_reasons),
                     ),
@@ -186,6 +221,8 @@ class ModelRouter:
             f"{request.priority} policy utility {selected.utility:.3f}",
             f"predicted quality {selected.predicted_quality:.2f} vs floor {features.quality_floor:.2f}",
             f"estimated request cost ${selected.estimated_cost_usd:.6f}",
+            f"quality evidence: {selected.quality_evidence}",
+            f"latency evidence: {selected.latency_evidence}",
         )
         all_scores = tuple(
             score

@@ -1,0 +1,88 @@
+# Current Switchyard Rust-server deployment candidate.
+# Validate before every deployment:
+#   switchyard-server --config config/switchyard_routes.toml --dry-run
+#
+# Switchyard is pre-alpha and explicitly not production-ready upstream. Keep it
+# isolated behind the model-router service, pin the tested commit/release, and
+# retain a trusted direct-provider fallback before enabling production traffic.
+schema_version = 1
+
+[llm_clients.openai]
+format = "openai_chat"
+base_url = "https://api.openai.com/v1"
+api_key_env = "OPENAI_API_KEY"
+
+[targets.capable]
+id = "gpt-5.6-sol"
+llm_client = "openai"
+
+[targets.balanced]
+id = "gpt-5.6-terra"
+llm_client = "openai"
+
+[targets.efficient]
+id = "gpt-5.6-luna"
+llm_client = "openai"
+
+[targets.classifier]
+id = "gpt-5.6-luna"
+llm_client = "openai"
+
+[routes.capable]
+id = "capable"
+type = "passthrough"
+target = "capable"
+
+[routes.balanced]
+id = "balanced"
+type = "passthrough"
+target = "balanced"
+
+[routes.efficient]
+id = "efficient"
+type = "passthrough"
+target = "efficient"
+
+[routes.smart_general]
+id = "smart-general"
+type = "llm_classifier"
+mode = "capability"
+classifier_target = "classifier"
+strong_target = "capable"
+weak_target = "efficient"
+base_threshold = 0.6
+threshold_step = 0.1
+recent_turn_window = 4
+session_affinity = true
+message_hash_fallback = false
+max_output_tokens = 1024
+
+[routes.smart_coding]
+id = "smart-coding"
+type = "llm_classifier"
+mode = "capability"
+classifier_target = "classifier"
+strong_target = "capable"
+weak_target = "efficient"
+base_threshold = 0.7
+threshold_step = 0.1
+recent_turn_window = 4
+session_affinity = true
+message_hash_fallback = false
+max_output_tokens = 1024
+
+[routes.smart_agent_stage]
+id = "smart-agent-stage"
+type = "stage_router"
+capable_target = "capable"
+efficient_target = "efficient"
+picker = "capable_first"
+confidence_threshold = 0.5
+recent_turn_window = 3
+
+[routes.benchmark_random]
+id = "benchmark-random"
+type = "random"
+targets = ["capable", "efficient"]
+weights = [1, 1]
+seed = 42

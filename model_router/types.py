@@ -11,20 +11,58 @@ Priority = Literal["balanced", "cost", "quality", "latency"]
 class ModelProfile:
     id: str
     switchyard_target: str
+    provider: str
+    provider_model: str
     tier: int
     input_price_per_million: float
+    cached_input_price_per_million: float
+    cache_write_price_per_million: float
     output_price_per_million: float
     latency_p95_ms: int
     context_window: int
+    max_output_tokens: int
     capabilities: frozenset[str]
     skills: dict[str, float]
+    pricing_source: str
+    pricing_as_of: str
+    quality_evidence: str
+    latency_evidence: str
+    long_context_threshold_tokens: int | None = None
+    long_context_input_multiplier: float = 1.0
+    long_context_output_multiplier: float = 1.0
     enabled: bool = True
     health: float = 1.0
 
-    def estimate_cost(self, input_tokens: int, output_tokens: int) -> float:
+    def estimate_cost(
+        self,
+        input_tokens: int,
+        output_tokens: int,
+        *,
+        cached_input_tokens: int = 0,
+        cache_write_tokens: int = 0,
+    ) -> float:
+        if (
+            min(input_tokens, output_tokens, cached_input_tokens, cache_write_tokens)
+            < 0
+        ):
+            raise ValueError("token counts cannot be negative")
+        if cached_input_tokens + cache_write_tokens > input_tokens:
+            raise ValueError("cached and cache-write tokens cannot exceed input tokens")
+        standard_input_tokens = input_tokens - cached_input_tokens - cache_write_tokens
+        long_context = (
+            self.long_context_threshold_tokens is not None
+            and input_tokens > self.long_context_threshold_tokens
+        )
+        input_multiplier = self.long_context_input_multiplier if long_context else 1.0
+        output_multiplier = self.long_context_output_multiplier if long_context else 1.0
         return (
-            input_tokens * self.input_price_per_million
-            + output_tokens * self.output_price_per_million
+            input_multiplier
+            * (
+                standard_input_tokens * self.input_price_per_million
+                + cached_input_tokens * self.cached_input_price_per_million
+                + cache_write_tokens * self.cache_write_price_per_million
+            )
+            + output_multiplier * output_tokens * self.output_price_per_million
         ) / 1_000_000
 
 
@@ -32,6 +70,8 @@ class ModelProfile:
 class RoutingRequest:
     prompt: str
     input_tokens: int | None = None
+    cached_input_tokens: int = 0
+    cache_write_tokens: int = 0
     expected_output_tokens: int = 500
     required_capabilities: frozenset[str] = field(default_factory=frozenset)
     priority: Priority = "balanced"
@@ -61,10 +101,15 @@ class RequestFeatures:
 @dataclass(frozen=True)
 class CandidateScore:
     model_id: str
+    provider: str
+    provider_model: str
     utility: float
     predicted_quality: float
     estimated_cost_usd: float
     latency_p95_ms: int
+    pricing_source: str
+    quality_evidence: str
+    latency_evidence: str
     eligible: bool
     rejection_reasons: tuple[str, ...] = ()
 
@@ -120,11 +165,16 @@ class RouteDecision:
             "candidates": [
                 {
                     "model": item.model_id,
+                    "provider": item.provider,
+                    "provider_model": item.provider_model,
                     "eligible": item.eligible,
                     "utility": round(item.utility, 4) if item.eligible else None,
                     "predicted_quality": round(item.predicted_quality, 4),
                     "estimated_cost_usd": round(item.estimated_cost_usd, 8),
                     "latency_p95_ms": item.latency_p95_ms,
+                    "pricing_source": item.pricing_source,
+                    "quality_evidence": item.quality_evidence,
+                    "latency_evidence": item.latency_evidence,
                     "rejection_reasons": list(item.rejection_reasons),
                 }
                 for item in self.candidates
