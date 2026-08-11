@@ -69,6 +69,8 @@ class ModelProfile:
 @dataclass(frozen=True)
 class RoutingRequest:
     prompt: str
+    request_id: str | None = None
+    tenant_id: str | None = None
     input_tokens: int | None = None
     cached_input_tokens: int = 0
     cache_write_tokens: int = 0
@@ -78,6 +80,8 @@ class RoutingRequest:
     max_cost_usd: float | None = None
     max_latency_ms: int | None = None
     use_case: str | None = None
+    allowed_model_ids: frozenset[str] = field(default_factory=frozenset)
+    allowed_providers: frozenset[str] = field(default_factory=frozenset)
 
 
 @dataclass(frozen=True)

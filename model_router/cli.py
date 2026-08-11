@@ -36,12 +36,16 @@ def _add_request_options(
     )
     parser.add_argument("--output-tokens", type=int, default=500)
     parser.add_argument("--input-tokens", type=int)
+    parser.add_argument("--request-id")
+    parser.add_argument("--tenant-id")
     parser.add_argument("--cached-input-tokens", type=int, default=0)
     parser.add_argument("--cache-write-tokens", type=int, default=0)
     parser.add_argument("--max-cost", type=float)
     parser.add_argument("--max-latency", type=int)
     parser.add_argument("--capability", action="append", default=[])
     parser.add_argument("--use-case", choices=["general_qa", "coding", "reasoning"])
+    parser.add_argument("--allow-model", action="append", default=[])
+    parser.add_argument("--allow-provider", action="append", default=[])
     parser.add_argument(
         "--classifier-mode",
         choices=["heuristic", "learned", "hybrid"],
@@ -89,6 +93,8 @@ def _routing_prompt(prompt: str | None, messages: list[dict[str, Any]]) -> str:
 def _routing_request(args: argparse.Namespace, prompt: str) -> RoutingRequest:
     return RoutingRequest(
         prompt=prompt,
+        request_id=args.request_id,
+        tenant_id=args.tenant_id,
         input_tokens=args.input_tokens,
         cached_input_tokens=args.cached_input_tokens,
         cache_write_tokens=args.cache_write_tokens,
@@ -98,6 +104,8 @@ def _routing_request(args: argparse.Namespace, prompt: str) -> RoutingRequest:
         max_cost_usd=args.max_cost,
         max_latency_ms=args.max_latency,
         use_case=args.use_case,
+        allowed_model_ids=frozenset(args.allow_model),
+        allowed_providers=frozenset(args.allow_provider),
     )
 
 

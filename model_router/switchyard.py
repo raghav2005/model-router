@@ -1,8 +1,13 @@
 from __future__ import annotations
 
 import json
+import random
+import threading
+import time
+import uuid
 from dataclasses import dataclass
-from typing import Any, Mapping, Sequence
+from email.utils import parsedate_to_datetime
+from typing import Any, Callable, Mapping, Sequence
 from urllib.error import HTTPError, URLError
 from urllib.parse import urlparse
 from urllib.request import Request, urlopen
@@ -19,9 +24,96 @@ Message = Mapping[str, Any]
 class SwitchyardError(RuntimeError):
     """Raised when the local Switchyard gateway cannot serve a request."""
 
+    def __init__(
+        self,
+        message: str,
+        *,
+        status_code: int | None = None,
+        retryable: bool = False,
+    ) -> None:
+        super().__init__(message)
+        self.status_code = status_code
+        self.retryable = retryable
+
+
+class CircuitOpenError(SwitchyardError):
+    """Raised while the gateway circuit breaker is open."""
+
+
+class ResponseValidationError(SwitchyardError):
+    """Raised when a model response fails an application validator."""
+
 
 class UnsafeDelegatedRoute(ValueError):
     """Raised when a Switchyard profile could violate a hard routing constraint."""
+
+
+@dataclass(frozen=True)
+class RetryPolicy:
+    max_attempts: int = 3
+    initial_backoff_seconds: float = 0.25
+    max_backoff_seconds: float = 2.0
+    retry_post_requests: bool = False
+
+    def __post_init__(self) -> None:
+        if self.max_attempts < 1:
+            raise ValueError("max_attempts must be at least one")
+        if self.initial_backoff_seconds < 0 or self.max_backoff_seconds < 0:
+            raise ValueError("retry backoff cannot be negative")
+
+
+class CircuitBreaker:
+    """Small thread-safe breaker around the Switchyard service boundary."""
+
+    def __init__(
+        self,
+        failure_threshold: int = 5,
+        recovery_seconds: float = 30.0,
+        *,
+        clock: Callable[[], float] = time.monotonic,
+    ) -> None:
+        if failure_threshold < 1 or recovery_seconds <= 0:
+            raise ValueError("invalid circuit-breaker configuration")
+        self.failure_threshold = failure_threshold
+        self.recovery_seconds = recovery_seconds
+        self._clock = clock
+        self._failures = 0
+        self._opened_at: float | None = None
+        self._probe_in_flight = False
+        self._lock = threading.Lock()
+
+    def before_call(self) -> None:
+        with self._lock:
+            if self._opened_at is None:
+                return
+            if self._clock() - self._opened_at < self.recovery_seconds:
+                raise CircuitOpenError(
+                    "Switchyard circuit breaker is open", retryable=True
+                )
+            if self._probe_in_flight:
+                raise CircuitOpenError(
+                    "Switchyard circuit breaker recovery probe is in flight",
+                    retryable=True,
+                )
+            self._probe_in_flight = True
+
+    def record_success(self) -> None:
+        with self._lock:
+            self._failures = 0
+            self._opened_at = None
+            self._probe_in_flight = False
+
+    def record_failure(self) -> None:
+        with self._lock:
+            self._probe_in_flight = False
+            self._failures += 1
+            if self._failures >= self.failure_threshold:
+                self._opened_at = self._clock()
+
+    def snapshot(self) -> dict[str, object]:
+        with self._lock:
+            state = "open" if self._opened_at is not None else "closed"
+            return {"state": state, "consecutive_failures": self._failures}
 
 
 @dataclass(frozen=True)
@@ -82,11 +174,13 @@ class ExecutionPlan:
 class ExecutionResult:
     plan: ExecutionPlan
     response: JSON
+    attempts: tuple[dict[str, object], ...] = ()
 
     def as_dict(self) -> dict[str, object]:
         return {
             "plan": self.plan.as_dict(),
             "response": self.response,
+            "attempts": list(self.attempts),
         }
 
 
@@ -98,6 +192,9 @@ class SwitchyardClient:
         base_url: str = "http://127.0.0.1:4000",
         api_key: str | None = None,
         timeout_seconds: float = 60.0,
+        retry_policy: RetryPolicy | None = None,
+        circuit_breaker: CircuitBreaker | None = None,
+        user_agent: str = "model-router/0.4",
     ) -> None:
         parsed = urlparse(base_url)
         if parsed.scheme not in {"http", "https"} or not parsed.netloc:
@@ -107,31 +204,92 @@ class SwitchyardClient:
         self.base_url = base_url.rstrip("/")
         self.api_key = api_key or "dummy"
         self.timeout_seconds = timeout_seconds
+        self.retry_policy = retry_policy or RetryPolicy()
+        self.circuit_breaker = circuit_breaker or CircuitBreaker()
+        self.user_agent = user_agent
 
-    def _request(self, method: str, path: str, payload: JSON | None = None) -> JSON:
-        body = None if payload is None else json.dumps(payload).encode("utf-8")
-        request = Request(
-            f"{self.base_url}{path}",
-            data=body,
-            method=method,
-            headers={
-                "Accept": "application/json",
-                "Authorization": f"Bearer {self.api_key}",
-                **({"Content-Type": "application/json"} if body is not None else {}),
-            },
-        )
+    @staticmethod
+    def _retry_after_seconds(error: HTTPError) -> float | None:
+        value = error.headers.get("Retry-After") if error.headers else None
+        if not value:
+            return None
         try:
-            with urlopen(request, timeout=self.timeout_seconds) as response:
-                raw = response.read().decode("utf-8")
-        except HTTPError as error:
-            details = error.read().decode("utf-8", errors="replace")
-            raise SwitchyardError(
-                f"Switchyard returned HTTP {error.code}: {details or error.reason}"
-            ) from error
-        except URLError as error:
-            raise SwitchyardError(
-                f"Could not reach Switchyard at {self.base_url}: {error.reason}"
-            ) from error
+            return max(0.0, float(value))
+        except ValueError:
+            try:
+                return max(
+                    0.0,
+                    parsedate_to_datetime(value).timestamp() - time.time(),
+                )
+            except (TypeError, ValueError, OverflowError):
+                return None
+
+    def _request(
+        self,
+        method: str,
+        path: str,
+        payload: JSON | None = None,
+        *,
+        request_id: str | None = None,
+    ) -> JSON:
+        body = None if payload is None else json.dumps(payload).encode("utf-8")
+        actual_request_id = request_id or str(uuid.uuid4())
+        can_retry = method in {"GET", "HEAD"} or self.retry_policy.retry_post_requests
+        attempts = self.retry_policy.max_attempts if can_retry else 1
+        last_error: SwitchyardError | None = None
+
+        for attempt in range(1, attempts + 1):
+            self.circuit_breaker.before_call()
+            request = Request(
+                f"{self.base_url}{path}",
+                data=body,
+                method=method,
+                headers={
+                    "Accept": "application/json",
+                    "Authorization": f"Bearer {self.api_key}",
+                    "User-Agent": self.user_agent,
+                    "X-Request-ID": actual_request_id,
+                    **(
+                        {"Content-Type": "application/json"} if body is not None else {}
+                    ),
+                },
+            )
+            retry_after: float | None = None
+            try:
+                with urlopen(request, timeout=self.timeout_seconds) as response:
+                    raw = response.read().decode("utf-8")
+                self.circuit_breaker.record_success()
+                break
+            except HTTPError as error:
+                details = error.read().decode("utf-8", errors="replace")
+                retryable = error.code in {408, 429, 500, 502, 503, 504}
+                last_error = SwitchyardError(
+                    f"Switchyard returned HTTP {error.code}: "
+                    f"{details or error.reason}",
+                    status_code=error.code,
+                    retryable=retryable,
+                )
+                retry_after = self._retry_after_seconds(error)
+            except URLError as error:
+                last_error = SwitchyardError(
+                    f"Could not reach Switchyard at {self.base_url}: {error.reason}",
+                    retryable=True,
+                )
+
+            assert last_error is not None
+            if last_error.retryable:
+                self.circuit_breaker.record_failure()
+            if not last_error.retryable or attempt == attempts:
+                raise last_error
+            backoff = min(
+                self.retry_policy.max_backoff_seconds,
+                self.retry_policy.initial_backoff_seconds * (2 ** (attempt - 1)),
+            )
+            delay = retry_after if retry_after is not None else backoff
+            time.sleep(delay + random.uniform(0.0, max(0.001, delay * 0.25)))
+        else:  # pragma: no cover - the loop either breaks or raises
+            assert last_error is not None
+            raise last_error
 
         try:
             parsed = json.loads(raw)
@@ -144,6 +302,9 @@ class SwitchyardClient:
     def list_models(self) -> JSON:
         return self._request("GET", "/v1/models")
 
+    def health(self) -> JSON:
+        return self._request("GET", "/health")
+
     def stats(self) -> JSON:
         return self._request("GET", "/v1/stats")
 
@@ -155,6 +316,7 @@ class SwitchyardClient:
         max_tokens: int,
         temperature: float | None = None,
         extra_body: Mapping[str, Any] | None = None,
+        request_id: str | None = None,
     ) -> JSON:
         if not model:
             raise ValueError("model is required")
@@ -177,7 +339,9 @@ class SwitchyardClient:
                 names = ", ".join(sorted(overlap))
                 raise ValueError(f"extra_body cannot replace protected fields: {names}")
             payload.update(extra_body)
-        return self._request("POST", "/v1/chat/completions", payload)
+        return self._request(
+            "POST", "/v1/chat/completions", payload, request_id=request_id
+        )
 
 
 class SwitchyardExecutor:
@@ -284,6 +448,9 @@ class SwitchyardExecutor:
         messages: Sequence[Message] | None = None,
         temperature: float | None = None,
         extra_body: Mapping[str, Any] | None = None,
+        request_id: str | None = None,
+        fallback_on_error: bool = False,
+        response_validator: Callable[[JSON], bool] | None = None,
     ) -> ExecutionResult:
         actual_messages = messages or ({"role": "user", "content": request.prompt},)
         plan = self.plan(
@@ -291,11 +458,55 @@ class SwitchyardExecutor:
             routing_mode=routing_mode,
             messages=actual_messages,
         )
-        response = self.client.chat_completions(
-            model=plan.switchyard_model,
-            messages=actual_messages,
-            max_tokens=request.expected_output_tokens,
-            temperature=temperature,
-            extra_body=extra_body,
-        )
-        return ExecutionResult(plan=plan, response=response)
+        target_names = [plan.switchyard_model]
+        if fallback_on_error and routing_mode == "policy":
+            target_names.extend(
+                self.models[model_id].switchyard_target
+                for model_id in plan.policy_decision.fallback_models
+            )
+        attempts: list[dict[str, object]] = []
+        last_error: SwitchyardError | None = None
+        for target in target_names:
+            started = time.perf_counter()
+            try:
+                response = self.client.chat_completions(
+                    model=target,
+                    messages=actual_messages,
+                    max_tokens=request.expected_output_tokens,
+                    temperature=temperature,
+                    extra_body=extra_body,
+                    request_id=request_id,
+                )
+                if response_validator is not None and not response_validator(response):
+                    raise ResponseValidationError(
+                        "model response failed application validation"
+                    )
+                attempts.append(
+                    {
+                        "target": target,
+                        "success": True,
+                        "latency_ms": round((time.perf_counter() - started) * 1_000, 3),
+                    }
+                )
+                return ExecutionResult(
+                    plan=plan, response=response, attempts=tuple(attempts)
+                )
+            except SwitchyardError as error:
+                last_error = error
+                attempts.append(
+                    {
+                        "target": target,
+                        "success": False,
+                        "latency_ms": round((time.perf_counter() - started) * 1_000, 3),
+                        "error": type(error).__name__,
+                        "retryable": error.retryable,
+                    }
+                )
+                if not fallback_on_error:
+                    raise
+        assert last_error is not None
+        raise SwitchyardError(
+            f"all eligible Switchyard targets failed after {len(attempts)} attempts",
+            status_code=last_error.status_code,
+            retryable=last_error.retryable,
+        ) from last_error

@@ -106,6 +106,13 @@ class ModelRouter:
             )
             if not model.enabled or model.health < 0.8:
                 rejection_reasons.append("model disabled or unhealthy")
+            if request.allowed_model_ids and model.id not in request.allowed_model_ids:
+                rejection_reasons.append("model is not permitted by request policy")
+            if (
+                request.allowed_providers
+                and model.provider not in request.allowed_providers
+            ):
+                rejection_reasons.append("provider is not permitted by request policy")
             if model.tier < features.minimum_model_tier:
                 rejection_reasons.append(
                     f"model tier below required tier {features.minimum_model_tier}"
