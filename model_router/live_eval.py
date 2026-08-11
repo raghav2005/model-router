@@ -328,8 +328,10 @@ def summarize(runs: Sequence[CandidateRun]) -> dict[str, object]:
         selected = [run for run in runs if run.target == target]
         successful = [run for run in selected if run.success]
         scored = [run for run in successful if run.score is not None]
-        latencies = [run.latency_ms for run in successful]
-        ttfts = [run.ttft_ms for run in successful if run.ttft_ms is not None]
+        # Summaries use the same canonical precision as the JSONL checkpoint so a
+        # resumed benchmark is byte-for-byte comparable with its original run.
+        latencies = [round(run.latency_ms, 3) for run in successful]
+        ttfts = [round(run.ttft_ms, 3) for run in successful if run.ttft_ms is not None]
         input_tokens = [
             run.input_tokens for run in successful if run.input_tokens is not None
         ]
@@ -337,7 +339,7 @@ def summarize(runs: Sequence[CandidateRun]) -> dict[str, object]:
             run.output_tokens for run in successful if run.output_tokens is not None
         ]
         costs = [
-            run.estimated_cost_usd
+            round(run.estimated_cost_usd, 10)
             for run in successful
             if run.estimated_cost_usd is not None
         ]

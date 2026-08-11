@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.4.1 — 2026-08-11
+
+- Made live-evaluation summaries deterministic across checkpoint and resume by
+  canonicalising timing and cost precision before aggregation.
+
 ## 0.4.0 — 2026-08-11
 
 - Replaced anonymous catalogue assumptions with sourced GPT-5.6 model IDs, prices, cache pricing, long-context multipliers, context/output limits, and evidence markers.
