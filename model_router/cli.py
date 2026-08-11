@@ -213,6 +213,10 @@ def build_parser() -> argparse.ArgumentParser:
     live_eval.add_argument("--concurrency", type=int, default=4)
     live_eval.add_argument("--store-content", action="store_true")
     live_eval.add_argument("--no-resume", action="store_true")
+    live_eval.add_argument("--repetitions", type=int, default=1)
+    live_eval.add_argument(
+        "--stream", action="store_true", help="Measure streaming time to first token"
+    )
 
     release_gates = subparsers.add_parser(
         "release-gates", help="Evaluate production-enforcement release gates"
@@ -284,6 +288,8 @@ def main() -> None:
                 concurrency=args.concurrency,
                 store_content=args.store_content,
                 resume=not args.no_resume,
+                repetitions=args.repetitions,
+                stream=args.stream,
             )
             print(json.dumps(result, indent=2))
             return

@@ -26,6 +26,37 @@ class FakeHTTPResponse:
         return json.dumps(self.payload).encode("utf-8")
 
 
+class FakeStreamingResponse:
+    def __enter__(self) -> FakeStreamingResponse:
+        return self
+
+    def __exit__(self, *args: object) -> None:
+        return None
+
+    def __iter__(self):  # type: ignore[no-untyped-def]
+        events = [
+            {
+                "id": "chatcmpl-stream",
+                "model": "efficient",
+                "choices": [{"delta": {"content": "To"}, "finish_reason": None}],
+            },
+            {
+                "id": "chatcmpl-stream",
+                "model": "efficient",
+                "choices": [{"delta": {"content": "kyo"}, "finish_reason": "stop"}],
+            },
+            {
+                "id": "chatcmpl-stream",
+                "model": "efficient",
+                "choices": [],
+                "usage": {"prompt_tokens": 10, "completion_tokens": 2},
+            },
+        ]
+        for event in events:
+            yield f"data: {json.dumps(event)}\n".encode()
+        yield b"data: [DONE]\n"
+
+
 class SwitchyardClientTests(unittest.TestCase):
     @patch("model_router.switchyard.urlopen")
     def test_chat_completion_uses_openai_compatible_endpoint(
@@ -67,6 +98,24 @@ class SwitchyardClientTests(unittest.TestCase):
         request = mocked_urlopen.call_args.args[0]  # type: ignore[attr-defined]
         self.assertEqual(request.get_method(), "GET")
         self.assertTrue(request.full_url.endswith("/v1/models"))
+
+    @patch("model_router.switchyard.urlopen")
+    def test_streaming_completion_records_ttft_and_usage(
+        self, mocked_urlopen: object
+    ) -> None:
+        mocked_urlopen.return_value = FakeStreamingResponse()  # type: ignore[attr-defined]
+        result = SwitchyardClient().chat_completions_stream(
+            model="efficient",
+            messages=[{"role": "user", "content": "Capital of Japan?"}],
+            max_tokens=20,
+        )
+        self.assertEqual(result["choices"][0]["message"]["content"], "Tokyo")
+        self.assertEqual(result["usage"]["completion_tokens"], 2)
+        self.assertGreaterEqual(result["_router_timing"]["ttft_ms"], 0)
+        request = mocked_urlopen.call_args.args[0]  # type: ignore[attr-defined]
+        payload = json.loads(request.data.decode("utf-8"))
+        self.assertTrue(payload["stream"])
+        self.assertTrue(payload["stream_options"]["include_usage"])
 
     def test_client_rejects_protected_extra_body_fields(self) -> None:
         client = SwitchyardClient()

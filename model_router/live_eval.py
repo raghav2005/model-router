@@ -10,7 +10,9 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 
+from .catalog import load_catalog
 from .switchyard import SwitchyardClient, SwitchyardError
+from .types import ModelProfile
 
 
 @dataclass(frozen=True)
@@ -33,12 +35,17 @@ class ValidatorResult:
 class CandidateRun:
     case_id: str
     target: str
+    repetition: int
     success: bool
     score: float | None
     latency_ms: float
+    ttft_ms: float | None
     response_model: str | None
     input_tokens: int | None
+    cached_input_tokens: int | None
     output_tokens: int | None
+    estimated_cost_usd: float | None
+    finish_reason: str | None
     validators: tuple[ValidatorResult, ...]
     error: str | None
     content: str | None
@@ -47,6 +54,12 @@ class CandidateRun:
     def as_dict(self) -> dict[str, object]:
         value = asdict(self)
         value["latency_ms"] = round(self.latency_ms, 3)
+        value["ttft_ms"] = round(self.ttft_ms, 3) if self.ttft_ms is not None else None
+        value["estimated_cost_usd"] = (
+            round(self.estimated_cost_usd, 10)
+            if self.estimated_cost_usd is not None
+            else None
+        )
         return value
 
 
@@ -189,15 +202,24 @@ def evaluate_one(
     target: str,
     *,
     store_content: bool = False,
+    repetition: int = 1,
+    stream: bool = False,
+    model_profile: ModelProfile | None = None,
 ) -> CandidateRun:
     started = time.perf_counter()
     try:
-        response = client.chat_completions(
-            model=target,
-            messages=case.messages,
-            max_tokens=case.max_tokens,
+        method = client.chat_completions_stream if stream else client.chat_completions
+        response = method(
+            model=target, messages=case.messages, max_tokens=case.max_tokens
         )
-        latency_ms = (time.perf_counter() - started) * 1_000
+        measured_latency_ms = (time.perf_counter() - started) * 1_000
+        timing = response.get("_router_timing", {})
+        if not isinstance(timing, dict):
+            timing = {}
+        latency_ms = float(timing.get("total_ms", measured_latency_ms))
+        ttft_ms = (
+            float(timing["ttft_ms"]) if timing.get("ttft_ms") is not None else None
+        )
         content = _extract_content(response)
         validator_results = tuple(
             _validate(content, validator) for validator in case.validators
@@ -210,23 +232,57 @@ def evaluate_one(
         usage = response.get("usage", {})
         if not isinstance(usage, dict):
             usage = {}
+        input_tokens = (
+            int(usage["prompt_tokens"])
+            if usage.get("prompt_tokens") is not None
+            else None
+        )
+        output_tokens = (
+            int(usage["completion_tokens"])
+            if usage.get("completion_tokens") is not None
+            else None
+        )
+        prompt_details = usage.get("prompt_tokens_details", {})
+        if not isinstance(prompt_details, dict):
+            prompt_details = {}
+        cached_input_tokens = (
+            int(prompt_details["cached_tokens"])
+            if prompt_details.get("cached_tokens") is not None
+            else None
+        )
+        estimated_cost = (
+            model_profile.estimate_cost(
+                input_tokens,
+                output_tokens,
+                cached_input_tokens=cached_input_tokens or 0,
+            )
+            if model_profile is not None
+            and input_tokens is not None
+            and output_tokens is not None
+            else None
+        )
+        choices = response.get("choices", [])
+        finish_reason = None
+        if isinstance(choices, list) and choices and isinstance(choices[0], dict):
+            finish_reason = (
+                str(choices[0]["finish_reason"])
+                if choices[0].get("finish_reason") is not None
+                else None
+            )
         return CandidateRun(
             case_id=case.id,
             target=target,
+            repetition=repetition,
             success=True,
             score=score,
             latency_ms=latency_ms,
+            ttft_ms=ttft_ms,
             response_model=str(response.get("model", target)),
-            input_tokens=(
-                int(usage["prompt_tokens"])
-                if usage.get("prompt_tokens") is not None
-                else None
-            ),
-            output_tokens=(
-                int(usage["completion_tokens"])
-                if usage.get("completion_tokens") is not None
-                else None
-            ),
+            input_tokens=input_tokens,
+            cached_input_tokens=cached_input_tokens,
+            output_tokens=output_tokens,
+            estimated_cost_usd=estimated_cost,
+            finish_reason=finish_reason,
             validators=validator_results,
             error=None,
             content=content if store_content else None,
@@ -236,12 +292,17 @@ def evaluate_one(
         return CandidateRun(
             case_id=case.id,
             target=target,
+            repetition=repetition,
             success=False,
             score=None,
             latency_ms=(time.perf_counter() - started) * 1_000,
+            ttft_ms=None,
             response_model=None,
             input_tokens=None,
+            cached_input_tokens=None,
             output_tokens=None,
+            estimated_cost_usd=None,
+            finish_reason=None,
             validators=(),
             error=f"{type(error).__name__}: {error}",
             content=None,
@@ -259,18 +320,32 @@ def _percentile(values: list[float], percentile: float) -> float | None:
 
 def summarize(runs: Sequence[CandidateRun]) -> dict[str, object]:
     targets = sorted({run.target for run in runs})
+    expected_models = {
+        model.switchyard_target: model.provider_model for model in load_catalog()
+    }
     by_target: dict[str, object] = {}
     for target in targets:
         selected = [run for run in runs if run.target == target]
         successful = [run for run in selected if run.success]
         scored = [run for run in successful if run.score is not None]
         latencies = [run.latency_ms for run in successful]
+        ttfts = [run.ttft_ms for run in successful if run.ttft_ms is not None]
         input_tokens = [
             run.input_tokens for run in successful if run.input_tokens is not None
         ]
         output_tokens = [
             run.output_tokens for run in successful if run.output_tokens is not None
         ]
+        costs = [
+            run.estimated_cost_usd
+            for run in successful
+            if run.estimated_cost_usd is not None
+        ]
+        mismatched_models = sum(
+            run.response_model
+            not in {None, run.target, expected_models.get(run.target)}
+            for run in successful
+        )
         by_target[target] = {
             "runs": len(selected),
             "successful_calls": len(successful),
@@ -294,19 +369,31 @@ def summarize(runs: Sequence[CandidateRun]) -> dict[str, object]:
                     else None
                 ),
             },
+            "ttft_ms": {
+                "p50": round(statistics.median(ttfts), 3) if ttfts else None,
+                "p95": (
+                    round(value, 3)
+                    if (value := _percentile(ttfts, 0.95)) is not None
+                    else None
+                ),
+            },
             "total_input_tokens": sum(input_tokens),
             "total_output_tokens": sum(output_tokens),
+            "estimated_total_cost_usd": (round(sum(costs), 8) if costs else None),
+            "response_model_mismatch_count": mismatched_models,
             "errors": Counter(
                 run.error or "unknown" for run in selected if not run.success
             ),
         }
     return {
-        "schema_version": "switchyard-live-eval-summary-v1",
+        "schema_version": "switchyard-live-eval-summary-v2",
         "total_runs": len(runs),
         "targets": by_target,
         "caveat": (
             "Deterministic validators cover only cases with machine-checkable outcomes. "
-            "Open-ended tasks require an approved judge or human evaluation rubric."
+            "Open-ended tasks require an approved judge or human evaluation rubric. "
+            "Estimated cost uses provider-reported token counts and the versioned "
+            "catalog; the provider invoice remains authoritative."
         ),
     }
 
@@ -321,32 +408,49 @@ def run_benchmark(
     concurrency: int = 4,
     store_content: bool = False,
     resume: bool = True,
+    repetitions: int = 1,
+    stream: bool = False,
 ) -> dict[str, object]:
     if not targets:
         raise ValueError("at least one target is required")
     if concurrency <= 0:
         raise ValueError("concurrency must be greater than zero")
+    if repetitions <= 0:
+        raise ValueError("repetitions must be greater than zero")
+    if len(set(targets)) != len(targets):
+        raise ValueError("targets must be unique")
     result_path = Path(output_path)
-    completed: dict[tuple[str, str], CandidateRun] = {}
+    completed: dict[tuple[str, str, int], CandidateRun] = {}
+    models_by_target = {model.switchyard_target: model for model in load_catalog()}
     if resume and result_path.exists():
         with result_path.open("r", encoding="utf-8") as handle:
             for line in handle:
                 if not line.strip():
                     continue
                 raw = json.loads(line)
+                raw.setdefault("repetition", 1)
+                raw.setdefault("ttft_ms", None)
+                raw.setdefault("cached_input_tokens", None)
+                raw.setdefault("estimated_cost_usd", None)
+                raw.setdefault("finish_reason", None)
                 validators = tuple(
                     ValidatorResult(**item) for item in raw.get("validators", [])
                 )
                 raw["validators"] = validators
-                completed[(str(raw["case_id"]), str(raw["target"]))] = CandidateRun(
-                    **raw
-                )
+                completed[
+                    (
+                        str(raw["case_id"]),
+                        str(raw["target"]),
+                        int(raw["repetition"]),
+                    )
+                ] = CandidateRun(**raw)
 
     pending = [
-        (case, target)
+        (case, target, repetition)
         for case in cases
         for target in targets
-        if (case.id, target) not in completed
+        for repetition in range(1, repetitions + 1)
+        if (case.id, target, repetition) not in completed
     ]
     with ThreadPoolExecutor(max_workers=concurrency) as executor:
         futures = {
@@ -356,14 +460,22 @@ def run_benchmark(
                 case,
                 target,
                 store_content=store_content,
-            ): (case.id, target)
-            for case, target in pending
+                repetition=repetition,
+                stream=stream,
+                model_profile=models_by_target.get(target),
+            ): (case.id, target, repetition)
+            for case, target, repetition in pending
         }
         for future in as_completed(futures):
             run = future.result()
-            completed[(run.case_id, run.target)] = run
+            completed[(run.case_id, run.target, run.repetition)] = run
 
-    ordered = [completed[(case.id, target)] for case in cases for target in targets]
+    ordered = [
+        completed[(case.id, target, repetition)]
+        for case in cases
+        for target in targets
+        for repetition in range(1, repetitions + 1)
+    ]
     result_path.parent.mkdir(parents=True, exist_ok=True)
     result_path.write_text(
         "".join(

@@ -86,6 +86,7 @@ class LiveEvaluationTests(unittest.TestCase):
                 output_path=result_path,
                 summary_path=summary_path,
                 concurrency=2,
+                repetitions=2,
             )
             second = run_benchmark(
                 FakeClient(),  # type: ignore[arg-type]
@@ -95,9 +96,13 @@ class LiveEvaluationTests(unittest.TestCase):
                 summary_path=summary_path,
                 concurrency=2,
                 resume=True,
+                repetitions=2,
             )
             self.assertEqual(first, second)
-            self.assertEqual(len(result_path.read_text().splitlines()), 2)
+            self.assertEqual(len(result_path.read_text().splitlines()), 4)
+            self.assertIsNotNone(
+                first["targets"]["efficient"]["estimated_total_cost_usd"]
+            )
 
 
 if __name__ == "__main__":

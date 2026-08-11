@@ -343,6 +343,138 @@ class SwitchyardClient:
             "POST", "/v1/chat/completions", payload, request_id=request_id
         )
 
+    def chat_completions_stream(
+        self,
+        *,
+        model: str,
+        messages: Sequence[Message],
+        max_tokens: int,
+        temperature: float | None = None,
+        extra_body: Mapping[str, Any] | None = None,
+        request_id: str | None = None,
+    ) -> JSON:
+        """Collect one SSE stream while retaining TTFT and total latency."""
+        if not model or not messages or max_tokens <= 0:
+            raise ValueError("model, messages, and positive max_tokens are required")
+        payload: JSON = {
+            "model": model,
+            "messages": [dict(message) for message in messages],
+            "max_tokens": max_tokens,
+            "stream": True,
+            "stream_options": {"include_usage": True},
+        }
+        if temperature is not None:
+            payload["temperature"] = temperature
+        if extra_body:
+            protected = {
+                "model",
+                "messages",
+                "max_tokens",
+                "stream",
+                "stream_options",
+            }
+            overlap = protected.intersection(extra_body)
+            if overlap:
+                names = ", ".join(sorted(overlap))
+                raise ValueError(f"extra_body cannot replace protected fields: {names}")
+            payload.update(extra_body)
+
+        actual_request_id = request_id or str(uuid.uuid4())
+        request = Request(
+            f"{self.base_url}/v1/chat/completions",
+            data=json.dumps(payload).encode("utf-8"),
+            method="POST",
+            headers={
+                "Accept": "text/event-stream",
+                "Authorization": f"Bearer {self.api_key}",
+                "Content-Type": "application/json",
+                "User-Agent": self.user_agent,
+                "X-Request-ID": actual_request_id,
+            },
+        )
+        started = time.perf_counter()
+        first_token_at: float | None = None
+        text_parts: list[str] = []
+        response_model = model
+        response_id: str | None = None
+        finish_reason: str | None = None
+        usage: JSON = {}
+        self.circuit_breaker.before_call()
+        try:
+            with urlopen(request, timeout=self.timeout_seconds) as response:
+                for raw_line in response:
+                    line = raw_line.decode("utf-8", errors="replace").strip()
+                    if not line.startswith("data:"):
+                        continue
+                    data = line[5:].strip()
+                    if not data or data == "[DONE]":
+                        continue
+                    try:
+                        event = json.loads(data)
+                    except json.JSONDecodeError as error:
+                        raise SwitchyardError(
+                            "Switchyard returned invalid streaming JSON"
+                        ) from error
+                    if not isinstance(event, dict):
+                        continue
+                    response_id = str(event.get("id", response_id or "")) or response_id
+                    response_model = str(event.get("model", response_model))
+                    event_usage = event.get("usage")
+                    if isinstance(event_usage, dict):
+                        usage = event_usage
+                    choices = event.get("choices", [])
+                    if not isinstance(choices, list) or not choices:
+                        continue
+                    choice = choices[0]
+                    if not isinstance(choice, dict):
+                        continue
+                    if choice.get("finish_reason") is not None:
+                        finish_reason = str(choice["finish_reason"])
+                    delta = choice.get("delta", {})
+                    if not isinstance(delta, dict):
+                        continue
+                    content = delta.get("content")
+                    if isinstance(content, str) and content:
+                        if first_token_at is None:
+                            first_token_at = time.perf_counter()
+                        text_parts.append(content)
+            self.circuit_breaker.record_success()
+        except HTTPError as error:
+            details = error.read().decode("utf-8", errors="replace")
+            retryable = error.code in {408, 429, 500, 502, 503, 504}
+            if retryable:
+                self.circuit_breaker.record_failure()
+            raise SwitchyardError(
+                f"Switchyard returned HTTP {error.code}: {details or error.reason}",
+                status_code=error.code,
+                retryable=retryable,
+            ) from error
+        except URLError as error:
+            self.circuit_breaker.record_failure()
+            raise SwitchyardError(
+                f"Could not reach Switchyard at {self.base_url}: {error.reason}",
+                retryable=True,
+            ) from error
+
+        completed = time.perf_counter()
+        if first_token_at is None:
+            first_token_at = completed
+        return {
+            "id": response_id or actual_request_id,
+            "model": response_model,
+            "choices": [
+                {
+                    "message": {"role": "assistant", "content": "".join(text_parts)},
+                    "finish_reason": finish_reason,
+                }
+            ],
+            "usage": usage,
+            "_router_timing": {
+                "ttft_ms": (first_token_at - started) * 1_000,
+                "total_ms": (completed - started) * 1_000,
+            },
+        }
+
 
 class SwitchyardExecutor:
     """
