@@ -24,7 +24,7 @@ def confusion_matrix(
 def expected_calibration_error(
     labels: Sequence[int], probabilities: np.ndarray, bins: int = 10
 ) -> float:
-    if not labels:
+    if len(labels) == 0:
         return 0.0
     predictions = probabilities.argmax(axis=1) + 1
     confidence = probabilities.max(axis=1)
@@ -187,6 +187,38 @@ def choose_temperature(scores: np.ndarray, labels: Sequence[int]) -> float:
             best_loss = loss
             best_temperature = float(candidate)
     return best_temperature
+
+
+def choose_view_ensemble(
+    full_scores: np.ndarray,
+    final_turn_scores: np.ndarray,
+    labels: Sequence[int],
+) -> tuple[float, float]:
+    """Calibrate a full-conversation/final-turn ensemble on validation data."""
+    if full_scores.shape != final_turn_scores.shape:
+        raise ValueError("full and final-turn score shapes differ")
+    if len(full_scores) != len(labels):
+        raise ValueError("score and label lengths differ")
+    label_indices = np.asarray(labels, dtype=np.int64) - 1
+    best_weight = 0.0
+    best_temperature = 1.0
+    best_loss = math.inf
+    for weight in np.linspace(0.0, 0.5, 11):
+        for temperature in np.geomspace(0.25, 64.0, 65):
+            full_probabilities = softmax(full_scores.copy(), float(temperature))
+            final_probabilities = softmax(final_turn_scores.copy(), float(temperature))
+            probabilities = (1.0 - float(weight)) * full_probabilities + float(
+                weight
+            ) * final_probabilities
+            selected = np.clip(
+                probabilities[np.arange(len(labels)), label_indices], 1e-12, 1.0
+            )
+            loss = -float(np.log(selected).mean())
+            if loss < best_loss:
+                best_loss = loss
+                best_weight = float(weight)
+                best_temperature = float(temperature)
+    return best_weight, best_temperature
 
 
 def relative_cost_saving(

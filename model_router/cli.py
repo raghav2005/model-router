@@ -181,10 +181,10 @@ def build_parser() -> argparse.ArgumentParser:
     )
     train.add_argument("dataset")
     train.add_argument(
-        "--artifact", default="model_router/artifacts/complexity_router_v1.npz"
+        "--artifact", default="model_router/artifacts/complexity_router_v2.npz"
     )
-    train.add_argument("--report-json", default="reports/complexity_router_v1.json")
-    train.add_argument("--report-markdown", default="reports/complexity_router_v1.md")
+    train.add_argument("--report-json", default="reports/complexity_router_v2.json")
+    train.add_argument("--report-markdown", default="reports/complexity_router_v2.md")
     train.add_argument("--external-context-dataset")
     train.add_argument("--feature-dimension", type=int, default=32_768)
     train.add_argument("--borderline-weight", type=float, default=0.65)
@@ -218,7 +218,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     release_gates.add_argument("--policy", default="config/release_policy.json")
     release_gates.add_argument(
-        "--training-report", default="reports/complexity_router_v1.json"
+        "--training-report", default="reports/complexity_router_v2.json"
     )
     release_gates.add_argument(
         "--live-summary", default="reports/live_eval_summary.json"

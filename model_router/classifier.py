@@ -5,7 +5,7 @@ import re
 from dataclasses import replace
 from typing import Literal
 
-from .learned import DecisionPolicy, NaiveBayesComplexityModel
+from .learned import MODEL_SCHEMA_VERSION, DecisionPolicy, NaiveBayesComplexityModel
 from .types import RequestFeatures, RoutingRequest
 
 CODE_TERMS = re.compile(
@@ -216,7 +216,7 @@ def classify_request_with_model(
     complexity = max(0.0, min(1.0, complexity))
     minimum_tier = prediction.minimum_tier
     dataset_hash = str(model.metadata.get("training_dataset_sha256", "unknown"))
-    model_version = f"complexity-router-nb-v1:{dataset_hash[:12]}"
+    model_version = f"{MODEL_SCHEMA_VERSION}:{dataset_hash[:12]}"
     return replace(
         heuristic,
         complexity=complexity,

@@ -27,6 +27,7 @@ class LearnedModelTests(unittest.TestCase):
         self.assertTrue(default_artifact_path().exists())
         self.assertEqual(self.model.feature_dimension, 32_768)
         self.assertIn("training_dataset_sha256", self.model.metadata)
+        self.assertGreater(self.model.final_turn_weight, 0.0)
 
     def test_probabilities_are_normalized(self) -> None:
         prediction = self.model.predict("What is the capital of Japan?")
@@ -123,6 +124,10 @@ class EvaluationTests(unittest.TestCase):
         self.assertAlmostEqual(metrics["under_level_rate"], 1 / 3, places=6)
         self.assertAlmostEqual(metrics["over_level_rate"], 1 / 3, places=6)
         self.assertAlmostEqual(metrics["within_one_level_rate"], 1.0)
+
+    def test_metrics_accept_numpy_label_arrays(self) -> None:
+        metrics = classification_metrics(np.asarray([1, 2]), [1, 2])
+        self.assertEqual(metrics["accuracy"], 1.0)
 
 
 if __name__ == "__main__":

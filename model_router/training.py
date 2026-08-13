@@ -17,16 +17,16 @@ from .catalog import load_catalog
 from .classifier import classify_request
 from .evaluation import (
     LEVEL_TO_TIER,
-    choose_temperature,
+    choose_view_ensemble,
     classification_metrics,
     relative_cost_saving,
     slice_metrics,
-    softmax,
 )
 from .learned import (
     DEFAULT_FEATURE_DIMENSION,
     HashedTextVectorizer,
     NaiveBayesComplexityModel,
+    final_user_turn,
     normalize_prompt,
 )
 from .types import RoutingRequest
@@ -228,7 +228,78 @@ def _external_context_evaluation(
         result["metrics"] = classification_metrics(
             [row.level for row in novel], predictions, probabilities
         )
+        result["routing_policies"] = _routing_policy_evaluation(model, novel)
     return result
+
+
+def _routing_policy_evaluation(
+    model: NaiveBayesComplexityModel, rows: list[DatasetRow]
+) -> dict[str, object]:
+    from .router import ModelRouter, NoEligibleModel
+
+    catalog = load_catalog()
+    tier_by_model = {profile.id: profile.tier for profile in catalog}
+    routers = {
+        "hybrid_argmax": ModelRouter(
+            catalog,
+            complexity_model=model,
+            classifier_mode="hybrid",
+            decision_policy="argmax",
+        ),
+        "hybrid_adaptive_p15": ModelRouter(
+            catalog,
+            complexity_model=model,
+            classifier_mode="hybrid",
+            decision_policy="adaptive",
+            underroute_tolerance=0.15,
+        ),
+        "hybrid_tier_risk_p15": ModelRouter(
+            catalog,
+            complexity_model=model,
+            classifier_mode="hybrid",
+            decision_policy="tier_risk",
+            underroute_tolerance=0.15,
+        ),
+    }
+    results: dict[str, object] = {}
+    for name, router in routers.items():
+        selected_tiers: list[int] = []
+        required_tiers: list[int] = []
+        total_cost = 0.0
+        errors = 0
+        for row in rows:
+            try:
+                decision = router.route(RoutingRequest(prompt=row.prompt))
+            except NoEligibleModel:
+                errors += 1
+                continue
+            selected_tiers.append(tier_by_model[decision.model_id])
+            required_tiers.append(LEVEL_TO_TIER[row.level])
+            total_cost += decision.estimated_cost_usd
+        count = len(rows)
+        tier_under = (
+            sum(
+                selected < required
+                for selected, required in zip(
+                    selected_tiers, required_tiers, strict=True
+                )
+            )
+            + errors
+        )
+        tier_over = sum(
+            selected > required
+            for selected, required in zip(selected_tiers, required_tiers, strict=True)
+        )
+        tier_exact = count - tier_under - tier_over
+        results[name] = {
+            "count": count,
+            "route_errors": errors,
+            "tier_accuracy": round(tier_exact / count, 6),
+            "tier_underroute_rate": round(tier_under / count, 6),
+            "tier_overroute_rate": round(tier_over / count, 6),
+            "average_estimated_cost_usd": round(total_cost / count, 8),
+        }
+    return results
 
 
 def _end_to_end_router_evaluation(
@@ -259,6 +330,20 @@ def _end_to_end_router_evaluation(
             classifier_mode="hybrid",
             decision_policy="conservative",
             underroute_tolerance=0.20,
+        ),
+        "hybrid_adaptive_p15": ModelRouter(
+            catalog,
+            complexity_model=model,
+            classifier_mode="hybrid",
+            decision_policy="adaptive",
+            underroute_tolerance=0.15,
+        ),
+        "hybrid_tier_risk_p15": ModelRouter(
+            catalog,
+            complexity_model=model,
+            classifier_mode="hybrid",
+            decision_policy="tier_risk",
+            underroute_tolerance=0.15,
         ),
     }
     results: dict[str, object] = {}
@@ -557,11 +642,19 @@ def train_and_evaluate(
         log_class_prior,
         temperature=1.0,
     )
-    validation_predictions, _, validation_scores = _predict_rows(
-        uncalibrated, split_rows["validation"]
-    )
     validation_labels = [row.level for row in split_rows["validation"]]
-    temperature = choose_temperature(validation_scores, validation_labels)
+    validation_scores = np.vstack(
+        [uncalibrated.raw_scores(row.prompt) for row in split_rows["validation"]]
+    )
+    final_turn_scores = np.vstack(
+        [
+            uncalibrated.raw_scores(final_user_turn(row.prompt))
+            for row in split_rows["validation"]
+        ]
+    )
+    final_turn_weight, temperature = choose_view_ensemble(
+        validation_scores, final_turn_scores, validation_labels
+    )
 
     generated_at = datetime.now(UTC).isoformat()
     metadata: dict[str, object] = {
@@ -572,6 +665,7 @@ def train_and_evaluate(
         "validation_rows": len(split_rows["validation"]),
         "feature_dimension": training_config.feature_dimension,
         "temperature": temperature,
+        "final_turn_weight": final_turn_weight,
         "class_prior": training_config.class_prior,
         "borderline_weight": training_config.borderline_weight,
         "label_semantics": "synthetic, LLM-audited prompt complexity level 1-5",
@@ -580,7 +674,11 @@ def train_and_evaluate(
         log_feature_probability,
         log_class_prior,
         temperature=temperature,
+        final_turn_weight=final_turn_weight,
         metadata=metadata,
+    )
+    validation_predictions, validation_probabilities, _ = _predict_rows(
+        model, split_rows["validation"]
     )
 
     test_rows = split_rows["test"]
@@ -630,7 +728,7 @@ def train_and_evaluate(
         },
     }
     report: dict[str, object] = {
-        "schema_version": "router-training-report-v1",
+        "schema_version": "router-training-report-v2",
         "generated_at": generated_at,
         "dataset": dataset_report,
         "training": {
@@ -642,11 +740,12 @@ def train_and_evaluate(
             "appropriate_weight": training_config.appropriate_weight,
             "class_prior": training_config.class_prior,
             "temperature": temperature,
+            "final_turn_weight": final_turn_weight,
         },
         "validation": classification_metrics(
             validation_labels,
             validation_predictions,
-            softmax(validation_scores.copy(), temperature),
+            validation_probabilities,
         ),
         "evaluation": {
             "split": "test",
@@ -716,10 +815,10 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("dataset", help="Audited JSONL dataset")
     parser.add_argument(
-        "--artifact", default="model_router/artifacts/complexity_router_v1.npz"
+        "--artifact", default="model_router/artifacts/complexity_router_v2.npz"
     )
-    parser.add_argument("--report-json", default="reports/complexity_router_v1.json")
-    parser.add_argument("--report-markdown", default="reports/complexity_router_v1.md")
+    parser.add_argument("--report-json", default="reports/complexity_router_v2.json")
+    parser.add_argument("--report-markdown", default="reports/complexity_router_v2.md")
     parser.add_argument("--external-context-dataset")
     parser.add_argument("--feature-dimension", type=int, default=32_768)
     parser.add_argument("--borderline-weight", type=float, default=0.65)

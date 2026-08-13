@@ -12,7 +12,8 @@ from typing import Literal
 
 import numpy as np
 
-MODEL_SCHEMA_VERSION = "complexity-router-nb-v1"
+MODEL_SCHEMA_VERSION = "complexity-router-nb-v2"
+SUPPORTED_MODEL_SCHEMAS = frozenset({"complexity-router-nb-v1", MODEL_SCHEMA_VERSION})
 VECTORIZER_VERSION = "hashed-word-ngram-v1"
 DEFAULT_FEATURE_DIMENSION = 32_768
 WORD_PATTERN = re.compile(r"[a-z][a-z0-9_+#.-]*|\d+", re.IGNORECASE)
@@ -51,8 +52,13 @@ def normalize_prompt(text: str) -> str:
 
 def default_artifact_path() -> Path:
     return Path(
-        str(files("model_router").joinpath("artifacts/complexity_router_v1.npz"))
+        str(files("model_router").joinpath("artifacts/complexity_router_v2.npz"))
     )
+
+
+def final_user_turn(text: str) -> str:
+    matches = list(re.finditer(r"(?:^|\n)\s*user:\s*", text, re.IGNORECASE))
+    return text[matches[-1].end() :].strip() if matches else text
 
 
 @dataclass(frozen=True)
@@ -147,6 +153,7 @@ class NaiveBayesComplexityModel:
         log_class_prior: np.ndarray,
         *,
         temperature: float = 1.0,
+        final_turn_weight: float = 0.0,
         vectorizer_version: str = VECTORIZER_VERSION,
         metadata: dict[str, object] | None = None,
     ) -> None:
@@ -158,6 +165,8 @@ class NaiveBayesComplexityModel:
             raise ValueError("log_class_prior must contain five values")
         if temperature <= 0:
             raise ValueError("temperature must be greater than zero")
+        if not 0 <= final_turn_weight <= 1:
+            raise ValueError("final_turn_weight must be in [0, 1]")
         if vectorizer_version != VECTORIZER_VERSION:
             raise ValueError(
                 f"Unsupported vectorizer {vectorizer_version!r}; "
@@ -168,6 +177,7 @@ class NaiveBayesComplexityModel:
         )
         self.log_class_prior = np.asarray(log_class_prior, dtype=np.float64)
         self.temperature = float(temperature)
+        self.final_turn_weight = float(final_turn_weight)
         self.vectorizer_version = vectorizer_version
         self.metadata = metadata or {}
         self.vectorizer = HashedTextVectorizer(
@@ -184,6 +194,16 @@ class NaiveBayesComplexityModel:
         return self.log_class_prior + feature_scores
 
     def probabilities(self, prompt: str) -> np.ndarray:
+        probabilities = self._probabilities_for_view(prompt)
+        latest = final_user_turn(prompt)
+        if self.final_turn_weight and latest != prompt:
+            latest_probabilities = self._probabilities_for_view(latest)
+            probabilities = (
+                1.0 - self.final_turn_weight
+            ) * probabilities + self.final_turn_weight * latest_probabilities
+        return probabilities / probabilities.sum()
+
+    def _probabilities_for_view(self, prompt: str) -> np.ndarray:
         scores = self.raw_scores(prompt) / self.temperature
         scores -= scores.max()
         probabilities = np.exp(scores)
@@ -257,6 +277,7 @@ class NaiveBayesComplexityModel:
             log_feature_probability=self.log_feature_probability,
             log_class_prior=self.log_class_prior,
             temperature=np.asarray([self.temperature], dtype=np.float64),
+            final_turn_weight=np.asarray([self.final_turn_weight], dtype=np.float64),
             metadata_json=np.asarray(
                 [json.dumps(self.metadata, sort_keys=True, ensure_ascii=False)]
             ),
@@ -271,15 +292,20 @@ class NaiveBayesComplexityModel:
             )
         with np.load(artifact_path, allow_pickle=False) as artifact:
             schema_version = str(artifact["schema_version"][0])
-            if schema_version != MODEL_SCHEMA_VERSION:
+            if schema_version not in SUPPORTED_MODEL_SCHEMAS:
                 raise ValueError(
                     f"Unsupported artifact schema {schema_version!r}; "
-                    f"expected {MODEL_SCHEMA_VERSION!r}"
+                    f"expected one of {sorted(SUPPORTED_MODEL_SCHEMAS)!r}"
                 )
             return cls(
                 artifact["log_feature_probability"],
                 artifact["log_class_prior"],
                 temperature=float(artifact["temperature"][0]),
+                final_turn_weight=(
+                    float(artifact["final_turn_weight"][0])
+                    if "final_turn_weight" in artifact
+                    else 0.0
+                ),
                 vectorizer_version=str(artifact["vectorizer_version"][0]),
                 metadata=json.loads(str(artifact["metadata_json"][0])),
             )
