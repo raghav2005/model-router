@@ -15,7 +15,7 @@ WEIGHTS = {
     "quality": (0.90, 0.05, 0.05),
     "latency": (0.35, 0.10, 0.55),
 }
-POLICY_VERSION = "hybrid-utility-policy-v3"
+POLICY_VERSION = "hybrid-utility-policy-v4"
 
 
 class NoEligibleModel(RuntimeError):
@@ -31,7 +31,7 @@ class ModelRouter:
         *,
         complexity_model: NaiveBayesComplexityModel | None = None,
         classifier_mode: Literal["heuristic", "learned", "hybrid"] = "heuristic",
-        decision_policy: DecisionPolicy = "argmax",
+        decision_policy: DecisionPolicy = "adaptive",
         underroute_tolerance: float = 0.20,
         require_measured_quality: bool = False,
         require_measured_latency: bool = False,
@@ -55,7 +55,7 @@ class ModelRouter:
         *,
         models: list[ModelProfile] | None = None,
         classifier_mode: Literal["learned", "hybrid"] = "hybrid",
-        decision_policy: DecisionPolicy = "argmax",
+        decision_policy: DecisionPolicy = "adaptive",
         underroute_tolerance: float = 0.20,
         require_measured_quality: bool = False,
         require_measured_latency: bool = False,
@@ -220,7 +220,14 @@ class ModelRouter:
         )
         selected_model, selected = ranked[0]
         next_best_utility = ranked[1][1].utility if len(ranked) > 1 else 0.0
-        confidence = min(1.0, 0.5 + max(0.0, selected.utility - next_best_utility))
+        utility_confidence = min(
+            1.0, 0.5 + max(0.0, selected.utility - next_best_utility)
+        )
+        confidence = (
+            min(utility_confidence, features.classifier_confidence)
+            if features.classifier_confidence is not None
+            else utility_confidence
+        )
         reasons = (
             f"classified by {features.classifier_source} as {features.use_case}, "
             f"level {features.complexity_level}, complexity {features.complexity:.2f}",
@@ -229,6 +236,12 @@ class ModelRouter:
             f"estimated request cost ${selected.estimated_cost_usd:.6f}",
             f"quality evidence: {selected.quality_evidence}",
             f"latency evidence: {selected.latency_evidence}",
+            (
+                "posterior tier under-route probability "
+                f"{features.tier_underroute_probability:.3f}"
+                if features.tier_underroute_probability is not None
+                else "posterior tier risk unavailable for heuristic classification"
+            ),
         )
         all_scores = tuple(
             score

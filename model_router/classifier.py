@@ -5,7 +5,7 @@ import re
 from dataclasses import replace
 from typing import Literal
 
-from .learned import DecisionPolicy, NaiveBayesComplexityModel
+from .learned import MODEL_SCHEMA_VERSION, DecisionPolicy, NaiveBayesComplexityModel
 from .types import RequestFeatures, RoutingRequest
 
 CODE_TERMS = re.compile(
@@ -45,11 +45,58 @@ DEEP_REASONING_TERMS = re.compile(
     r"\b(prove|proof|derive|derivation|theorem|hidden assumptions?|alternative derivations?)\b",
     re.IGNORECASE,
 )
+BOUNDED_SIMPLE_META_TERMS = re.compile(
+    r"^\s*(?:spell the phrase\b|how many words are in the phrase\b|"
+    r"translate only the phrase\b|is\s+['\"].+['\"]\s+written in title case\b)",
+    re.IGNORECASE,
+)
+SHORT_RESPONSE_TERMS = re.compile(
+    r"\b(?:one word|una palabra|un mot|einem wort|una parola)\b|"
+    r"一語|只回答|한 단어|केवल",
+    re.IGNORECASE,
+)
+ADVANCED_ACTION_TERMS = re.compile(
+    r"\b(?:analy[sz]e|audit|compare|debug|derive|design|diagnose|evaluate|"
+    r"implement|plan|prove|reason|refactor|test|verify|write code)\b",
+    re.IGNORECASE,
+)
+
+BOUNDED_SIMPLE_SIGNAL = "bounded simple request"
+
+
+def is_bounded_simple_request(text: str) -> bool:
+    """Identify tightly scoped requests whose quoted terms are not task complexity.
+
+    The anchored meta-frames are deliberately narrow. The short-answer rule is
+    additionally disabled for code, high-stakes, or advanced-action requests so
+    an instruction such as "prove this; answer in one word" cannot lower its tier.
+    """
+    if BOUNDED_SIMPLE_META_TERMS.search(text):
+        return "```" not in text
+    return bool(
+        len(text) <= 220
+        and SHORT_RESPONSE_TERMS.search(text)
+        and not CODE_TERMS.search(text)
+        and not HIGH_STAKES_TERMS.search(text)
+        and not ADVANCED_ACTION_TERMS.search(text)
+        and "```" not in text
+    )
 
 
 def estimate_tokens(text: str) -> int:
-    """A conservative tokenizer-free approximation suitable for routing."""
-    return max(1, math.ceil(len(text) / 4))
+    """A conservative tokenizer-free approximation suitable for hard gates.
+
+    Character-count rules materially undercount CJK text and short whitespace-
+    separated tokens. Taking the maximum of byte, Unicode, and lexical estimates
+    is still approximate, but fails safer when an exact provider tokenizer is not
+    available at the routing edge.
+    """
+    ascii_characters = sum(ord(character) < 128 for character in text)
+    non_ascii_characters = len(text) - ascii_characters
+    unicode_estimate = math.ceil(ascii_characters / 4 + non_ascii_characters)
+    byte_estimate = math.ceil(len(text.encode("utf-8")) / 4)
+    lexical_estimate = len(re.findall(r"\w+|[^\w\s]", text, re.UNICODE))
+    return max(1, unicode_estimate, byte_estimate, lexical_estimate)
 
 
 def complexity_to_level(complexity: float) -> int:
@@ -78,14 +125,18 @@ def classify_request(request: RoutingRequest) -> RequestFeatures:
     text = request.prompt
     signals: list[str] = []
     inferred_capabilities = set(request.required_capabilities)
+    bounded_simple = is_bounded_simple_request(text)
 
-    has_code = bool(CODE_TERMS.search(text) or "```" in text)
-    has_reasoning = bool(REASONING_TERMS.search(text))
-    high_stakes = bool(HIGH_STAKES_TERMS.search(text))
+    has_code = not bounded_simple and bool(CODE_TERMS.search(text) or "```" in text)
+    has_reasoning = not bounded_simple and bool(REASONING_TERMS.search(text))
+    high_stakes = not bounded_simple and bool(HIGH_STAKES_TERMS.search(text))
 
     if request.use_case:
         use_case = request.use_case
         signals.append("caller supplied use case")
+    elif bounded_simple:
+        use_case = "general_qa"
+        signals.append(BOUNDED_SIMPLE_SIGNAL)
     elif has_code:
         use_case = "coding"
         signals.append("coding vocabulary or code block")
@@ -108,13 +159,13 @@ def classify_request(request: RoutingRequest) -> RequestFeatures:
         complexity += 0.13
     if has_reasoning:
         complexity += 0.22
-    if MODERATE_CODE_TERMS.search(text):
+    if not bounded_simple and MODERATE_CODE_TERMS.search(text):
         complexity += 0.12
         signals.append("non-trivial implementation or verification")
-    if ADVANCED_SYSTEM_TERMS.search(text):
+    if not bounded_simple and ADVANCED_SYSTEM_TERMS.search(text):
         complexity += 0.20
         signals.append("advanced system-level task")
-    if DEEP_REASONING_TERMS.search(text):
+    if not bounded_simple and DEEP_REASONING_TERMS.search(text):
         complexity += 0.20
         signals.append("deep formal reasoning")
     if "```" in text:
@@ -175,10 +226,23 @@ def classify_request_with_model(
     underroute_tolerance: float = 0.20,
 ) -> RequestFeatures:
     heuristic = classify_request(request)
+    actual_policy: DecisionPolicy = decision_policy
+    if decision_policy == "adaptive":
+        argmax_prediction = model.predict(request.prompt, decision_policy="argmax")
+        if heuristic.risk == "high" or request.priority == "quality":
+            actual_policy = "tier_risk"
+        elif request.priority == "balanced" and argmax_prediction.confidence < 0.45:
+            actual_policy = "tier_risk"
+        else:
+            actual_policy = "argmax"
     prediction = model.predict(
         request.prompt,
-        decision_policy=decision_policy,
-        underroute_tolerance=underroute_tolerance,
+        decision_policy=actual_policy,
+        underroute_tolerance=(
+            min(underroute_tolerance, 0.10)
+            if heuristic.risk == "high"
+            else underroute_tolerance
+        ),
     )
     learned_complexity = level_to_complexity(prediction.expected_level)
     if mode == "learned":
@@ -189,23 +253,34 @@ def classify_request_with_model(
             complexity = max(complexity, heuristic.complexity)
     else:
         raise ValueError(f"Unknown learned classifier mode: {mode}")
+    bounded_simple = BOUNDED_SIMPLE_SIGNAL in heuristic.signals
+    if bounded_simple:
+        # A tightly bounded semantic task takes precedence over misleading words
+        # inside the content. Keep the posterior in telemetry for later review.
+        complexity = min(complexity, 0.19)
     complexity = max(0.0, min(1.0, complexity))
-    minimum_tier = {1: 1, 2: 1, 3: 2, 4: 3, 5: 3}[prediction.level]
+    minimum_tier = 1 if bounded_simple else prediction.minimum_tier
+    complexity_level = 1 if bounded_simple else prediction.level
     dataset_hash = str(model.metadata.get("training_dataset_sha256", "unknown"))
-    model_version = f"complexity-router-nb-v1:{dataset_hash[:12]}"
+    model_version = f"{MODEL_SCHEMA_VERSION}:{dataset_hash[:12]}"
     return replace(
         heuristic,
         complexity=complexity,
-        complexity_level=prediction.level,
+        complexity_level=complexity_level,
         quality_floor=quality_floor_for(complexity, heuristic.risk),
         minimum_model_tier=minimum_tier,
         signals=heuristic.signals
         + (
-            f"learned complexity level {prediction.level} using {decision_policy}",
+            f"learned complexity level {prediction.level} using {actual_policy}",
             f"learned classifier confidence {prediction.confidence:.2f}",
+            f"normalized classifier entropy {prediction.entropy:.2f}",
+            "posterior tier under-route probability "
+            f"{prediction.tier_underroute_probability:.3f}",
         ),
         classifier_source=mode,
         classifier_model_version=model_version,
         classifier_confidence=prediction.confidence,
+        classifier_entropy=prediction.entropy,
+        tier_underroute_probability=prediction.tier_underroute_probability,
         level_probabilities=prediction.probabilities,
     )

@@ -35,6 +35,9 @@ MODEL_ROUTER_API_TOKEN=<secret>
 MODEL_ROUTER_METRICS_TOKEN=<secret>
 MODEL_ROUTER_AUDIT_HMAC_KEY=<secret>
 MODEL_ROUTER_AUDIT_PATH=-
+MODEL_ROUTER_CLASSIFIER_MODE=hybrid
+MODEL_ROUTER_COMPLEXITY_POLICY=adaptive
+MODEL_ROUTER_UNDERROUTE_TOLERANCE=0.15
 SWITCHYARD_URL=http://switchyard:4000
 ```
 
@@ -56,9 +59,21 @@ Required evidence includes:
 
 Update the catalogue evidence markers and release report only after approval of the underlying data.
 
+Create the drift baseline only after the shadow window and its traffic mix are
+approved. Store it with the release evidence:
+
+```bash
+model-router drift-baseline audit-shadow.jsonl --output config/drift_baseline.json
+model-router drift-report audit-next-window.jsonl --baseline config/drift_baseline.json
+```
+
+Do not overwrite an approved baseline silently. A new baseline is a reviewed policy
+change, not a way to clear an alert.
+
 ## 5. Guarded enforcement
 
-1. Confirm `model-router release-gates` passes for the release inputs.
+1. Confirm `model-router release-gates` passes for the release inputs. The service
+   independently repeats this check and refuses to start in `enforce` mode if it fails.
 2. Route a small, explicitly allowlisted traffic percentage through `enforce` mode.
 3. Keep high-risk and unvalidated workloads pinned to capable.
 4. Compare against a concurrent control group.

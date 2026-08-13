@@ -8,6 +8,7 @@ from typing import Iterable
 from .types import RouteDecision
 
 LATENCY_BUCKETS_MS = (10, 25, 50, 100, 250, 500, 1_000, 2_500, 5_000, 10_000)
+CLASSIFIER_BUCKETS = (0.2, 0.4, 0.6, 0.8, 1.0)
 
 
 def _label(value: str) -> str:
@@ -25,6 +26,9 @@ class RoutingMetrics:
         self._executions: Counter[tuple[str, str]] = Counter()
         self._estimated_cost: Counter[str] = Counter()
         self._actual_tokens: Counter[tuple[str, str]] = Counter()
+        self._classifier_confidence: Counter[float] = Counter()
+        self._classifier_entropy: Counter[float] = Counter()
+        self._tier_risk: Counter[float] = Counter()
         self._latencies: dict[str, deque[float]] = defaultdict(
             lambda: deque(maxlen=latency_sample_limit)
         )
@@ -38,6 +42,26 @@ class RoutingMetrics:
         with self._lock:
             self._routes[key] += 1
             self._estimated_cost[decision.model_id] += decision.estimated_cost_usd
+            self._record_classifier_value(
+                self._classifier_confidence,
+                decision.features.classifier_confidence,
+            )
+            self._record_classifier_value(
+                self._classifier_entropy,
+                decision.features.classifier_entropy,
+            )
+            self._record_classifier_value(
+                self._tier_risk,
+                decision.features.tier_underroute_probability,
+            )
+
+    @staticmethod
+    def _record_classifier_value(counter: Counter[float], value: float | None) -> None:
+        if value is None:
+            return
+        for boundary in CLASSIFIER_BUCKETS:
+            if value <= boundary:
+                counter[boundary] += 1
 
     def record_execution(
         self,
@@ -100,8 +124,41 @@ class RoutingMetrics:
                     "model_router_tokens_total"
                     f'{{model="{_label(model)}",type="{token_type}"}} {count}'
                 )
+            lines.extend(
+                self._classifier_lines(
+                    "model_router_classifier_confidence",
+                    "Calibrated classifier confidence at route time.",
+                    self._classifier_confidence,
+                )
+            )
+            lines.extend(
+                self._classifier_lines(
+                    "model_router_classifier_entropy",
+                    "Normalized classifier entropy at route time.",
+                    self._classifier_entropy,
+                )
+            )
+            lines.extend(
+                self._classifier_lines(
+                    "model_router_tier_underroute_probability",
+                    "Posterior probability that the selected minimum tier is too low.",
+                    self._tier_risk,
+                )
+            )
             lines.extend(self._latency_lines())
         return "\n".join(lines) + "\n"
+
+    @staticmethod
+    def _classifier_lines(
+        name: str, help_text: str, buckets: Counter[float]
+    ) -> Iterable[str]:
+        yield f"# HELP {name} {help_text}"
+        yield f"# TYPE {name} histogram"
+        count = max(buckets.values(), default=0)
+        for boundary in CLASSIFIER_BUCKETS:
+            yield f'{name}_bucket{{le="{boundary}"}} {buckets[boundary]}'
+        yield f'{name}_bucket{{le="+Inf"}} {count}'
+        yield f"{name}_count {count}"
 
     def _latency_lines(self) -> Iterable[str]:
         yield "# HELP model_router_execution_latency_ms Gateway completion latency."

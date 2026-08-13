@@ -12,12 +12,38 @@ from typing import Literal
 
 import numpy as np
 
-MODEL_SCHEMA_VERSION = "complexity-router-nb-v1"
+MODEL_SCHEMA_VERSION = "complexity-router-nb-v2"
+SUPPORTED_MODEL_SCHEMAS = frozenset({"complexity-router-nb-v1", MODEL_SCHEMA_VERSION})
 VECTORIZER_VERSION = "hashed-word-ngram-v1"
 DEFAULT_FEATURE_DIMENSION = 32_768
 WORD_PATTERN = re.compile(r"[a-z][a-z0-9_+#.-]*|\d+", re.IGNORECASE)
 Whitespace = re.compile(r"\s+")
-DecisionPolicy = Literal["argmax", "expected", "conservative"]
+DecisionPolicy = Literal["argmax", "expected", "conservative", "tier_risk", "adaptive"]
+
+
+def level_to_tier(level: int) -> int:
+    return {1: 1, 2: 1, 3: 2, 4: 3, 5: 3}[level]
+
+
+def tier_underroute_probability(probabilities: np.ndarray, selected_tier: int) -> float:
+    if selected_tier not in {1, 2, 3}:
+        raise ValueError("selected_tier must be 1, 2, or 3")
+    if selected_tier == 1:
+        return float(probabilities[2:].sum())
+    if selected_tier == 2:
+        return float(probabilities[3:].sum())
+    return 0.0
+
+
+def tier_for_risk(probabilities: np.ndarray, tolerance: float) -> int:
+    """Return the cheapest tier whose posterior under-route risk is tolerated."""
+    if not 0 <= tolerance < 1:
+        raise ValueError("underroute_tolerance must be in [0, 1)")
+    if tier_underroute_probability(probabilities, 1) <= tolerance:
+        return 1
+    if tier_underroute_probability(probabilities, 2) <= tolerance:
+        return 2
+    return 3
 
 
 def normalize_prompt(text: str) -> str:
@@ -26,8 +52,13 @@ def normalize_prompt(text: str) -> str:
 
 def default_artifact_path() -> Path:
     return Path(
-        str(files("model_router").joinpath("artifacts/complexity_router_v1.npz"))
+        str(files("model_router").joinpath("artifacts/complexity_router_v2.npz"))
     )
+
+
+def final_user_turn(text: str) -> str:
+    matches = list(re.finditer(r"(?:^|\n)\s*user:\s*", text, re.IGNORECASE))
+    return text[matches[-1].end() :].strip() if matches else text
 
 
 @dataclass(frozen=True)
@@ -38,6 +69,8 @@ class ComplexityPrediction:
     entropy: float
     probabilities: tuple[float, ...]
     decision_policy: str
+    minimum_tier: int
+    tier_underroute_probability: float
 
     def as_dict(self) -> dict[str, object]:
         return {
@@ -50,6 +83,8 @@ class ComplexityPrediction:
                 for index, probability in enumerate(self.probabilities)
             },
             "decision_policy": self.decision_policy,
+            "minimum_tier": self.minimum_tier,
+            "tier_underroute_probability": round(self.tier_underroute_probability, 5),
         }
 
 
@@ -118,6 +153,7 @@ class NaiveBayesComplexityModel:
         log_class_prior: np.ndarray,
         *,
         temperature: float = 1.0,
+        final_turn_weight: float = 0.0,
         vectorizer_version: str = VECTORIZER_VERSION,
         metadata: dict[str, object] | None = None,
     ) -> None:
@@ -129,6 +165,8 @@ class NaiveBayesComplexityModel:
             raise ValueError("log_class_prior must contain five values")
         if temperature <= 0:
             raise ValueError("temperature must be greater than zero")
+        if not 0 <= final_turn_weight <= 1:
+            raise ValueError("final_turn_weight must be in [0, 1]")
         if vectorizer_version != VECTORIZER_VERSION:
             raise ValueError(
                 f"Unsupported vectorizer {vectorizer_version!r}; "
@@ -139,6 +177,7 @@ class NaiveBayesComplexityModel:
         )
         self.log_class_prior = np.asarray(log_class_prior, dtype=np.float64)
         self.temperature = float(temperature)
+        self.final_turn_weight = float(final_turn_weight)
         self.vectorizer_version = vectorizer_version
         self.metadata = metadata or {}
         self.vectorizer = HashedTextVectorizer(
@@ -155,6 +194,16 @@ class NaiveBayesComplexityModel:
         return self.log_class_prior + feature_scores
 
     def probabilities(self, prompt: str) -> np.ndarray:
+        probabilities = self._probabilities_for_view(prompt)
+        latest = final_user_turn(prompt)
+        if self.final_turn_weight and latest != prompt:
+            latest_probabilities = self._probabilities_for_view(latest)
+            probabilities = (
+                1.0 - self.final_turn_weight
+            ) * probabilities + self.final_turn_weight * latest_probabilities
+        return probabilities / probabilities.sum()
+
+    def _probabilities_for_view(self, prompt: str) -> np.ndarray:
         scores = self.raw_scores(prompt) / self.temperature
         scores -= scores.max()
         probabilities = np.exp(scores)
@@ -186,8 +235,23 @@ class NaiveBayesComplexityModel:
                 + 1
             )
             level = min(5, level)
+        elif decision_policy == "tier_risk":
+            minimum_tier = tier_for_risk(probabilities, underroute_tolerance)
+            # Preserve ordinal meaning while making the selected tier explicit.
+            level = {1: 2, 2: 3, 3: 5}[minimum_tier]
+        elif decision_policy == "adaptive":
+            raise ValueError(
+                "adaptive policy requires request context; use the router classifier"
+            )
         else:
             raise ValueError(f"Unknown decision policy: {decision_policy}")
+
+        minimum_tier = (
+            minimum_tier if decision_policy == "tier_risk" else level_to_tier(level)
+        )
+        underroute_probability = tier_underroute_probability(
+            probabilities, minimum_tier
+        )
 
         entropy = -float(
             np.sum(probabilities * np.log(np.clip(probabilities, 1e-12, 1.0)))
@@ -199,6 +263,8 @@ class NaiveBayesComplexityModel:
             entropy=entropy,
             probabilities=tuple(float(value) for value in probabilities),
             decision_policy=decision_policy,
+            minimum_tier=minimum_tier,
+            tier_underroute_probability=underroute_probability,
         )
 
     def save(self, path: str | Path) -> None:
@@ -211,6 +277,7 @@ class NaiveBayesComplexityModel:
             log_feature_probability=self.log_feature_probability,
             log_class_prior=self.log_class_prior,
             temperature=np.asarray([self.temperature], dtype=np.float64),
+            final_turn_weight=np.asarray([self.final_turn_weight], dtype=np.float64),
             metadata_json=np.asarray(
                 [json.dumps(self.metadata, sort_keys=True, ensure_ascii=False)]
             ),
@@ -225,15 +292,20 @@ class NaiveBayesComplexityModel:
             )
         with np.load(artifact_path, allow_pickle=False) as artifact:
             schema_version = str(artifact["schema_version"][0])
-            if schema_version != MODEL_SCHEMA_VERSION:
+            if schema_version not in SUPPORTED_MODEL_SCHEMAS:
                 raise ValueError(
                     f"Unsupported artifact schema {schema_version!r}; "
-                    f"expected {MODEL_SCHEMA_VERSION!r}"
+                    f"expected one of {sorted(SUPPORTED_MODEL_SCHEMAS)!r}"
                 )
             return cls(
                 artifact["log_feature_probability"],
                 artifact["log_class_prior"],
                 temperature=float(artifact["temperature"][0]),
+                final_turn_weight=(
+                    float(artifact["final_turn_weight"][0])
+                    if "final_turn_weight" in artifact
+                    else 0.0
+                ),
                 vectorizer_version=str(artifact["vectorizer_version"][0]),
                 metadata=json.loads(str(artifact["metadata_json"][0])),
             )

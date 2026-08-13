@@ -12,7 +12,9 @@ from wsgiref.simple_server import make_server
 
 from .audit import DecisionAuditLogger
 from .catalog import catalog_sha256, load_catalog
+from .messages import flatten_messages, validate_string_array
 from .observability import RoutingMetrics
+from .readiness import evaluate_release_gates
 from .router import ModelRouter, NoEligibleModel
 from .switchyard import SwitchyardClient, SwitchyardError, SwitchyardExecutor
 from .types import RoutingRequest
@@ -28,6 +30,9 @@ class RuntimeConfig:
     metrics_token: str | None = None
     max_body_bytes: int = 1_048_576
     fallback_on_error: bool = False
+    release_policy_path: str = "config/release_policy.json"
+    training_report_path: str = "reports/complexity_router_v2.json"
+    live_summary_path: str = "reports/live_eval_summary.json"
 
     def __post_init__(self) -> None:
         if self.mode not in {"shadow", "enforce"}:
@@ -44,6 +49,15 @@ class RuntimeConfig:
             metrics_token=os.getenv("MODEL_ROUTER_METRICS_TOKEN"),
             max_body_bytes=int(os.getenv("MODEL_ROUTER_MAX_BODY_BYTES", "1048576")),
             fallback_on_error=os.getenv("MODEL_ROUTER_FALLBACK_ON_ERROR", "0") == "1",
+            release_policy_path=os.getenv(
+                "MODEL_ROUTER_RELEASE_POLICY", "config/release_policy.json"
+            ),
+            training_report_path=os.getenv(
+                "MODEL_ROUTER_TRAINING_REPORT", "reports/complexity_router_v2.json"
+            ),
+            live_summary_path=os.getenv(
+                "MODEL_ROUTER_LIVE_SUMMARY", "reports/live_eval_summary.json"
+            ),
         )
 
 
@@ -56,17 +70,6 @@ def _usage(response: Mapping[str, Any]) -> tuple[int, int]:
     if not isinstance(usage, Mapping):
         return 0, 0
     return int(usage.get("prompt_tokens", 0)), int(usage.get("completion_tokens", 0))
-
-
-def _prompt_from_messages(messages: object) -> str:
-    if not isinstance(messages, list) or not messages:
-        raise ValueError("messages must be a non-empty array")
-    for message in reversed(messages):
-        if not isinstance(message, dict):
-            raise ValueError("every message must be an object")
-        if message.get("role") == "user" and isinstance(message.get("content"), str):
-            return str(message["content"])
-    raise ValueError("messages must include a text user message")
 
 
 class RouterApplication:
@@ -82,12 +85,37 @@ class RouterApplication:
         config: RuntimeConfig | None = None,
     ) -> None:
         self.config = config or RuntimeConfig.from_environment()
+        self.release_report: dict[str, object] | None = None
+        if self.config.mode == "enforce":
+            try:
+                self.release_report = evaluate_release_gates(
+                    policy_path=self.config.release_policy_path,
+                    training_report_path=self.config.training_report_path,
+                    live_summary_path=self.config.live_summary_path,
+                )
+            except (OSError, KeyError, TypeError, ValueError) as error:
+                raise RuntimeError(
+                    "enforcement mode refused: release evidence could not be evaluated"
+                ) from error
+            if not self.release_report["ready_for_enforcement"]:
+                failures = ", ".join(
+                    str(gate["name"])
+                    for gate in self.release_report["gates"]
+                    if not gate["passed"]
+                )
+                raise RuntimeError(
+                    f"enforcement mode refused: failed release gates: {failures}"
+                )
         self.models = load_catalog()
         self.model_by_id = {model.id: model for model in self.models}
         if self.config.shadow_target not in self.model_by_id:
             raise ValueError("shadow_target must be a catalog role")
         self.router = router or ModelRouter.from_artifact(
-            classifier_mode="hybrid", decision_policy="conservative"
+            classifier_mode=os.getenv("MODEL_ROUTER_CLASSIFIER_MODE", "hybrid"),
+            decision_policy=os.getenv("MODEL_ROUTER_COMPLEXITY_POLICY", "adaptive"),
+            underroute_tolerance=float(
+                os.getenv("MODEL_ROUTER_UNDERROUTE_TOLERANCE", "0.15")
+            ),
         )
         self.client = client or SwitchyardClient(
             os.getenv("SWITCHYARD_URL", "http://127.0.0.1:4000"),
@@ -169,7 +197,7 @@ class RouterApplication:
         prompt = (
             str(body["prompt"])
             if isinstance(body.get("prompt"), str)
-            else _prompt_from_messages(body.get("messages"))
+            else flatten_messages(body.get("messages"))
         )
         max_tokens = int(body.get("max_tokens", body.get("max_completion_tokens", 500)))
         return RoutingRequest(
@@ -188,7 +216,9 @@ class RouterApplication:
             cached_input_tokens=int(routing.get("cached_input_tokens", 0)),
             cache_write_tokens=int(routing.get("cache_write_tokens", 0)),
             expected_output_tokens=max_tokens,
-            required_capabilities=frozenset(routing.get("required_capabilities", [])),
+            required_capabilities=validate_string_array(
+                routing.get("required_capabilities", []), "required_capabilities"
+            ),
             priority=str(routing.get("priority", "balanced")),
             max_cost_usd=(
                 float(routing["max_cost_usd"])
@@ -201,8 +231,12 @@ class RouterApplication:
                 else None
             ),
             use_case=(str(routing["use_case"]) if routing.get("use_case") else None),
-            allowed_model_ids=frozenset(routing.get("allowed_model_ids", [])),
-            allowed_providers=frozenset(routing.get("allowed_providers", [])),
+            allowed_model_ids=validate_string_array(
+                routing.get("allowed_model_ids", []), "allowed_model_ids"
+            ),
+            allowed_providers=validate_string_array(
+                routing.get("allowed_providers", []), "allowed_providers"
+            ),
         )
 
     def _record_decision(self, request: RoutingRequest, decision: Any) -> None:
@@ -311,7 +345,18 @@ class RouterApplication:
                 return self._respond(
                     start_response,
                     HTTPStatus.OK,
-                    _json_bytes({"status": "ready", "switchyard": gateway}),
+                    _json_bytes(
+                        {
+                            "status": "ready",
+                            "mode": self.config.mode,
+                            "release_gate_ready": (
+                                self.release_report["ready_for_enforcement"]
+                                if self.release_report is not None
+                                else None
+                            ),
+                            "switchyard": gateway,
+                        }
+                    ),
                     headers=common_headers,
                 )
             if method == "GET" and path == "/metrics":

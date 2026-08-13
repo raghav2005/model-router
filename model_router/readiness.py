@@ -32,7 +32,7 @@ def evaluate_release_gates(
     *,
     policy_path: str | Path = "config/release_policy.json",
     catalog_path: str | Path | None = None,
-    training_report_path: str | Path = "reports/complexity_router_v1.json",
+    training_report_path: str | Path = "reports/complexity_router_v2.json",
     live_summary_path: str | Path = "reports/live_eval_summary.json",
     today: date | None = None,
 ) -> dict[str, object]:

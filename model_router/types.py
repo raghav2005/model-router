@@ -82,6 +82,32 @@ class RoutingRequest:
     allowed_model_ids: frozenset[str] = field(default_factory=frozenset)
     allowed_providers: frozenset[str] = field(default_factory=frozenset)
 
+    def __post_init__(self) -> None:
+        if not self.prompt.strip():
+            raise ValueError("prompt must not be empty")
+        if self.input_tokens is not None and self.input_tokens < 1:
+            raise ValueError("input_tokens must be positive when supplied")
+        if min(self.cached_input_tokens, self.cache_write_tokens) < 0:
+            raise ValueError("cache token counts cannot be negative")
+        if (
+            self.input_tokens is not None
+            and self.cached_input_tokens + self.cache_write_tokens > self.input_tokens
+        ):
+            raise ValueError("cache token counts cannot exceed input_tokens")
+        if self.expected_output_tokens < 1:
+            raise ValueError("expected_output_tokens must be positive")
+        if self.max_cost_usd is not None and self.max_cost_usd <= 0:
+            raise ValueError("max_cost_usd must be positive when supplied")
+        if self.max_latency_ms is not None and self.max_latency_ms <= 0:
+            raise ValueError("max_latency_ms must be positive when supplied")
+        for name, values in (
+            ("required_capabilities", self.required_capabilities),
+            ("allowed_model_ids", self.allowed_model_ids),
+            ("allowed_providers", self.allowed_providers),
+        ):
+            if any(not value.strip() for value in values):
+                raise ValueError(f"{name} cannot contain an empty value")
+
 
 @dataclass(frozen=True)
 class RequestFeatures:
@@ -98,6 +124,8 @@ class RequestFeatures:
     classifier_source: str = "heuristic"
     classifier_model_version: str | None = None
     classifier_confidence: float | None = None
+    classifier_entropy: float | None = None
+    tier_underroute_probability: float | None = None
     level_probabilities: tuple[float, ...] = ()
 
 
@@ -152,6 +180,16 @@ class RouteDecision:
                 "classifier_confidence": (
                     round(self.features.classifier_confidence, 4)
                     if self.features.classifier_confidence is not None
+                    else None
+                ),
+                "classifier_entropy": (
+                    round(self.features.classifier_entropy, 4)
+                    if self.features.classifier_entropy is not None
+                    else None
+                ),
+                "tier_underroute_probability": (
+                    round(self.features.tier_underroute_probability, 5)
+                    if self.features.tier_underroute_probability is not None
                     else None
                 ),
                 "level_probabilities": {

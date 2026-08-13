@@ -6,3 +6,11 @@ build/
 .venv/
 reports/live_eval_results.jsonl
 reports/live_eval_summary.json
+
+# Source training data is private and must never be published from this repository.
+model-routing-datagen/
+data/raw/
+data/private/
+data/training/
+routing_dataset*.jsonl
+*training_dataset*.jsonl

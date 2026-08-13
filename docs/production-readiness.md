@@ -37,7 +37,7 @@ The custom service owns decisions and business controls. Switchyard owns the pro
 ### Safe rollout modes
 
 - `shadow`: records the proposed route but executes a fixed capable baseline.
-- `enforce`: executes the selected target and is intended only after release gates pass.
+- `enforce`: executes the selected target and refuses to start unless every release gate passes.
 
 The container and Kubernetes examples default to `shadow`.
 
@@ -71,7 +71,14 @@ The API exports bounded-cardinality Prometheus metrics for:
 - estimated spend by selected role;
 - execution success/error counts;
 - provider-reported input/output tokens; and
-- completion-latency histograms.
+- completion-latency histograms;
+- classifier confidence and normalized entropy; and
+- posterior tier-underroute probability.
+
+An offline drift command builds an approved baseline from prompt-free shadow audit
+events and compares later windows using Jensen-Shannon distance and standardized
+mean shifts. It fails for insufficient sample size rather than reporting a healthy
+window without evidence.
 
 Switchyard's own `/v1/stats`, selected-model headers, and provider telemetry should be collected alongside these metrics.
 
@@ -116,6 +123,7 @@ Thresholds are initial release criteria and must be approved against business ri
 - Implement and exercise a direct-provider bypass independently of Switchyard.
 - Load-test the entire path at expected peak concurrency.
 - Define SLOs and alerts for success, p95/p99 latency, under-routing, fallback, cost, token use, and distribution drift.
+- Approve a shadow-traffic drift baseline, automate scheduled comparisons, and connect failed reports to alerting and rollback.
 - Add multi-region or multi-provider failover if required by the availability target.
 - Test graceful shutdown, rolling upgrades, rollback, quota exhaustion, 429s, slow responses, invalid JSON, and partial streams.
 
