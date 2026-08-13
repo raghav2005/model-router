@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.5.0 — 2026-08-13
+
+- Added full-conversation classification, calibrated classifier confidence,
+  normalized entropy, posterior tier-underroute risk, and adaptive routing.
+- Promoted a validation-selected multi-view classifier with better internal
+  accuracy, macro F1, calibration loss, and external negative log likelihood.
+- Added a deterministic 167-case adversarial regression suite covering lexical
+  traps, concise hard tasks, multilingual requests, prompt injection, high-risk
+  requests, and multi-turn intent shifts.
+- Fixed keyword-driven over-routing for tightly bounded meta-tasks and guarded
+  short-answer facts without weakening hard or high-stakes regression slices.
+- Made enforcement fail closed at service startup unless every production
+  release gate passes, and exposed the release state from readiness.
+- Added a privacy-safe offline drift monitor for route, workload, complexity,
+  uncertainty, tier-risk, and cost distributions.
+- Expanded the credential-free test suite to 68 tests.
+
 ## 0.4.2 — 2026-08-11
 
 - Pinned Ruff and declared the CI lint rules explicitly so local and hosted

@@ -1,21 +1,25 @@
 # Model router: production-readiness update
 
-**Date:** 11 August 2026  
+**Date:** 13 August 2026
+
 **Status:** Deployable for integration and shadow evaluation; blocked from enforced production routing
 
 ## What has been delivered
 
-The prototype is now an operationally structured service rather than only a classifier and command-line demonstration. It includes the trained complexity model, explainable routing policy, current Switchyard configuration, verified pricing semantics, an authenticated HTTP interface, privacy-safe audit events, metrics, resilience controls, expanded live benchmarking, automated release gates, container/Kubernetes assets, CI, and a deployment/rollback runbook.
+The prototype is now an operationally structured service rather than only a classifier and command-line demonstration. It includes the trained multi-view complexity model, explainable adaptive routing policy, current Switchyard configuration, verified pricing semantics, an authenticated HTTP interface, privacy-safe audit events and drift detection, metrics, resilience controls, expanded live benchmarking, fail-closed release enforcement, container/Kubernetes assets, CI, and a deployment/rollback runbook.
 
 The first model set is OpenAI GPT-5.6 Luna, Terra, and Sol in efficient, balanced, and capable roles. Official prices, context limits, cached-input rates, cache-write rates, and long-context multipliers are versioned in the catalogue. Published benchmark results are documented as directional research; they are not misrepresented as application quality.
 
 ## Evidence available now
 
 - 86,967 audited training examples.
-- 90.93% exact accuracy and 3.64% tier under-routing on the internal 8,522-row test set.
+- 91.14% exact accuracy and 3.56% tier under-routing on the internal 8,522-row test set.
 - 57.14% exact accuracy and 18.68% tier under-routing on the 455 genuinely non-overlapping multi-turn examples.
-- 47 passing credential-free tests.
+- 68 passing credential-free tests.
 - A live harness capable of measuring validator outcomes, time to first token, completion latency, tokens, cached tokens, estimated cost, errors, finish reason, and actual response model across repeated trials.
+- A 167-case adversarial regression suite that found and fixed a major keyword-driven over-routing pattern; it remains separate from release evidence.
+- A startup interlock that prevents enforcement from bypassing the release gates.
+- A prompt-free drift detector for workload, route, complexity, uncertainty, tier-risk, and cost changes.
 
 ## Why production enforcement remains blocked
 

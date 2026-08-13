@@ -1,6 +1,7 @@
 # Model research and catalogue rationale
 
-**Research date:** 11 August 2026  
+**Research date:** 13 August 2026
+
 **Scope:** Initial OpenAI deployment candidate behind NVIDIA NeMo Switchyard
 
 ## Decision
@@ -16,6 +17,14 @@ The first controlled deployment uses one model family across three stable routin
 Using one provider family simplifies the first evaluation: formats, tool behaviour, context limits, and billing semantics are comparable. A second provider should be added later for resilience, but only after its models have been run through the same response-level benchmark.
 
 The prices, model IDs, context windows, and feature claims above come from the official [OpenAI model catalogue](https://developers.openai.com/api/docs/models) and [API pricing page](https://openai.com/api/pricing/). The production catalogue records an exact source URL and verification date for every role.
+
+OpenAI's current [model-selection guidance](https://developers.openai.com/tracks/building-agents#how-to-choose)
+recommends starting with the flagship model, moving simple or latency-sensitive
+work to smaller models, and using a faster conversational model that delegates
+demanding tasks to the flagship. It also recommends varying prompts during
+evaluation. This supports the efficient/balanced/capable role design and the
+adaptive escalation policy, but it does not establish our routing thresholds;
+those still require workload-specific evaluation.
 
 ## Pricing details implemented
 
@@ -79,3 +88,10 @@ The current `config/switchyard_routes.toml` follows the current Rust-server sche
 ## Remaining research and measurement
 
 The OpenAI family is an initial controlled candidate, not a permanent provider decision. Before multi-provider routing, benchmark approved Anthropic, Google, NVIDIA NIM, or self-hosted candidates under identical prompts, validators, reasoning budgets, and concurrency. Include contractual data retention, regional availability, quotas, support, deprecation policy, and incident history in the selection—not only token price.
+
+The current multi-view classifier improves internal accuracy to 91.14% and internal
+tier under-routing to 3.56%, but the non-overlapping multi-turn slice remains at
+57.14% exact accuracy and 18.68% tier under-routing. Better calibration loss on
+that external slice does not remove this generalisation failure. The next research
+priority is therefore real, time- or customer-separated traffic with response-level
+outcomes, not further optimization against the existing synthetic generator.

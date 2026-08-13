@@ -2,12 +2,13 @@
 
 This repository contains a trained, explainable LLM router and the controls needed to evaluate it safely on the path to production. It combines:
 
-- a calibrated five-level request-complexity classifier;
+- a calibrated multi-view, five-level request-complexity classifier;
 - deterministic capability, risk, context, budget, and policy gates;
 - quality/cost/latency utility scoring across stable model roles;
 - [NVIDIA NeMo Switchyard](https://github.com/NVIDIA-NeMo/Switchyard) as the provider-facing protocol and routing gateway;
 - offline, response-level, streaming-latency, and release-gate evaluation; and
-- an authenticated shadow-mode HTTP service with prompt-free audit events and Prometheus metrics.
+- an authenticated shadow-mode HTTP service with prompt-free audit events,
+  drift detection, Prometheus metrics, and fail-closed enforcement.
 
 The project is ready for integration and shadow evaluation. It is **not approved for enforced production routing**. The supplied data labels prompt complexity but contains no candidate-model answers or real production outcomes, and the independent multi-turn slice exposes significant distribution shift.
 
@@ -25,12 +26,21 @@ The selected classifier was trained on 86,967 audited examples using a determini
 
 | Evaluation | Exact accuracy | Tier under-route |
 |---|---:|---:|
-| Internal hash-held-out test | 90.93% | 3.64% |
+| Internal hash-held-out test | 91.14% | 3.56% |
 | Genuinely non-overlapping multi-turn slice | 57.14% | 18.68% |
 
 The multi-turn result is a release blocker. The internal result shows that the model learned the supplied synthetic rubric; it does not demonstrate production generalisation.
 
-The current test suite contains 47 credential-free tests. Linting, formatting, source compilation, CLI operation, wheel packaging, catalogue validation, API behaviour, resilience, audit privacy, streaming parsing, evaluation resumability, and release gates are covered.
+The selected model combines complete-conversation and final-turn predictions with
+a validation-selected 0.10 final-turn weight and temperature 3.668. The default
+adaptive end-to-end policy reduces internal tier under-routing to 2.57% while its
+estimated cost is 35.00% below the always-capable reference. These are offline
+proxies, not measured production savings.
+
+The current test suite contains 68 credential-free tests. Linting, formatting,
+source compilation, CLI operation, wheel packaging, catalogue validation, API
+behaviour, resilience, audit privacy, drift detection, streaming parsing,
+evaluation resumability, adversarial regression, and release gates are covered.
 
 ## Architecture
 
@@ -62,7 +72,10 @@ The learned model predicts complexity only. Deterministic policy remains respons
 - model health; and
 - final quality/cost/latency ranking.
 
-In `shadow` mode, the router records its proposed role but executes a fixed capable baseline. In `enforce` mode, it executes the proposed direct Switchyard target. The supplied deployment assets default to shadow mode.
+In `shadow` mode, the router records its proposed role but executes a fixed capable
+baseline. In `enforce` mode, it executes the proposed direct Switchyard target.
+Enforcement now refuses to start unless every configured release gate passes. The
+supplied deployment assets default to shadow mode.
 
 ## Initial model family
 
@@ -111,6 +124,12 @@ model-router release-gates
 
 This command currently exits with status 3 because enforcement is intentionally blocked. Its JSON output lists every passing and failing gate.
 
+Run the deterministic design regression suite:
+
+```bash
+model-router adversarial-eval
+```
+
 ## CLI commands
 
 | Command | Purpose | Calls a model? |
@@ -123,8 +142,15 @@ This command currently exits with status 3 because enforcement is intentionally 
 | `train` | Validate data, train, calibrate, and report | No |
 | `live-eval` | Run frozen cases against direct model roles | Yes |
 | `release-gates` | Evaluate production-enforcement evidence | No |
+| `adversarial-eval` | Run 167 deterministic routing regression cases | No |
+| `drift-baseline` | Create an approved baseline from prompt-free audit events | No |
+| `drift-report` | Compare recent audit events with the approved baseline | No |
 
-The CLI defaults to hybrid classification. Use `--classifier-mode heuristic` for the deterministic baseline or `--complexity-policy conservative` to reduce under-routing at higher expected cost.
+The CLI defaults to hybrid classification with the adaptive policy. Adaptive mode
+uses ordinary argmax routing for confident, normal-risk work and posterior tier-risk
+routing for high-risk, quality-first, or sufficiently uncertain work. Use
+`--classifier-mode heuristic` for the deterministic baseline or
+`--complexity-policy tier_risk` for a stronger under-routing bound at higher cost.
 
 Cost estimates can include `--cached-input-tokens` and `--cache-write-tokens`. Provider/model allowlists and measured-evidence requirements are available as hard constraints.
 
@@ -135,7 +161,7 @@ The service exposes:
 | Endpoint | Purpose |
 |---|---|
 | `GET /healthz` | Process liveness; does not depend on Switchyard |
-| `GET /readyz` | Readiness including Switchyard health |
+| `GET /readyz` | Readiness including Switchyard and enforcement-gate state |
 | `GET /metrics` | Prometheus text metrics |
 | `POST /v1/route` | Explainable route only |
 | `POST /v1/chat/completions` | OpenAI-compatible routed execution |
@@ -186,7 +212,10 @@ The recommended application path remains custom `policy` routing to a direct Swi
 
 ## Training
 
-The model is a weighted multinomial Naive Bayes classifier using stable hashed word unigrams, bigrams, and conversation-structure features. `borderline` examples receive reduced weight, and validation data calibrates the output probabilities.
+The model is a weighted multinomial Naive Bayes classifier using stable hashed word
+unigrams, bigrams, and conversation-structure features. `borderline` examples
+receive reduced weight. Validation data, rather than the test split, selects the
+full-conversation/final-turn ensemble weight and probability temperature.
 
 Reproduce the selected artifact:
 
@@ -198,11 +227,14 @@ model-router train \
 
 The command writes:
 
-- `model_router/artifacts/complexity_router_v1.npz`;
-- `reports/complexity_router_v1.json`; and
-- `reports/complexity_router_v1.md`.
+- `model_router/artifacts/complexity_router_v2.npz`;
+- `reports/complexity_router_v2.json`; and
+- `reports/complexity_router_v2.md`.
 
-The equal-level dataset was trained as a challenger. It performed worse on the common internal and novel multi-turn sets; see `reports/experiments/champion_selection.md`.
+The previous model and equal-level dataset remain challengers. The version-two
+champion improves internal accuracy, macro F1, negative log likelihood, expected
+calibration error, and external negative log likelihood; see
+`reports/experiments/champion_selection_v2.md`.
 
 ## Evaluation
 
@@ -215,6 +247,13 @@ The 12-case smoke benchmark verifies basic routing mechanics:
 ```bash
 model-router benchmark --iterations 300
 ```
+
+The separate adversarial suite is deterministic and never enters training or the
+independent release gate. It exposed a keyword-driven over-routing pattern; after
+the guarded fix, default-policy exact tier accuracy improved from 47.31% to 77.84%,
+over-routing fell from 45.51% to 14.97%, and all concise-hard/high-stakes cases
+remained on the capable tier. See
+`reports/experiments/adversarial_regression_v1.md`.
 
 ### Response-level benchmark
 
@@ -248,7 +287,23 @@ Supported validators are exact text, required substrings, regular expression, va
 
 The Switchyard client includes timeouts, safe GET retries with exponential backoff and jitter, `Retry-After` handling, a circuit breaker, request IDs, and optional explicit fallback. Generation retries are off by default because a failed generation may still be billable.
 
-Prometheus output covers decisions, estimated spend, execution outcomes, tokens, and latency histograms. Audit events include prompt HMAC, model/catalog/policy/classifier versions, decision, estimate, latency, usage, and error type without prompt or response content.
+Prometheus output covers decisions, estimated spend, execution outcomes, tokens,
+latency histograms, classifier confidence, normalized entropy, and posterior tier
+risk. Audit events include prompt HMAC, model/catalog/policy/classifier versions,
+decision, estimate, latency, usage, and error type without prompt or response
+content.
+
+After an approved shadow window, create and retain an immutable drift baseline,
+then compare each subsequent observation window:
+
+```bash
+model-router drift-baseline audit-shadow.jsonl --output config/drift_baseline.json
+model-router drift-report audit-current.jsonl --baseline config/drift_baseline.json
+```
+
+The report uses Jensen-Shannon distance for categorical distributions and
+standardized mean shifts for uncertainty and cost. It exits non-zero for material
+drift or insufficient data.
 
 ## Deployment
 
@@ -292,6 +347,7 @@ These failures are intentional safety controls, not hidden TODOs.
 │   ├── audit.py            # prompt-free append-only audit events
 │   ├── catalog.json        # provenance-aware model catalogue
 │   ├── classifier.py       # learned and deterministic feature integration
+│   ├── drift.py            # prompt-free distribution-drift reports
 │   ├── live_eval.py        # response, cost, TTFT, and validator harness
 │   ├── observability.py    # Prometheus metrics
 │   ├── readiness.py        # executable production release gates
@@ -311,3 +367,4 @@ These failures are intentional safety controls, not hidden TODOs.
 - [OpenAI model catalogue](https://developers.openai.com/api/docs/models)
 - [OpenAI API pricing](https://openai.com/api/pricing/)
 - [GPT-5.6 published evaluations](https://openai.com/index/gpt-5-6/)
+- [OpenAI: choosing the right model](https://developers.openai.com/tracks/building-agents#how-to-choose)
