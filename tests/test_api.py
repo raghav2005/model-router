@@ -6,6 +6,7 @@ import unittest
 from typing import Any
 
 from model_router.api import RouterApplication, RuntimeConfig
+from model_router.messages import flatten_messages
 from model_router.router import ModelRouter
 
 
@@ -105,6 +106,31 @@ class APITests(unittest.TestCase):
         status, _, body = invoke(self.app, "GET", "/metrics")
         self.assertEqual(status, 200)
         self.assertIn(b"model_router_decisions_total", body)
+
+    def test_router_classifies_the_complete_conversation(self) -> None:
+        prompt = flatten_messages(
+            [
+                {"role": "user", "content": "Design a distributed database."},
+                {"role": "assistant", "content": "What constraints matter?"},
+                {"role": "user", "content": "Compare consistency trade-offs."},
+            ]
+        )
+        self.assertIn("Design a distributed database", prompt)
+        self.assertIn("Compare consistency trade-offs", prompt)
+
+    def test_routing_arrays_must_contain_strings(self) -> None:
+        status, _, body = invoke(
+            self.app,
+            "POST",
+            "/v1/route",
+            {
+                "messages": [{"role": "user", "content": "Hello"}],
+                "routing": {"allowed_model_ids": "efficient"},
+            },
+            token="secret",
+        )
+        self.assertEqual(status, 400)
+        self.assertIn("array of strings", json.loads(body)["error"])
 
 
 if __name__ == "__main__":

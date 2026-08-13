@@ -93,6 +93,23 @@ class LearnedRouterTests(unittest.TestCase):
         )
         self.assertGreaterEqual(conservative.level, argmax.level)
 
+    def test_tier_risk_policy_bounds_posterior_underroute_probability(self) -> None:
+        model = NaiveBayesComplexityModel.load()
+        prediction = model.predict(
+            "Compare database indexes and explain the operational trade-offs.",
+            decision_policy="tier_risk",
+            underroute_tolerance=0.15,
+        )
+        self.assertLessEqual(prediction.tier_underroute_probability, 0.15)
+        self.assertIn(prediction.minimum_tier, {1, 2, 3})
+
+    def test_router_exposes_classifier_uncertainty(self) -> None:
+        decision = ModelRouter.from_artifact().route(
+            RoutingRequest("Compare database indexes and their trade-offs.")
+        )
+        self.assertIsNotNone(decision.features.classifier_entropy)
+        self.assertIsNotNone(decision.features.tier_underroute_probability)
+
 
 class EvaluationTests(unittest.TestCase):
     def test_split_is_whitespace_and_case_stable(self) -> None:

@@ -12,6 +12,9 @@ class ClassifierTests(unittest.TestCase):
     def test_token_estimate_is_never_zero(self) -> None:
         self.assertEqual(estimate_tokens(""), 1)
 
+    def test_token_estimate_does_not_undercount_non_ascii_text(self) -> None:
+        self.assertGreaterEqual(estimate_tokens("这是一个用于路由的测试问题"), 13)
+
     def test_infers_coding_and_tools(self) -> None:
         features = classify_request(
             RoutingRequest("Debug this repository and run the unit tests")
@@ -94,6 +97,15 @@ class RouterTests(unittest.TestCase):
     def test_output_limit_is_enforced(self) -> None:
         with self.assertRaises(NoEligibleModel):
             self.router.route(RoutingRequest("Hello", expected_output_tokens=128_001))
+
+    def test_request_rejects_inconsistent_cache_tokens(self) -> None:
+        with self.assertRaises(ValueError):
+            RoutingRequest(
+                "Hello",
+                input_tokens=10,
+                cached_input_tokens=8,
+                cache_write_tokens=3,
+            )
 
 
 if __name__ == "__main__":

@@ -17,7 +17,32 @@ VECTORIZER_VERSION = "hashed-word-ngram-v1"
 DEFAULT_FEATURE_DIMENSION = 32_768
 WORD_PATTERN = re.compile(r"[a-z][a-z0-9_+#.-]*|\d+", re.IGNORECASE)
 Whitespace = re.compile(r"\s+")
-DecisionPolicy = Literal["argmax", "expected", "conservative"]
+DecisionPolicy = Literal["argmax", "expected", "conservative", "tier_risk", "adaptive"]
+
+
+def level_to_tier(level: int) -> int:
+    return {1: 1, 2: 1, 3: 2, 4: 3, 5: 3}[level]
+
+
+def tier_underroute_probability(probabilities: np.ndarray, selected_tier: int) -> float:
+    if selected_tier not in {1, 2, 3}:
+        raise ValueError("selected_tier must be 1, 2, or 3")
+    if selected_tier == 1:
+        return float(probabilities[2:].sum())
+    if selected_tier == 2:
+        return float(probabilities[3:].sum())
+    return 0.0
+
+
+def tier_for_risk(probabilities: np.ndarray, tolerance: float) -> int:
+    """Return the cheapest tier whose posterior under-route risk is tolerated."""
+    if not 0 <= tolerance < 1:
+        raise ValueError("underroute_tolerance must be in [0, 1)")
+    if tier_underroute_probability(probabilities, 1) <= tolerance:
+        return 1
+    if tier_underroute_probability(probabilities, 2) <= tolerance:
+        return 2
+    return 3
 
 
 def normalize_prompt(text: str) -> str:
@@ -38,6 +63,8 @@ class ComplexityPrediction:
     entropy: float
     probabilities: tuple[float, ...]
     decision_policy: str
+    minimum_tier: int
+    tier_underroute_probability: float
 
     def as_dict(self) -> dict[str, object]:
         return {
@@ -50,6 +77,8 @@ class ComplexityPrediction:
                 for index, probability in enumerate(self.probabilities)
             },
             "decision_policy": self.decision_policy,
+            "minimum_tier": self.minimum_tier,
+            "tier_underroute_probability": round(self.tier_underroute_probability, 5),
         }
 
 
@@ -186,8 +215,23 @@ class NaiveBayesComplexityModel:
                 + 1
             )
             level = min(5, level)
+        elif decision_policy == "tier_risk":
+            minimum_tier = tier_for_risk(probabilities, underroute_tolerance)
+            # Preserve ordinal meaning while making the selected tier explicit.
+            level = {1: 2, 2: 3, 3: 5}[minimum_tier]
+        elif decision_policy == "adaptive":
+            raise ValueError(
+                "adaptive policy requires request context; use the router classifier"
+            )
         else:
             raise ValueError(f"Unknown decision policy: {decision_policy}")
+
+        minimum_tier = (
+            minimum_tier if decision_policy == "tier_risk" else level_to_tier(level)
+        )
+        underroute_probability = tier_underroute_probability(
+            probabilities, minimum_tier
+        )
 
         entropy = -float(
             np.sum(probabilities * np.log(np.clip(probabilities, 1e-12, 1.0)))
@@ -199,6 +243,8 @@ class NaiveBayesComplexityModel:
             entropy=entropy,
             probabilities=tuple(float(value) for value in probabilities),
             decision_policy=decision_policy,
+            minimum_tier=minimum_tier,
+            tier_underroute_probability=underroute_probability,
         )
 
     def save(self, path: str | Path) -> None:

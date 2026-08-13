@@ -129,6 +129,7 @@ class OperationsTests(unittest.TestCase):
         rendered = metrics.prometheus()
         self.assertIn("model_router_decisions_total", rendered)
         self.assertIn("model_router_execution_latency_ms_bucket", rendered)
+        self.assertIn("model_router_classifier_entropy_bucket", rendered)
 
     def test_request_provider_allowlist_is_a_hard_gate(self) -> None:
         with self.assertRaises(NoEligibleModel):

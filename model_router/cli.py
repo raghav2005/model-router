@@ -10,6 +10,7 @@ from .benchmark import run_benchmark
 from .learned import default_artifact_path
 from .live_eval import load_cases as load_live_eval_cases
 from .live_eval import run_benchmark as run_live_benchmark
+from .messages import copy_messages, flatten_messages
 from .readiness import evaluate_release_gates
 from .router import ModelRouter, NoEligibleModel
 from .switchyard import (
@@ -57,8 +58,8 @@ def _add_request_options(
     )
     parser.add_argument(
         "--complexity-policy",
-        choices=["argmax", "expected", "conservative"],
-        default="argmax",
+        choices=["argmax", "expected", "conservative", "tier_risk", "adaptive"],
+        default=os.getenv("MODEL_ROUTER_COMPLEXITY_POLICY", "adaptive"),
     )
     parser.add_argument("--underroute-tolerance", type=float, default=0.20)
     parser.add_argument("--require-measured-quality", action="store_true")
@@ -73,7 +74,7 @@ def _load_messages(path: str | None, prompt: str | None) -> list[dict[str, Any]]
             isinstance(message, dict) for message in raw
         ):
             raise ValueError("messages file must contain a JSON array of objects")
-        messages.extend(raw)
+        messages.extend(copy_messages(raw))
     if prompt:
         messages.append({"role": "user", "content": prompt})
     if not messages:
@@ -82,12 +83,7 @@ def _load_messages(path: str | None, prompt: str | None) -> list[dict[str, Any]]
 
 
 def _routing_prompt(prompt: str | None, messages: list[dict[str, Any]]) -> str:
-    if prompt:
-        return prompt
-    for message in reversed(messages):
-        if message.get("role") == "user" and isinstance(message.get("content"), str):
-            return str(message["content"])
-    raise ValueError("messages file must include a text user message")
+    return prompt if prompt and len(messages) == 1 else flatten_messages(messages)
 
 
 def _routing_request(args: argparse.Namespace, prompt: str) -> RoutingRequest:
@@ -173,8 +169,8 @@ def build_parser() -> argparse.ArgumentParser:
     benchmark.add_argument("--model-artifact", default=str(default_artifact_path()))
     benchmark.add_argument(
         "--complexity-policy",
-        choices=["argmax", "expected", "conservative"],
-        default="argmax",
+        choices=["argmax", "expected", "conservative", "tier_risk", "adaptive"],
+        default="adaptive",
     )
     benchmark.add_argument("--underroute-tolerance", type=float, default=0.20)
     benchmark.add_argument("--require-measured-quality", action="store_true")

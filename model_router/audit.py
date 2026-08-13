@@ -55,6 +55,10 @@ class DecisionAuditLogger:
             "classifier_source": decision.features.classifier_source,
             "classifier_model_version": decision.features.classifier_model_version,
             "classifier_confidence": decision.features.classifier_confidence,
+            "classifier_entropy": decision.features.classifier_entropy,
+            "tier_underroute_probability": (
+                decision.features.tier_underroute_probability
+            ),
             "complexity_level": decision.features.complexity_level,
             "use_case": decision.features.use_case,
             "risk": decision.features.risk,

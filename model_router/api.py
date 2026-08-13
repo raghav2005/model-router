@@ -12,6 +12,7 @@ from wsgiref.simple_server import make_server
 
 from .audit import DecisionAuditLogger
 from .catalog import catalog_sha256, load_catalog
+from .messages import flatten_messages, validate_string_array
 from .observability import RoutingMetrics
 from .router import ModelRouter, NoEligibleModel
 from .switchyard import SwitchyardClient, SwitchyardError, SwitchyardExecutor
@@ -58,17 +59,6 @@ def _usage(response: Mapping[str, Any]) -> tuple[int, int]:
     return int(usage.get("prompt_tokens", 0)), int(usage.get("completion_tokens", 0))
 
 
-def _prompt_from_messages(messages: object) -> str:
-    if not isinstance(messages, list) or not messages:
-        raise ValueError("messages must be a non-empty array")
-    for message in reversed(messages):
-        if not isinstance(message, dict):
-            raise ValueError("every message must be an object")
-        if message.get("role") == "user" and isinstance(message.get("content"), str):
-            return str(message["content"])
-    raise ValueError("messages must include a text user message")
-
-
 class RouterApplication:
     """Minimal OpenAI-compatible WSGI edge around the routing core."""
 
@@ -87,7 +77,11 @@ class RouterApplication:
         if self.config.shadow_target not in self.model_by_id:
             raise ValueError("shadow_target must be a catalog role")
         self.router = router or ModelRouter.from_artifact(
-            classifier_mode="hybrid", decision_policy="conservative"
+            classifier_mode=os.getenv("MODEL_ROUTER_CLASSIFIER_MODE", "hybrid"),
+            decision_policy=os.getenv("MODEL_ROUTER_COMPLEXITY_POLICY", "adaptive"),
+            underroute_tolerance=float(
+                os.getenv("MODEL_ROUTER_UNDERROUTE_TOLERANCE", "0.15")
+            ),
         )
         self.client = client or SwitchyardClient(
             os.getenv("SWITCHYARD_URL", "http://127.0.0.1:4000"),
@@ -169,7 +163,7 @@ class RouterApplication:
         prompt = (
             str(body["prompt"])
             if isinstance(body.get("prompt"), str)
-            else _prompt_from_messages(body.get("messages"))
+            else flatten_messages(body.get("messages"))
         )
         max_tokens = int(body.get("max_tokens", body.get("max_completion_tokens", 500)))
         return RoutingRequest(
@@ -188,7 +182,9 @@ class RouterApplication:
             cached_input_tokens=int(routing.get("cached_input_tokens", 0)),
             cache_write_tokens=int(routing.get("cache_write_tokens", 0)),
             expected_output_tokens=max_tokens,
-            required_capabilities=frozenset(routing.get("required_capabilities", [])),
+            required_capabilities=validate_string_array(
+                routing.get("required_capabilities", []), "required_capabilities"
+            ),
             priority=str(routing.get("priority", "balanced")),
             max_cost_usd=(
                 float(routing["max_cost_usd"])
@@ -201,8 +197,12 @@ class RouterApplication:
                 else None
             ),
             use_case=(str(routing["use_case"]) if routing.get("use_case") else None),
-            allowed_model_ids=frozenset(routing.get("allowed_model_ids", [])),
-            allowed_providers=frozenset(routing.get("allowed_providers", [])),
+            allowed_model_ids=validate_string_array(
+                routing.get("allowed_model_ids", []), "allowed_model_ids"
+            ),
+            allowed_providers=validate_string_array(
+                routing.get("allowed_providers", []), "allowed_providers"
+            ),
         )
 
     def _record_decision(self, request: RoutingRequest, decision: Any) -> None:

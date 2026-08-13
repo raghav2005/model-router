@@ -48,8 +48,19 @@ DEEP_REASONING_TERMS = re.compile(
 
 
 def estimate_tokens(text: str) -> int:
-    """A conservative tokenizer-free approximation suitable for routing."""
-    return max(1, math.ceil(len(text) / 4))
+    """A conservative tokenizer-free approximation suitable for hard gates.
+
+    Character-count rules materially undercount CJK text and short whitespace-
+    separated tokens. Taking the maximum of byte, Unicode, and lexical estimates
+    is still approximate, but fails safer when an exact provider tokenizer is not
+    available at the routing edge.
+    """
+    ascii_characters = sum(ord(character) < 128 for character in text)
+    non_ascii_characters = len(text) - ascii_characters
+    unicode_estimate = math.ceil(ascii_characters / 4 + non_ascii_characters)
+    byte_estimate = math.ceil(len(text.encode("utf-8")) / 4)
+    lexical_estimate = len(re.findall(r"\w+|[^\w\s]", text, re.UNICODE))
+    return max(1, unicode_estimate, byte_estimate, lexical_estimate)
 
 
 def complexity_to_level(complexity: float) -> int:
@@ -175,10 +186,23 @@ def classify_request_with_model(
     underroute_tolerance: float = 0.20,
 ) -> RequestFeatures:
     heuristic = classify_request(request)
+    actual_policy: DecisionPolicy = decision_policy
+    if decision_policy == "adaptive":
+        argmax_prediction = model.predict(request.prompt, decision_policy="argmax")
+        if heuristic.risk == "high" or request.priority == "quality":
+            actual_policy = "tier_risk"
+        elif request.priority == "balanced" and argmax_prediction.confidence < 0.45:
+            actual_policy = "tier_risk"
+        else:
+            actual_policy = "argmax"
     prediction = model.predict(
         request.prompt,
-        decision_policy=decision_policy,
-        underroute_tolerance=underroute_tolerance,
+        decision_policy=actual_policy,
+        underroute_tolerance=(
+            min(underroute_tolerance, 0.10)
+            if heuristic.risk == "high"
+            else underroute_tolerance
+        ),
     )
     learned_complexity = level_to_complexity(prediction.expected_level)
     if mode == "learned":
@@ -190,7 +214,7 @@ def classify_request_with_model(
     else:
         raise ValueError(f"Unknown learned classifier mode: {mode}")
     complexity = max(0.0, min(1.0, complexity))
-    minimum_tier = {1: 1, 2: 1, 3: 2, 4: 3, 5: 3}[prediction.level]
+    minimum_tier = prediction.minimum_tier
     dataset_hash = str(model.metadata.get("training_dataset_sha256", "unknown"))
     model_version = f"complexity-router-nb-v1:{dataset_hash[:12]}"
     return replace(
@@ -201,11 +225,16 @@ def classify_request_with_model(
         minimum_model_tier=minimum_tier,
         signals=heuristic.signals
         + (
-            f"learned complexity level {prediction.level} using {decision_policy}",
+            f"learned complexity level {prediction.level} using {actual_policy}",
             f"learned classifier confidence {prediction.confidence:.2f}",
+            f"normalized classifier entropy {prediction.entropy:.2f}",
+            "posterior tier under-route probability "
+            f"{prediction.tier_underroute_probability:.3f}",
         ),
         classifier_source=mode,
         classifier_model_version=model_version,
         classifier_confidence=prediction.confidence,
+        classifier_entropy=prediction.entropy,
+        tier_underroute_probability=prediction.tier_underroute_probability,
         level_probabilities=prediction.probabilities,
     )
