@@ -8,6 +8,13 @@ from typing import Any
 
 from .adversarial import evaluate_adversarial_suite, write_cases, write_report
 from .benchmark import run_benchmark
+from .drift import (
+    build_baseline,
+    compare_to_baseline,
+    load_route_events,
+    read_baseline,
+)
+from .drift import write_json as write_drift_json
 from .learned import default_artifact_path
 from .live_eval import load_cases as load_live_eval_cases
 from .live_eval import run_benchmark as run_live_benchmark
@@ -236,6 +243,25 @@ def build_parser() -> argparse.ArgumentParser:
     adversarial.add_argument(
         "--report-output", default="reports/adversarial_routing_eval.json"
     )
+
+    drift_baseline = subparsers.add_parser(
+        "drift-baseline",
+        help="Create an approved routing-distribution baseline from audit events",
+    )
+    drift_baseline.add_argument("audit_log")
+    drift_baseline.add_argument("--output", default="config/drift_baseline.json")
+
+    drift_report = subparsers.add_parser(
+        "drift-report", help="Compare recent prompt-free audit events to a baseline"
+    )
+    drift_report.add_argument("audit_log")
+    drift_report.add_argument("--baseline", default="config/drift_baseline.json")
+    drift_report.add_argument("--output", default="reports/drift_report.json")
+    drift_report.add_argument("--minimum-events", type=int, default=100)
+    drift_report.add_argument("--maximum-js-distance", type=float, default=0.10)
+    drift_report.add_argument(
+        "--maximum-standardized-mean-shift", type=float, default=2.0
+    )
     return parser
 
 
@@ -243,6 +269,26 @@ def main() -> None:
     parser = build_parser()
     args = parser.parse_args()
     try:
+        if args.command == "drift-baseline":
+            baseline = build_baseline(load_route_events(args.audit_log))
+            write_drift_json(args.output, baseline)
+            print(json.dumps(baseline, indent=2))
+            return
+
+        if args.command == "drift-report":
+            report = compare_to_baseline(
+                read_baseline(args.baseline),
+                load_route_events(args.audit_log),
+                minimum_events=args.minimum_events,
+                maximum_js_distance=args.maximum_js_distance,
+                maximum_standardized_mean_shift=(args.maximum_standardized_mean_shift),
+            )
+            write_drift_json(args.output, report)
+            print(json.dumps(report, indent=2))
+            if not report["passed"]:
+                raise SystemExit(2)
+            return
+
         if args.command == "adversarial-eval":
             report = evaluate_adversarial_suite(artifact_path=args.model_artifact)
             write_cases(args.cases_output)
