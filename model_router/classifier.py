@@ -45,6 +45,42 @@ DEEP_REASONING_TERMS = re.compile(
     r"\b(prove|proof|derive|derivation|theorem|hidden assumptions?|alternative derivations?)\b",
     re.IGNORECASE,
 )
+BOUNDED_SIMPLE_META_TERMS = re.compile(
+    r"^\s*(?:spell the phrase\b|how many words are in the phrase\b|"
+    r"translate only the phrase\b|is\s+['\"].+['\"]\s+written in title case\b)",
+    re.IGNORECASE,
+)
+SHORT_RESPONSE_TERMS = re.compile(
+    r"\b(?:one word|una palabra|un mot|einem wort|una parola)\b|"
+    r"一語|只回答|한 단어|केवल",
+    re.IGNORECASE,
+)
+ADVANCED_ACTION_TERMS = re.compile(
+    r"\b(?:analy[sz]e|audit|compare|debug|derive|design|diagnose|evaluate|"
+    r"implement|plan|prove|reason|refactor|test|verify|write code)\b",
+    re.IGNORECASE,
+)
+
+BOUNDED_SIMPLE_SIGNAL = "bounded simple request"
+
+
+def is_bounded_simple_request(text: str) -> bool:
+    """Identify tightly scoped requests whose quoted terms are not task complexity.
+
+    The anchored meta-frames are deliberately narrow. The short-answer rule is
+    additionally disabled for code, high-stakes, or advanced-action requests so
+    an instruction such as "prove this; answer in one word" cannot lower its tier.
+    """
+    if BOUNDED_SIMPLE_META_TERMS.search(text):
+        return "```" not in text
+    return bool(
+        len(text) <= 220
+        and SHORT_RESPONSE_TERMS.search(text)
+        and not CODE_TERMS.search(text)
+        and not HIGH_STAKES_TERMS.search(text)
+        and not ADVANCED_ACTION_TERMS.search(text)
+        and "```" not in text
+    )
 
 
 def estimate_tokens(text: str) -> int:
@@ -89,14 +125,18 @@ def classify_request(request: RoutingRequest) -> RequestFeatures:
     text = request.prompt
     signals: list[str] = []
     inferred_capabilities = set(request.required_capabilities)
+    bounded_simple = is_bounded_simple_request(text)
 
-    has_code = bool(CODE_TERMS.search(text) or "```" in text)
-    has_reasoning = bool(REASONING_TERMS.search(text))
-    high_stakes = bool(HIGH_STAKES_TERMS.search(text))
+    has_code = not bounded_simple and bool(CODE_TERMS.search(text) or "```" in text)
+    has_reasoning = not bounded_simple and bool(REASONING_TERMS.search(text))
+    high_stakes = not bounded_simple and bool(HIGH_STAKES_TERMS.search(text))
 
     if request.use_case:
         use_case = request.use_case
         signals.append("caller supplied use case")
+    elif bounded_simple:
+        use_case = "general_qa"
+        signals.append(BOUNDED_SIMPLE_SIGNAL)
     elif has_code:
         use_case = "coding"
         signals.append("coding vocabulary or code block")
@@ -119,13 +159,13 @@ def classify_request(request: RoutingRequest) -> RequestFeatures:
         complexity += 0.13
     if has_reasoning:
         complexity += 0.22
-    if MODERATE_CODE_TERMS.search(text):
+    if not bounded_simple and MODERATE_CODE_TERMS.search(text):
         complexity += 0.12
         signals.append("non-trivial implementation or verification")
-    if ADVANCED_SYSTEM_TERMS.search(text):
+    if not bounded_simple and ADVANCED_SYSTEM_TERMS.search(text):
         complexity += 0.20
         signals.append("advanced system-level task")
-    if DEEP_REASONING_TERMS.search(text):
+    if not bounded_simple and DEEP_REASONING_TERMS.search(text):
         complexity += 0.20
         signals.append("deep formal reasoning")
     if "```" in text:
@@ -213,14 +253,20 @@ def classify_request_with_model(
             complexity = max(complexity, heuristic.complexity)
     else:
         raise ValueError(f"Unknown learned classifier mode: {mode}")
+    bounded_simple = BOUNDED_SIMPLE_SIGNAL in heuristic.signals
+    if bounded_simple:
+        # A tightly bounded semantic task takes precedence over misleading words
+        # inside the content. Keep the posterior in telemetry for later review.
+        complexity = min(complexity, 0.19)
     complexity = max(0.0, min(1.0, complexity))
-    minimum_tier = prediction.minimum_tier
+    minimum_tier = 1 if bounded_simple else prediction.minimum_tier
+    complexity_level = 1 if bounded_simple else prediction.level
     dataset_hash = str(model.metadata.get("training_dataset_sha256", "unknown"))
     model_version = f"{MODEL_SCHEMA_VERSION}:{dataset_hash[:12]}"
     return replace(
         heuristic,
         complexity=complexity,
-        complexity_level=prediction.level,
+        complexity_level=complexity_level,
         quality_floor=quality_floor_for(complexity, heuristic.risk),
         minimum_model_tier=minimum_tier,
         signals=heuristic.signals

@@ -6,6 +6,7 @@ import os
 from pathlib import Path
 from typing import Any
 
+from .adversarial import evaluate_adversarial_suite, write_cases, write_report
 from .benchmark import run_benchmark
 from .learned import default_artifact_path
 from .live_eval import load_cases as load_live_eval_cases
@@ -223,6 +224,18 @@ def build_parser() -> argparse.ArgumentParser:
     release_gates.add_argument(
         "--live-summary", default="reports/live_eval_summary.json"
     )
+
+    adversarial = subparsers.add_parser(
+        "adversarial-eval",
+        help="Run deterministic synthetic routing regression cases",
+    )
+    adversarial.add_argument("--model-artifact", default=str(default_artifact_path()))
+    adversarial.add_argument(
+        "--cases-output", default="data/adversarial_routing_cases.jsonl"
+    )
+    adversarial.add_argument(
+        "--report-output", default="reports/adversarial_routing_eval.json"
+    )
     return parser
 
 
@@ -230,6 +243,13 @@ def main() -> None:
     parser = build_parser()
     args = parser.parse_args()
     try:
+        if args.command == "adversarial-eval":
+            report = evaluate_adversarial_suite(artifact_path=args.model_artifact)
+            write_cases(args.cases_output)
+            write_report(args.report_output, report)
+            print(json.dumps(report, indent=2))
+            return
+
         if args.command == "release-gates":
             report = evaluate_release_gates(
                 policy_path=args.policy,

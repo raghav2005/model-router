@@ -26,6 +26,25 @@ class ClassifierTests(unittest.TestCase):
         features = classify_request(RoutingRequest("What is the current price?"))
         self.assertIn("web", features.inferred_capabilities)
 
+    def test_quoted_complex_term_does_not_make_meta_task_complex(self) -> None:
+        features = classify_request(
+            RoutingRequest("Spell the phrase 'security audit' exactly.")
+        )
+        self.assertEqual(features.use_case, "general_qa")
+        self.assertEqual(features.risk, "normal")
+        self.assertEqual(features.complexity_level, 1)
+        self.assertIn("bounded simple request", features.signals)
+
+    def test_short_answer_cannot_hide_an_advanced_task(self) -> None:
+        features = classify_request(
+            RoutingRequest(
+                "Prove the theorem and examine assumptions. Answer in one word."
+            )
+        )
+        self.assertEqual(features.use_case, "reasoning")
+        self.assertGreaterEqual(features.complexity_level, 3)
+        self.assertNotIn("bounded simple request", features.signals)
+
 
 class RouterTests(unittest.TestCase):
     def setUp(self) -> None:
@@ -45,6 +64,20 @@ class RouterTests(unittest.TestCase):
             )
         )
         self.assertEqual(decision.model_id, "capable")
+
+    def test_learned_router_keeps_bounded_meta_task_on_efficient_tier(self) -> None:
+        decision = ModelRouter.from_artifact().route(
+            RoutingRequest("Spell the phrase 'security audit' exactly.")
+        )
+        self.assertEqual(decision.model_id, "efficient")
+
+    def test_learned_router_keeps_short_multilingual_fact_on_efficient_tier(
+        self,
+    ) -> None:
+        decision = ModelRouter.from_artifact().route(
+            RoutingRequest("日本の首都はどこですか。一語で答えてください。")
+        )
+        self.assertEqual(decision.model_id, "efficient")
 
     def test_budget_is_hard_constraint(self) -> None:
         decision = self.router.route(
