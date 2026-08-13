@@ -4,6 +4,7 @@ import io
 import json
 import unittest
 from typing import Any
+from unittest.mock import patch
 
 from model_router.api import RouterApplication, RuntimeConfig
 from model_router.messages import flatten_messages
@@ -106,6 +107,38 @@ class APITests(unittest.TestCase):
         status, _, body = invoke(self.app, "GET", "/metrics")
         self.assertEqual(status, 200)
         self.assertIn(b"model_router_decisions_total", body)
+
+    def test_ready_endpoint_exposes_shadow_release_state(self) -> None:
+        status, _, body = invoke(self.app, "GET", "/readyz")
+        payload = json.loads(body)
+        self.assertEqual(status, 200)
+        self.assertEqual(payload["mode"], "shadow")
+        self.assertIsNone(payload["release_gate_ready"])
+
+    def test_enforcement_refuses_to_start_when_release_gates_fail(self) -> None:
+        failed = {
+            "ready_for_enforcement": False,
+            "gates": [{"name": "live response benchmark passes", "passed": False}],
+        }
+        with patch("model_router.api.evaluate_release_gates", return_value=failed):
+            with self.assertRaisesRegex(RuntimeError, "live response benchmark"):
+                RouterApplication(
+                    router=ModelRouter(),
+                    client=self.client,  # type: ignore[arg-type]
+                    config=RuntimeConfig(mode="enforce"),
+                )
+
+    def test_enforcement_starts_only_after_release_gates_pass(self) -> None:
+        passed = {"ready_for_enforcement": True, "gates": []}
+        with patch("model_router.api.evaluate_release_gates", return_value=passed):
+            app = RouterApplication(
+                router=ModelRouter(),
+                client=self.client,  # type: ignore[arg-type]
+                config=RuntimeConfig(mode="enforce"),
+            )
+        status, _, body = invoke(app, "GET", "/readyz")
+        self.assertEqual(status, 200)
+        self.assertTrue(json.loads(body)["release_gate_ready"])
 
     def test_router_classifies_the_complete_conversation(self) -> None:
         prompt = flatten_messages(
