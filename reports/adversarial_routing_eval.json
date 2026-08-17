@@ -16,7 +16,7 @@
   ],
   "policies": {
     "hybrid_adaptive_p15": {
-      "average_estimated_cost_usd": 0.0093487,
+      "average_estimated_cost_usd": 0.00819118,
       "categories": {
         "concise_hard": {
           "exact": 48
@@ -394,7 +394,7 @@
       "use_case_accuracy": 0.736527
     },
     "hybrid_argmax": {
-      "average_estimated_cost_usd": 0.00884114,
+      "average_estimated_cost_usd": 0.00758211,
       "categories": {
         "concise_hard": {
           "exact": 48
@@ -772,7 +772,7 @@
       "use_case_accuracy": 0.736527
     },
     "hybrid_tier_risk_p15": {
-      "average_estimated_cost_usd": 0.01030955,
+      "average_estimated_cost_usd": 0.0093442,
       "categories": {
         "concise_hard": {
           "exact": 48

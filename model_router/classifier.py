@@ -62,6 +62,7 @@ ADVANCED_ACTION_TERMS = re.compile(
 )
 
 BOUNDED_SIMPLE_SIGNAL = "bounded simple request"
+DEFAULT_ADAPTIVE_CONFIDENCE_THRESHOLD = 0.45
 
 
 def is_bounded_simple_request(text: str) -> bool:
@@ -224,14 +225,20 @@ def classify_request_with_model(
     mode: Literal["learned", "hybrid"] = "hybrid",
     decision_policy: DecisionPolicy = "argmax",
     underroute_tolerance: float = 0.20,
+    adaptive_confidence_threshold: float = DEFAULT_ADAPTIVE_CONFIDENCE_THRESHOLD,
 ) -> RequestFeatures:
+    if not 0 <= adaptive_confidence_threshold <= 1:
+        raise ValueError("adaptive_confidence_threshold must be in [0, 1]")
     heuristic = classify_request(request)
     actual_policy: DecisionPolicy = decision_policy
     if decision_policy == "adaptive":
         argmax_prediction = model.predict(request.prompt, decision_policy="argmax")
         if heuristic.risk == "high" or request.priority == "quality":
             actual_policy = "tier_risk"
-        elif request.priority == "balanced" and argmax_prediction.confidence < 0.45:
+        elif (
+            request.priority == "balanced"
+            and argmax_prediction.confidence < adaptive_confidence_threshold
+        ):
             actual_policy = "tier_risk"
         else:
             actual_policy = "argmax"

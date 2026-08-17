@@ -12,6 +12,8 @@ from wsgiref.simple_server import make_server
 
 from .audit import DecisionAuditLogger
 from .catalog import catalog_sha256, load_catalog
+from .classifier import DEFAULT_ADAPTIVE_CONFIDENCE_THRESHOLD
+from .learned import default_artifact_path
 from .messages import flatten_messages, validate_string_array
 from .observability import RoutingMetrics
 from .readiness import evaluate_release_gates
@@ -33,6 +35,8 @@ class RuntimeConfig:
     release_policy_path: str = "config/release_policy.json"
     training_report_path: str = "reports/complexity_router_v2.json"
     live_summary_path: str = "reports/live_eval_summary.json"
+    pricing_report_path: str = "reports/pricing_verification.json"
+    model_artifact_path: str = str(default_artifact_path())
 
     def __post_init__(self) -> None:
         if self.mode not in {"shadow", "enforce"}:
@@ -57,6 +61,12 @@ class RuntimeConfig:
             ),
             live_summary_path=os.getenv(
                 "MODEL_ROUTER_LIVE_SUMMARY", "reports/live_eval_summary.json"
+            ),
+            pricing_report_path=os.getenv(
+                "MODEL_ROUTER_PRICING_REPORT", "reports/pricing_verification.json"
+            ),
+            model_artifact_path=os.getenv(
+                "MODEL_ROUTER_ARTIFACT", str(default_artifact_path())
             ),
         )
 
@@ -92,6 +102,8 @@ class RouterApplication:
                     policy_path=self.config.release_policy_path,
                     training_report_path=self.config.training_report_path,
                     live_summary_path=self.config.live_summary_path,
+                    pricing_report_path=self.config.pricing_report_path,
+                    artifact_path=self.config.model_artifact_path,
                 )
             except (OSError, KeyError, TypeError, ValueError) as error:
                 raise RuntimeError(
@@ -111,10 +123,17 @@ class RouterApplication:
         if self.config.shadow_target not in self.model_by_id:
             raise ValueError("shadow_target must be a catalog role")
         self.router = router or ModelRouter.from_artifact(
+            self.config.model_artifact_path,
             classifier_mode=os.getenv("MODEL_ROUTER_CLASSIFIER_MODE", "hybrid"),
             decision_policy=os.getenv("MODEL_ROUTER_COMPLEXITY_POLICY", "adaptive"),
             underroute_tolerance=float(
                 os.getenv("MODEL_ROUTER_UNDERROUTE_TOLERANCE", "0.15")
+            ),
+            adaptive_confidence_threshold=float(
+                os.getenv(
+                    "MODEL_ROUTER_ADAPTIVE_CONFIDENCE_THRESHOLD",
+                    str(DEFAULT_ADAPTIVE_CONFIDENCE_THRESHOLD),
+                )
             ),
         )
         self.client = client or SwitchyardClient(

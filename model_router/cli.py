@@ -8,6 +8,7 @@ from typing import Any
 
 from .adversarial import evaluate_adversarial_suite, write_cases, write_report
 from .benchmark import run_benchmark
+from .classifier import DEFAULT_ADAPTIVE_CONFIDENCE_THRESHOLD
 from .drift import (
     build_baseline,
     compare_to_baseline,
@@ -16,9 +17,12 @@ from .drift import (
 )
 from .drift import write_json as write_drift_json
 from .learned import default_artifact_path
+from .live_eval import case_set_sha256
 from .live_eval import load_cases as load_live_eval_cases
 from .live_eval import run_benchmark as run_live_benchmark
 from .messages import copy_messages, flatten_messages
+from .pricing import verify_catalog_pricing
+from .pricing import write_report as write_pricing_report
 from .readiness import evaluate_release_gates
 from .router import ModelRouter, NoEligibleModel
 from .switchyard import (
@@ -70,6 +74,16 @@ def _add_request_options(
         default=os.getenv("MODEL_ROUTER_COMPLEXITY_POLICY", "adaptive"),
     )
     parser.add_argument("--underroute-tolerance", type=float, default=0.20)
+    parser.add_argument(
+        "--adaptive-confidence-threshold",
+        type=float,
+        default=float(
+            os.getenv(
+                "MODEL_ROUTER_ADAPTIVE_CONFIDENCE_THRESHOLD",
+                str(DEFAULT_ADAPTIVE_CONFIDENCE_THRESHOLD),
+            )
+        ),
+    )
     parser.add_argument("--require-measured-quality", action="store_true")
     parser.add_argument("--require-measured-latency", action="store_true")
 
@@ -124,6 +138,7 @@ def _model_router(args: argparse.Namespace) -> ModelRouter:
         classifier_mode=args.classifier_mode,
         decision_policy=args.complexity_policy,
         underroute_tolerance=args.underroute_tolerance,
+        adaptive_confidence_threshold=args.adaptive_confidence_threshold,
         require_measured_quality=args.require_measured_quality,
         require_measured_latency=args.require_measured_latency,
     )
@@ -181,6 +196,11 @@ def build_parser() -> argparse.ArgumentParser:
         default="adaptive",
     )
     benchmark.add_argument("--underroute-tolerance", type=float, default=0.20)
+    benchmark.add_argument(
+        "--adaptive-confidence-threshold",
+        type=float,
+        default=DEFAULT_ADAPTIVE_CONFIDENCE_THRESHOLD,
+    )
     benchmark.add_argument("--require-measured-quality", action="store_true")
     benchmark.add_argument("--require-measured-latency", action="store_true")
 
@@ -220,6 +240,17 @@ def build_parser() -> argparse.ArgumentParser:
     live_eval.add_argument(
         "--stream", action="store_true", help="Measure streaming time to first token"
     )
+    live_eval.add_argument(
+        "--switchyard-revision",
+        default=os.getenv("SWITCHYARD_REVISION"),
+        help="Exact qualified Switchyard version or commit used by this run",
+    )
+
+    case_set_hash = subparsers.add_parser(
+        "case-set-hash",
+        help="Compute the canonical digest for an evaluation case set",
+    )
+    case_set_hash.add_argument("cases")
 
     release_gates = subparsers.add_parser(
         "release-gates", help="Evaluate production-enforcement release gates"
@@ -231,6 +262,18 @@ def build_parser() -> argparse.ArgumentParser:
     release_gates.add_argument(
         "--live-summary", default="reports/live_eval_summary.json"
     )
+    release_gates.add_argument(
+        "--pricing-report", default="reports/pricing_verification.json"
+    )
+    release_gates.add_argument("--model-artifact", default=str(default_artifact_path()))
+
+    verify_pricing = subparsers.add_parser(
+        "verify-pricing",
+        help="Compare catalogue economics with official provider documentation",
+    )
+    verify_pricing.add_argument("--catalog")
+    verify_pricing.add_argument("--output", default="reports/pricing_verification.json")
+    verify_pricing.add_argument("--timeout", type=float, default=15.0)
 
     adversarial = subparsers.add_parser(
         "adversarial-eval",
@@ -269,6 +312,30 @@ def main() -> None:
     parser = build_parser()
     args = parser.parse_args()
     try:
+        if args.command == "case-set-hash":
+            cases = load_live_eval_cases(args.cases)
+            print(
+                json.dumps(
+                    {
+                        "case_count": len(cases),
+                        "case_set_sha256": case_set_sha256(cases),
+                    },
+                    indent=2,
+                )
+            )
+            return
+
+        if args.command == "verify-pricing":
+            report = verify_catalog_pricing(
+                catalog_path=args.catalog,
+                timeout_seconds=args.timeout,
+            )
+            write_pricing_report(args.output, report)
+            print(json.dumps(report, indent=2))
+            if not report["passed"]:
+                raise SystemExit(4)
+            return
+
         if args.command == "drift-baseline":
             baseline = build_baseline(load_route_events(args.audit_log))
             write_drift_json(args.output, baseline)
@@ -301,6 +368,8 @@ def main() -> None:
                 policy_path=args.policy,
                 training_report_path=args.training_report,
                 live_summary_path=args.live_summary,
+                pricing_report_path=args.pricing_report,
+                artifact_path=args.model_artifact,
             )
             print(json.dumps(report, indent=2))
             if not report["ready_for_enforcement"]:
@@ -351,6 +420,7 @@ def main() -> None:
                 resume=not args.no_resume,
                 repetitions=args.repetitions,
                 stream=args.stream,
+                switchyard_revision=args.switchyard_revision,
             )
             print(json.dumps(result, indent=2))
             return

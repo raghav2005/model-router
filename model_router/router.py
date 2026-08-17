@@ -5,7 +5,11 @@ from pathlib import Path
 from typing import Literal
 
 from .catalog import load_catalog
-from .classifier import classify_request, classify_request_with_model
+from .classifier import (
+    DEFAULT_ADAPTIVE_CONFIDENCE_THRESHOLD,
+    classify_request,
+    classify_request_with_model,
+)
 from .learned import DecisionPolicy, NaiveBayesComplexityModel
 from .types import CandidateScore, ModelProfile, RouteDecision, RoutingRequest
 
@@ -33,6 +37,7 @@ class ModelRouter:
         classifier_mode: Literal["heuristic", "learned", "hybrid"] = "heuristic",
         decision_policy: DecisionPolicy = "adaptive",
         underroute_tolerance: float = 0.20,
+        adaptive_confidence_threshold: float = DEFAULT_ADAPTIVE_CONFIDENCE_THRESHOLD,
         require_measured_quality: bool = False,
         require_measured_latency: bool = False,
     ) -> None:
@@ -44,7 +49,12 @@ class ModelRouter:
         self.complexity_model = complexity_model
         self.classifier_mode = classifier_mode
         self.decision_policy = decision_policy
+        if not 0 <= underroute_tolerance < 1:
+            raise ValueError("underroute_tolerance must be in [0, 1)")
+        if not 0 <= adaptive_confidence_threshold <= 1:
+            raise ValueError("adaptive_confidence_threshold must be in [0, 1]")
         self.underroute_tolerance = underroute_tolerance
+        self.adaptive_confidence_threshold = adaptive_confidence_threshold
         self.require_measured_quality = require_measured_quality
         self.require_measured_latency = require_measured_latency
 
@@ -57,6 +67,7 @@ class ModelRouter:
         classifier_mode: Literal["learned", "hybrid"] = "hybrid",
         decision_policy: DecisionPolicy = "adaptive",
         underroute_tolerance: float = 0.20,
+        adaptive_confidence_threshold: float = DEFAULT_ADAPTIVE_CONFIDENCE_THRESHOLD,
         require_measured_quality: bool = False,
         require_measured_latency: bool = False,
     ) -> ModelRouter:
@@ -66,6 +77,7 @@ class ModelRouter:
             classifier_mode=classifier_mode,
             decision_policy=decision_policy,
             underroute_tolerance=underroute_tolerance,
+            adaptive_confidence_threshold=adaptive_confidence_threshold,
             require_measured_quality=require_measured_quality,
             require_measured_latency=require_measured_latency,
         )
@@ -92,6 +104,7 @@ class ModelRouter:
                 mode=self.classifier_mode,
                 decision_policy=self.decision_policy,
                 underroute_tolerance=self.underroute_tolerance,
+                adaptive_confidence_threshold=self.adaptive_confidence_threshold,
             )
         evaluated: list[tuple[ModelProfile, CandidateScore]] = []
 

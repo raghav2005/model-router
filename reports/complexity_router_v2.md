@@ -1,6 +1,6 @@
 # Learned Complexity Router — Training and Evaluation Report
 
-**Generated:** 2026-08-13T08:04:01.369340+00:00
+**Generated:** 2026-08-17T11:36:55.036830+00:00
 
 ## Result summary
 
@@ -39,7 +39,7 @@ The trained model predicts the audited Level 1–5 complexity label from the fla
 - Collapsed tier accuracy: 93.53%
 - Collapsed tier under-route rate: 3.56%
 - Expected calibration error: 0.023
-- Local inference latency: median 115.6 µs; p95 168.5 µs over 1,000 prompts
+- Local inference latency: median 166.2 µs; p95 234.7 µs over 1,000 prompts
 
 ## End-to-end router simulation
 
@@ -47,13 +47,28 @@ This section runs the complete policy router, including hard gates and catalogue
 
 | Router mode | Tier success proxy | Tier under-route | Tier over-route | Est. cost/request | Saving vs capable | Route mix |
 |---|---:|---:|---:|---:|---:|---|
-| heuristic | 44.91% | 55.09% | 9.14% | $0.00533 | 65.77% | balanced: 3656, capable: 140, efficient: 4726 |
-| learned_argmax | 97.32% | 2.68% | 15.45% | $0.01035 | 33.51% | balanced: 3100, capable: 3767, efficient: 1655 |
-| hybrid_argmax | 97.13% | 2.87% | 9.63% | $0.01007 | 35.29% | balanced: 2584, capable: 3769, efficient: 2169 |
-| hybrid_conservative_p80 | 98.47% | 1.53% | 11.24% | $0.01033 | 33.64% | balanced: 2386, capable: 4019, efficient: 2117 |
-| hybrid_adaptive_p15 | 97.43% | 2.57% | 9.83% | $0.01012 | 35.00% | balanced: 2551, capable: 3812, efficient: 2159 |
-| hybrid_tier_risk_p15 | 98.73% | 1.27% | 11.84% | $0.01041 | 33.11% | balanced: 2334, capable: 4096, efficient: 2092 |
+| heuristic | 44.91% | 55.09% | 9.14% | $0.00328 | 78.92% | balanced: 3656, capable: 140, efficient: 4726 |
+| learned_argmax | 97.32% | 2.68% | 15.45% | $0.00931 | 40.21% | balanced: 3100, capable: 3767, efficient: 1655 |
+| hybrid_argmax | 97.13% | 2.87% | 9.63% | $0.00897 | 42.35% | balanced: 2584, capable: 3769, efficient: 2169 |
+| hybrid_conservative_p80 | 98.47% | 1.53% | 11.24% | $0.00928 | 40.38% | balanced: 2386, capable: 4019, efficient: 2117 |
+| hybrid_adaptive_p15 | 97.43% | 2.57% | 9.83% | $0.00903 | 42.01% | balanced: 2551, capable: 3812, efficient: 2159 |
+| hybrid_tier_risk_p15 | 98.73% | 1.27% | 11.84% | $0.00938 | 39.73% | balanced: 2334, capable: 4096, efficient: 2092 |
+| hybrid_adaptive_validation_selected | 97.15% | 2.85% | 9.73% | $0.00899 | 42.27% | balanced: 2572, capable: 3781, efficient: 2169 |
 | always_capable_reference | 100.00% | 0.00% | 55.60% | $0.01556 | 0.00% | capable: 8522 |
+
+## Validation-selected adaptive policy
+
+The confidence threshold and posterior risk tolerance were selected using only the validation split. The objective minimises estimated cost while respecting the declared validation under-routing cap.
+
+- Confidence threshold: 0.30
+- Posterior under-route tolerance: 0.10
+- Validation tier under-route: 2.95%
+- Validation tier over-route: 9.64%
+- Validation estimated cost/request: $0.00895
+- Feasible candidates: 28/28
+- External confirmation: not passed
+- Decision: retain current production default and continue shadow evaluation
+- This is a validation candidate, not a deployment recommendation.
 
 ## Important interpretation
 

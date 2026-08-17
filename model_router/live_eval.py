@@ -7,10 +7,11 @@ import time
 from collections import Counter
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import asdict, dataclass
+from hashlib import sha256
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 
-from .catalog import load_catalog
+from .catalog import catalog_sha256, load_catalog
 from .switchyard import SwitchyardClient, SwitchyardError
 from .types import ModelProfile
 
@@ -61,6 +62,44 @@ class CandidateRun:
             else None
         )
         return value
+
+
+def case_set_sha256(cases: Sequence[EvaluationCase]) -> str:
+    canonical = json.dumps(
+        [asdict(case) for case in cases],
+        ensure_ascii=False,
+        separators=(",", ":"),
+        sort_keys=True,
+    ).encode("utf-8")
+    return sha256(canonical).hexdigest()
+
+
+def _benchmark_provenance(
+    cases: Sequence[EvaluationCase],
+    targets: Sequence[str],
+    *,
+    repetitions: int,
+    stream: bool,
+    store_content: bool,
+    switchyard_revision: str | None,
+) -> dict[str, object]:
+    inputs = {
+        "case_set_sha256": case_set_sha256(cases),
+        "catalog_sha256": catalog_sha256(),
+        "targets": list(targets),
+        "repetitions": repetitions,
+        "stream": stream,
+        "store_content": store_content,
+        "switchyard_revision": switchyard_revision,
+    }
+    fingerprint = sha256(
+        json.dumps(inputs, separators=(",", ":"), sort_keys=True).encode("utf-8")
+    ).hexdigest()
+    return {
+        "schema_version": "switchyard-live-eval-provenance-v1",
+        **inputs,
+        "benchmark_fingerprint": fingerprint,
+    }
 
 
 def load_cases(path: str | Path) -> list[EvaluationCase]:
@@ -412,6 +451,7 @@ def run_benchmark(
     resume: bool = True,
     repetitions: int = 1,
     stream: bool = False,
+    switchyard_revision: str | None = None,
 ) -> dict[str, object]:
     if not targets:
         raise ValueError("at least one target is required")
@@ -422,9 +462,36 @@ def run_benchmark(
     if len(set(targets)) != len(targets):
         raise ValueError("targets must be unique")
     result_path = Path(output_path)
+    summary_file = Path(summary_path)
     completed: dict[tuple[str, str, int], CandidateRun] = {}
     models_by_target = {model.switchyard_target: model for model in load_catalog()}
+    provenance = _benchmark_provenance(
+        cases,
+        targets,
+        repetitions=repetitions,
+        stream=stream,
+        store_content=store_content,
+        switchyard_revision=switchyard_revision,
+    )
     if resume and result_path.exists():
+        if not summary_file.exists():
+            raise ValueError(
+                "cannot safely resume: checkpoint summary/provenance is missing"
+            )
+        previous_summary = json.loads(summary_file.read_text(encoding="utf-8"))
+        previous_provenance = (
+            previous_summary.get("provenance", {})
+            if isinstance(previous_summary, dict)
+            else {}
+        )
+        if (
+            not isinstance(previous_provenance, dict)
+            or previous_provenance.get("benchmark_fingerprint")
+            != provenance["benchmark_fingerprint"]
+        ):
+            raise ValueError(
+                "cannot safely resume: cases, catalogue, targets, or run settings changed"
+            )
         with result_path.open("r", encoding="utf-8") as handle:
             for line in handle:
                 if not line.strip():
@@ -486,7 +553,7 @@ def run_benchmark(
         encoding="utf-8",
     )
     summary = summarize(ordered)
-    summary_file = Path(summary_path)
+    summary["provenance"] = provenance
     summary_file.parent.mkdir(parents=True, exist_ok=True)
     summary_file.write_text(
         json.dumps(summary, indent=2, sort_keys=True, ensure_ascii=False) + "\n",

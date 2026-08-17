@@ -103,6 +103,38 @@ class LiveEvaluationTests(unittest.TestCase):
             self.assertIsNotNone(
                 first["targets"]["efficient"]["estimated_total_cost_usd"]
             )
+            self.assertEqual(
+                first["provenance"]["benchmark_fingerprint"],
+                second["provenance"]["benchmark_fingerprint"],
+            )
+
+    def test_resume_rejects_changed_case_set(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            result_path = root / "results.jsonl"
+            summary_path = root / "summary.json"
+            run_benchmark(
+                FakeClient(),  # type: ignore[arg-type]
+                [self.case],
+                ["efficient"],
+                output_path=result_path,
+                summary_path=summary_path,
+            )
+            changed = EvaluationCase(
+                id=self.case.id,
+                messages=({"role": "user", "content": "What is 3+3?"},),
+                max_tokens=self.case.max_tokens,
+                validators=self.case.validators,
+                metadata=self.case.metadata,
+            )
+            with self.assertRaisesRegex(ValueError, "cannot safely resume"):
+                run_benchmark(
+                    FakeClient(),  # type: ignore[arg-type]
+                    [changed],
+                    ["efficient"],
+                    output_path=result_path,
+                    summary_path=summary_path,
+                )
 
 
 if __name__ == "__main__":
