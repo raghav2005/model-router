@@ -1,5 +1,27 @@
 # Changelog
 
+## 0.6.0 — 2026-08-17
+
+- Corrected Luna and Terra token prices from the official model pages and added
+  an automated verifier for model IDs, all token rates, cache-write pricing,
+  context/output limits, and long-context multipliers.
+- Bound pricing evidence to the exact catalogue digest and training evidence to
+  the exact router artifact, catalogue schema/digest, external data hash, and
+  routing-policy version.
+- Added validation-only tuning across 28 adaptive confidence/risk settings. The
+  cheaper candidate was retained only as research evidence because it failed
+  external confirmation; the runtime default was not changed.
+- Reduced adaptive-policy tuning work by reusing route decisions across the
+  search grid.
+- Made live benchmark resume fail closed when the cases, catalogue, targets,
+  repetitions, streaming mode, retention setting, or Switchyard revision changes.
+- Required live release evidence to match an explicitly approved case-set hash,
+  the qualified Switchyard revision, call-success and validator thresholds, and
+  the expected upstream response-model identities.
+- Expanded the credential-free suite to 74 tests and regenerated the public-safe
+  artifact, adversarial report, and aggregate training reports without publishing
+  source training data.
+
 ## 0.5.0 — 2026-08-13
 
 - Added full-conversation classification, calibrated classifier confidence,

@@ -1,6 +1,6 @@
 # Model research and catalogue rationale
 
-**Research date:** 13 August 2026
+**Research date:** 17 August 2026
 
 **Scope:** Initial OpenAI deployment candidate behind NVIDIA NeMo Switchyard
 
@@ -10,13 +10,13 @@ The first controlled deployment uses one model family across three stable routin
 
 | Router role | Upstream model | Intended workload | Standard input / output per 1M tokens |
 |---|---|---|---:|
-| `efficient` | `gpt-5.6-luna` | High-volume and straightforward work | $1 / $6 |
-| `balanced` | `gpt-5.6-terra` | Everyday professional work | $2.50 / $15 |
+| `efficient` | `gpt-5.6-luna` | High-volume and straightforward work | $0.20 / $1.20 |
+| `balanced` | `gpt-5.6-terra` | Everyday professional work | $2 / $12 |
 | `capable` | `gpt-5.6-sol` | Complex reasoning, coding, and high-risk work | $5 / $30 |
 
 Using one provider family simplifies the first evaluation: formats, tool behaviour, context limits, and billing semantics are comparable. A second provider should be added later for resilience, but only after its models have been run through the same response-level benchmark.
 
-The prices, model IDs, context windows, and feature claims above come from the official [OpenAI model catalogue](https://developers.openai.com/api/docs/models) and [API pricing page](https://openai.com/api/pricing/). The production catalogue records an exact source URL and verification date for every role.
+The prices, model IDs, context windows, and feature claims above come from the official [OpenAI model catalogue](https://developers.openai.com/api/docs/models) and individual model pages. The production catalogue records an exact source URL and verification date for every role. The automated verifier re-downloads those pages and compares prices, context/output limits, cache-write pricing, and long-context multipliers before a release; the verification report is bound to the exact catalogue SHA-256.
 
 OpenAI's current [model-selection guidance](https://developers.openai.com/tracks/building-agents#how-to-choose)
 recommends starting with the flagship model, moving simple or latency-sensitive
@@ -69,6 +69,36 @@ Before enforcement, the live harness must measure at least:
 - the effect of reasoning effort and long context.
 
 Measurements must be repeated in the intended deployment region and provider service tier. Published relative-speed descriptions are not sufficient for an SLA.
+
+## Recent routing research and design implications
+
+Recent preprints reinforce the direction of the prototype while also showing why
+the current evidence is insufficient for enforcement:
+
+- [UCCI](https://arxiv.org/abs/2605.18796) calibrates an uncertainty score to a
+  per-query failure probability and chooses an escalation threshold through
+  constrained cost minimisation. Importantly, its reported cascade evidence uses
+  actual model outputs and measured hardware latency. Version 0.6 adopts the
+  validation-only constrained-search structure, but its uncertainty still predicts
+  synthetic prompt complexity rather than candidate-model failure, so the selected
+  threshold remains shadow evidence.
+- [LLMRouterBench](https://arxiv.org/abs/2601.07206) reports that several complex
+  routers do not reliably beat simple baselines under unified evaluation. The
+  harness therefore retains argmax, always-capable, tier-risk, heuristic, and random
+  comparisons and requires material held-out benefit before promotion.
+- [When Routing Collapses](https://arxiv.org/abs/2602.03478) describes routers
+  converging on the most expensive model as budgets rise because score prediction
+  and discrete model comparison are misaligned. Route mix and the full quality-cost
+  frontier should therefore be release evidence, not just aggregate accuracy.
+- [R2-Router](https://arxiv.org/abs/2602.02823) treats output length as part of the
+  routing decision. Expected output is already included in this router's cost and
+  hard-limit checks; jointly optimising model and approved output budget is a useful
+  later experiment once response-level quality data exists.
+
+These are research results, not production guarantees. The practical conclusion is
+to keep the selector simple, calibrated, and benchmarked against strong baselines
+until application outcomes show that a more complex router earns its operational
+cost.
 
 ## Switchyard production position
 

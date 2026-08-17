@@ -4,7 +4,7 @@
 multinomial Naive Bayes model trained from the audited
 `routing_dataset_100k_valid_only.jsonl` snapshot.
 
-Artifact SHA-256: `35da060daaca938ba22e1abfe6ec3b97a3c46a7fd0ea7fdbfe48e6c552e6258f`
+Artifact SHA-256: `b893eaa86e744e86eb3efa195a9b8fa56cc702286bc1cc78bc294c773375f650`
 
 `complexity_router_v1.npz` is retained as the frozen baseline. Git history and
 `reports/complexity_router_v1.*` preserve its original evidence.
@@ -23,6 +23,8 @@ Artifact SHA-256: `35da060daaca938ba22e1abfe6ec3b97a3c46a7fd0ea7fdbfe48e6c552e62
 - Class prior: uniform
 - Multi-view inference: 90% complete conversation and 10% latest user turn
 - Probability calibration: ensemble weight and temperature selected by validation log loss
+- Adaptive policy search: 28 confidence/risk settings evaluated on validation only
+- The validation-selected candidate was rejected for deployment because external confirmation failed
 
 ## Champion evidence
 

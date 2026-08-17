@@ -47,7 +47,18 @@ Models can be rejected for tier, capability, context, maximum output, health, re
 
 ### Evidence-aware catalogue
 
-The catalogue records provider and upstream model, verified price source and date, cache pricing, long-context multipliers, context/output limits, and evidence status for quality and latency. Published vendor benchmarks are stored separately from workload-measured scores.
+The catalogue records provider and upstream model, verified price source and date,
+cache pricing, long-context multipliers, context/output limits, and evidence status
+for quality and latency. An automated verifier compares every price and limit with
+the official provider pages. Enforcement requires a current verification report
+whose catalogue digest matches the exact deployed catalogue. Published vendor
+benchmarks are stored separately from workload-measured scores.
+
+The training report similarly records hashes for the exact learned artifact,
+catalogue, external dataset, and routing-policy version. A stale report cannot
+approve a different artifact or policy. Live benchmark summaries carry a fingerprint
+of their cases, catalogue, targets, repetitions, and execution settings; resume and
+release approval both fail on a mismatch.
 
 ### Dependency resilience
 
@@ -88,12 +99,17 @@ The default release policy requires:
 
 1. an explicit change from shadow to enforce mode;
 2. current, source-linked pricing;
-3. workload-measured response quality for every role;
-4. workload-measured latency for every role;
-5. at least 1,000 independent external examples, at least 75% exact complexity accuracy, and no more than 5% tier under-routing;
-6. at least 100 live response cases per role with at least a 90% all-validator pass rate;
-7. a pinned and tested Switchyard release or commit; and
-8. a trusted direct-provider bypass.
+3. a current official-source verification report matching the exact catalogue;
+4. workload-measured response quality for every role;
+5. workload-measured latency for every role;
+6. at least 1,000 independent external examples, at least 75% exact complexity accuracy, and no more than 5% tier under-routing;
+7. a training report matching the exact router artifact, catalogue, and policy version;
+8. at least 100 scored live responses per role, at least a 99% call-success rate,
+   at least a 90% all-validator pass rate, and no unexpected response-model substitutions;
+9. live evidence matching the exact catalogue, qualified Switchyard revision, and
+   an explicitly approved case-set digest;
+10. a pinned and tested Switchyard release or commit; and
+11. a trusted direct-provider bypass.
 
 Thresholds are initial release criteria and must be approved against business risk. Open-ended work also needs blinded human review or an approved judge model; deterministic validators alone are insufficient.
 
