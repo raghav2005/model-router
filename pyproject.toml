@@ -1,12 +1,12 @@
 [project]
 name = "model-routing-poc"
-version = "0.6.0"
+version = "0.7.0"
 description = "Trained, explainable LLM router with Switchyard execution and evaluation harnesses"
 requires-python = ">=3.12"
 dependencies = ["numpy>=1.26,<3"]
 
 [project.optional-dependencies]
-switchyard = ["nemo-switchyard[cli,server]>=0.1.0,<0.2.0"]
+switchyard = ["nemo-switchyard[cli,server]==0.2.0"]
 production = ["gunicorn>=23,<24"]
 dev = ["build>=1.2,<2", "ruff==0.16.2"]
 
