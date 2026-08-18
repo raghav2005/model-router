@@ -6,6 +6,7 @@ from dataclasses import replace
 from typing import Literal
 
 from .learned import MODEL_SCHEMA_VERSION, DecisionPolicy, NaiveBayesComplexityModel
+from .normalization import unwrap_supported_envelope
 from .types import RequestFeatures, RoutingRequest
 
 CODE_TERMS = re.compile(
@@ -123,8 +124,11 @@ def quality_floor_for(complexity: float, risk: str) -> float:
 
 
 def classify_request(request: RoutingRequest) -> RequestFeatures:
-    text = request.prompt
+    raw_text = request.prompt
+    text, envelope = unwrap_supported_envelope(raw_text)
     signals: list[str] = []
+    if envelope is not None:
+        signals.append(f"normalized supported {envelope} contract")
     inferred_capabilities = set(request.required_capabilities)
     bounded_simple = is_bounded_simple_request(text)
 
@@ -148,7 +152,7 @@ def classify_request(request: RoutingRequest) -> RequestFeatures:
         use_case = "general_qa"
         signals.append("general question/answer pattern")
 
-    input_tokens = request.input_tokens or estimate_tokens(text)
+    input_tokens = request.input_tokens or estimate_tokens(raw_text)
     complexity = 0.12
     if input_tokens > 250:
         complexity += 0.12
@@ -230,9 +234,10 @@ def classify_request_with_model(
     if not 0 <= adaptive_confidence_threshold <= 1:
         raise ValueError("adaptive_confidence_threshold must be in [0, 1]")
     heuristic = classify_request(request)
+    semantic_prompt, _ = unwrap_supported_envelope(request.prompt)
     actual_policy: DecisionPolicy = decision_policy
     if decision_policy == "adaptive":
-        argmax_prediction = model.predict(request.prompt, decision_policy="argmax")
+        argmax_prediction = model.predict(semantic_prompt, decision_policy="argmax")
         if heuristic.risk == "high" or request.priority == "quality":
             actual_policy = "tier_risk"
         elif (
@@ -243,7 +248,7 @@ def classify_request_with_model(
         else:
             actual_policy = "argmax"
     prediction = model.predict(
-        request.prompt,
+        semantic_prompt,
         decision_policy=actual_policy,
         underroute_tolerance=(
             min(underroute_tolerance, 0.10)

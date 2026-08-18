@@ -36,6 +36,8 @@ class RuntimeConfig:
     training_report_path: str = "reports/complexity_router_v2.json"
     live_summary_path: str = "reports/live_eval_summary.json"
     pricing_report_path: str = "reports/pricing_verification.json"
+    metamorphic_report_path: str = "reports/metamorphic_routing_eval.json"
+    switchyard_contract_report_path: str = "reports/switchyard_contract.json"
     model_artifact_path: str = str(default_artifact_path())
 
     def __post_init__(self) -> None:
@@ -64,6 +66,14 @@ class RuntimeConfig:
             ),
             pricing_report_path=os.getenv(
                 "MODEL_ROUTER_PRICING_REPORT", "reports/pricing_verification.json"
+            ),
+            metamorphic_report_path=os.getenv(
+                "MODEL_ROUTER_METAMORPHIC_REPORT",
+                "reports/metamorphic_routing_eval.json",
+            ),
+            switchyard_contract_report_path=os.getenv(
+                "MODEL_ROUTER_SWITCHYARD_CONTRACT_REPORT",
+                "reports/switchyard_contract.json",
             ),
             model_artifact_path=os.getenv(
                 "MODEL_ROUTER_ARTIFACT", str(default_artifact_path())
@@ -103,6 +113,10 @@ class RouterApplication:
                     training_report_path=self.config.training_report_path,
                     live_summary_path=self.config.live_summary_path,
                     pricing_report_path=self.config.pricing_report_path,
+                    metamorphic_report_path=self.config.metamorphic_report_path,
+                    switchyard_contract_report_path=(
+                        self.config.switchyard_contract_report_path
+                    ),
                     artifact_path=self.config.model_artifact_path,
                 )
             except (OSError, KeyError, TypeError, ValueError) as error:

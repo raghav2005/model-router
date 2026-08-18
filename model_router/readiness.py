@@ -39,6 +39,12 @@ def _sha256_file(path: Path) -> str:
     return digest.hexdigest()
 
 
+def _interval_lower(value: object) -> float | None:
+    if not isinstance(value, dict) or value.get("lower") is None:
+        return None
+    return float(value["lower"])
+
+
 def evaluate_release_gates(
     *,
     policy_path: str | Path = "config/release_policy.json",
@@ -46,6 +52,8 @@ def evaluate_release_gates(
     training_report_path: str | Path = "reports/complexity_router_v2.json",
     live_summary_path: str | Path = "reports/live_eval_summary.json",
     pricing_report_path: str | Path = "reports/pricing_verification.json",
+    metamorphic_report_path: str | Path = "reports/metamorphic_routing_eval.json",
+    switchyard_contract_report_path: str | Path = "reports/switchyard_contract.json",
     artifact_path: str | Path = default_artifact_path(),
     today: date | None = None,
 ) -> dict[str, object]:
@@ -181,6 +189,48 @@ def evaluate_release_gates(
         ReleaseGate("router generalises to external data", external_passed, detail)
     )
 
+    synthetic_policy = policy.get("synthetic_regression")
+    if isinstance(synthetic_policy, dict):
+        metamorphic_path = Path(metamorphic_report_path)
+        selected_policy = str(synthetic_policy.get("policy", "hybrid_adaptive_p15"))
+        if metamorphic_path.exists():
+            metamorphic = _read_json(metamorphic_path)
+            policies = metamorphic.get("policies", {})
+            selected = (
+                policies.get(selected_policy, {}) if isinstance(policies, dict) else {}
+            )
+            if not isinstance(selected, dict):
+                selected = {}
+            count = int(selected.get("count", 0))
+            underroute = float(selected.get("tier_underroute_rate", 1.0))
+            invariance = float(selected.get("tier_invariance_rate", 0.0))
+            minimum_cases = int(synthetic_policy["minimum_cases"])
+            maximum_underroute = float(synthetic_policy["maximum_tier_underroute_rate"])
+            minimum_invariance = float(synthetic_policy["minimum_tier_invariance_rate"])
+            metamorphic_passed = (
+                metamorphic.get("schema_version") == "model-router-metamorphic-eval-v1"
+                and count >= minimum_cases
+                and underroute <= maximum_underroute
+                and invariance >= minimum_invariance
+            )
+            metamorphic_detail = (
+                f"policy={selected_policy}, count={count}/{minimum_cases}, "
+                f"underroute={underroute:.3f}/{maximum_underroute:.3f} max, "
+                f"tier_invariance={invariance:.3f}/{minimum_invariance:.3f} min"
+            )
+        else:
+            metamorphic_passed = False
+            metamorphic_detail = (
+                f"metamorphic regression report not found: {metamorphic_path}"
+            )
+        gates.append(
+            ReleaseGate(
+                "metamorphic routing regression passes",
+                metamorphic_passed,
+                metamorphic_detail,
+            )
+        )
+
     artifact = Path(artifact_path)
     if training_path.exists() and artifact.exists():
         training = _read_json(training_path)
@@ -242,6 +292,12 @@ def evaluate_release_gates(
         minimum_cases = int(policy["minimum_live_cases_per_target"])
         minimum_pass = float(policy["minimum_live_all_validators_pass_rate"])
         minimum_call_success = float(policy["minimum_live_call_success_rate"])
+        minimum_pass_lower = float(
+            policy.get("minimum_live_all_validators_pass_wilson_lower_bound", 0.0)
+        )
+        minimum_call_success_lower = float(
+            policy.get("minimum_live_call_success_wilson_lower_bound", 0.0)
+        )
         maximum_model_mismatches = int(
             policy["maximum_live_response_model_mismatch_count"]
         )
@@ -262,6 +318,16 @@ def evaluate_release_gates(
             call_success_rate = (
                 result.get("call_success_rate") if isinstance(result, dict) else None
             )
+            pass_lower = (
+                _interval_lower(result.get("all_validators_pass_rate_wilson_95"))
+                if isinstance(result, dict)
+                else None
+            )
+            call_success_lower = (
+                _interval_lower(result.get("call_success_rate_wilson_95"))
+                if isinstance(result, dict)
+                else None
+            )
             model_mismatches = (
                 int(result.get("response_model_mismatch_count", 0))
                 if isinstance(result, dict)
@@ -274,6 +340,13 @@ def evaluate_release_gates(
                 or float(pass_rate) < minimum_pass
                 or call_success_rate is None
                 or float(call_success_rate) < minimum_call_success
+                or (minimum_pass_lower > 0 and pass_lower is None)
+                or (pass_lower is not None and pass_lower < minimum_pass_lower)
+                or (minimum_call_success_lower > 0 and call_success_lower is None)
+                or (
+                    call_success_lower is not None
+                    and call_success_lower < minimum_call_success_lower
+                )
                 or model_mismatches > maximum_model_mismatches
             ):
                 missing.append(model.id)
@@ -296,7 +369,8 @@ def evaluate_release_gates(
         live_provenance = live.get("provenance", {})
         switchyard = policy.get("switchyard", {})
         tested_switchyard_revision = (
-            switchyard.get("tested_version_or_commit")
+            switchyard.get("approved_version_or_commit")
+            or switchyard.get("tested_version_or_commit")
             if isinstance(switchyard, dict)
             else None
         )
@@ -306,7 +380,7 @@ def evaluate_release_gates(
             else []
         )
         live_evidence_passed = (
-            live.get("schema_version") == "switchyard-live-eval-summary-v2"
+            live.get("schema_version") == "switchyard-live-eval-summary-v3"
             and isinstance(live_provenance, dict)
             and live_provenance.get("schema_version")
             == "switchyard-live-eval-provenance-v1"
@@ -337,7 +411,8 @@ def evaluate_release_gates(
 
     switchyard = policy.get("switchyard", {})
     switchyard_pin = (
-        switchyard.get("tested_version_or_commit")
+        switchyard.get("approved_version_or_commit")
+        or switchyard.get("tested_version_or_commit")
         if isinstance(switchyard, dict)
         else None
     )
@@ -348,15 +423,41 @@ def evaluate_release_gates(
     )
     gates.append(
         ReleaseGate(
-            "Switchyard build is pinned",
+            "Switchyard release is approved and pinned",
             bool(switchyard_pin),
             (
-                f"tested pin: {switchyard_pin}"
+                f"approved pin: {switchyard_pin}"
                 if switchyard_pin
-                else "no tested Switchyard version or commit is recorded"
+                else "no approved Switchyard version or commit is recorded"
             ),
         )
     )
+    if isinstance(switchyard, dict) and switchyard.get("contract_report_required"):
+        contract_path = Path(switchyard_contract_report_path)
+        config_path = Path("config/switchyard_routes.toml")
+        if contract_path.exists() and config_path.exists():
+            contract = _read_json(contract_path)
+            release_version = str(switchyard.get("release", "")).removeprefix("v")
+            contract_passed = (
+                contract.get("schema_version") == "model-router-switchyard-contract-v1"
+                and contract.get("passed") is True
+                and contract.get("switchyard_version") == release_version
+                and contract.get("config_sha256") == _sha256_file(config_path)
+            )
+            contract_detail = (
+                f"version={contract.get('switchyard_version')}, config digest "
+                f"{'matches' if contract.get('config_sha256') == _sha256_file(config_path) else 'differs'}"
+            )
+        else:
+            contract_passed = False
+            contract_detail = f"Switchyard contract report not found: {contract_path}"
+        gates.append(
+            ReleaseGate(
+                "Switchyard runtime contract passes",
+                contract_passed,
+                contract_detail,
+            )
+        )
     gates.append(
         ReleaseGate(
             "trusted gateway bypass exists",
