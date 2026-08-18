@@ -7,6 +7,8 @@ python -m pip install -e '.[dev]'
 ruff check .
 ruff format --check .
 python -m unittest discover -s tests -v
+model-router verify-pricing
+model-router release-gates
 python -m build
 docker build -t model-router:<immutable-version> .
 ```
@@ -38,7 +40,11 @@ MODEL_ROUTER_AUDIT_PATH=-
 MODEL_ROUTER_CLASSIFIER_MODE=hybrid
 MODEL_ROUTER_COMPLEXITY_POLICY=adaptive
 MODEL_ROUTER_UNDERROUTE_TOLERANCE=0.15
+MODEL_ROUTER_ADAPTIVE_CONFIDENCE_THRESHOLD=0.45
+MODEL_ROUTER_ARTIFACT=model_router/artifacts/complexity_router_v2.npz
+MODEL_ROUTER_PRICING_REPORT=reports/pricing_verification.json
 SWITCHYARD_URL=http://switchyard:4000
+SWITCHYARD_REVISION=<qualified-version-or-commit>
 ```
 
 In shadow mode, `X-Model-Router-Proposed-Role` reports the proposed target while the capable baseline is executed. Compare proposed decisions with observed outcomes without changing customer behaviour.
@@ -56,6 +62,12 @@ Required evidence includes:
 - provider errors, timeouts, and refusals;
 - classifier confidence and distribution drift; and
 - any security or data-policy violations.
+
+Freeze the live case set before the paid benchmark, run
+`model-router case-set-hash <cases.jsonl>`, and record the generated
+`case_set_sha256` as `approved_live_case_set_sha256` in the reviewed release policy.
+Do not reuse results after cases, targets, catalogue, repetition count, or streaming
+settings change; the harness enforces this by refusing an incompatible resume.
 
 Update the catalogue evidence markers and release report only after approval of the underlying data.
 

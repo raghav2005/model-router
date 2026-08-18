@@ -32,12 +32,12 @@ The selected classifier was trained on 86,967 audited examples using a determini
 The multi-turn result is a release blocker. The internal result shows that the model learned the supplied synthetic rubric; it does not demonstrate production generalisation.
 
 The selected model combines complete-conversation and final-turn predictions with
-a validation-selected 0.10 final-turn weight and temperature 3.668. The default
-adaptive end-to-end policy reduces internal tier under-routing to 2.57% while its
-estimated cost is 35.00% below the always-capable reference. These are offline
-proxies, not measured production savings.
+a validation-selected 0.10 final-turn weight and temperature 3.668. After correcting
+the provider prices, the default adaptive end-to-end policy has 2.57% internal tier
+under-routing and an estimated cost 42.01% below the always-capable reference. These
+are offline proxies, not measured production savings.
 
-The current test suite contains 68 credential-free tests. Linting, formatting,
+The current test suite contains 74 credential-free tests. Linting, formatting,
 source compilation, CLI operation, wheel packaging, catalogue validation, API
 behaviour, resilience, audit privacy, drift detection, streaming parsing,
 evaluation resumability, adversarial regression, and release gates are covered.
@@ -83,11 +83,11 @@ The versioned catalogue uses the current GPT-5.6 family as the first controlled 
 
 | Role | Provider model | Standard input / output per 1M tokens | Context | Max output |
 |---|---|---:|---:|---:|
-| `efficient` | `gpt-5.6-luna` | $1 / $6 | 1.05M | 128K |
-| `balanced` | `gpt-5.6-terra` | $2.50 / $15 | 1.05M | 128K |
+| `efficient` | `gpt-5.6-luna` | $0.20 / $1.20 | 1.05M | 128K |
+| `balanced` | `gpt-5.6-terra` | $2 / $12 | 1.05M | 128K |
 | `capable` | `gpt-5.6-sol` | $5 / $30 | 1.05M | 128K |
 
-The cost engine includes cached-input rates, cache-write rates, and the published long-context multipliers above 272,000 input tokens. Every price records an official source URL and verification date.
+The cost engine includes cached-input rates, cache-write rates, and the published long-context multipliers above 272,000 input tokens. Every price records an official source URL and verification date. `model-router verify-pricing` independently downloads the official model Markdown, compares every billable field and limit, and writes a digest-bound verification report; enforcement rejects stale reports or reports created for another catalogue revision.
 
 Published model benchmarks are stored as directional research evidence. They are not treated as application success probabilities. Workload quality and p95 latency remain marked unmeasured; an explicit latency SLA fails closed until measured evidence is loaded.
 
@@ -141,7 +141,9 @@ model-router adversarial-eval
 | `benchmark` | Run the 12-case policy smoke test | No |
 | `train` | Validate data, train, calibrate, and report | No |
 | `live-eval` | Run frozen cases against direct model roles | Yes |
+| `case-set-hash` | Compute the immutable live case-set digest | No |
 | `release-gates` | Evaluate production-enforcement evidence | No |
+| `verify-pricing` | Verify catalogue economics against official model pages | Provider docs only |
 | `adversarial-eval` | Run 167 deterministic routing regression cases | No |
 | `drift-baseline` | Create an approved baseline from prompt-free audit events | No |
 | `drift-report` | Compare recent audit events with the approved baseline | No |
@@ -151,6 +153,10 @@ uses ordinary argmax routing for confident, normal-risk work and posterior tier-
 routing for high-risk, quality-first, or sufficiently uncertain work. Use
 `--classifier-mode heuristic` for the deterministic baseline or
 `--complexity-policy tier_risk` for a stronger under-routing bound at higher cost.
+The adaptive confidence threshold is configurable. Training evaluates 28 threshold
+and posterior-risk combinations using only the validation split, then checks the
+frozen candidate on held-out and external data. The latest cheaper candidate was
+not promoted because it worsened external multi-turn under-routing.
 
 Cost estimates can include `--cached-input-tokens` and `--cache-write-tokens`. Provider/model allowlists and measured-evidence requirements are available as hard constraints.
 
@@ -215,7 +221,9 @@ The recommended application path remains custom `policy` routing to a direct Swi
 The model is a weighted multinomial Naive Bayes classifier using stable hashed word
 unigrams, bigrams, and conversation-structure features. `borderline` examples
 receive reduced weight. Validation data, rather than the test split, selects the
-full-conversation/final-turn ensemble weight and probability temperature.
+full-conversation/final-turn ensemble weight and probability temperature. The same
+validation split selects a candidate adaptive escalation policy under a predeclared
+tier-risk cap; external confirmation is required before adoption.
 
 Reproduce the selected artifact:
 
@@ -267,6 +275,7 @@ model-router live-eval \
   --target capable \
   --concurrency 3 \
   --repetitions 3 \
+  --switchyard-revision <qualified-version-or-commit> \
   --stream
 ```
 
@@ -280,6 +289,18 @@ It records:
 - total completion latency;
 - streaming time to first token; and
 - finish reason.
+
+Compute and approve the frozen case digest before spending on a live run:
+
+```bash
+model-router case-set-hash examples/live_eval_cases.jsonl
+```
+
+The summary is cryptographically bound to the exact canonical case set, catalogue,
+targets, repetition count, streaming mode, and content-retention setting. Resume is
+refused when any of those inputs or the Switchyard revision changed. Enforcement
+additionally requires the case-set digest to be explicitly approved in
+`config/release_policy.json` and the run to use the qualified Switchyard revision.
 
 Supported validators are exact text, required substrings, regular expression, valid JSON, and required JSON keys. Open-ended reasoning, writing, and coding still require executable task outcomes, an approved independent judge rubric, blinded human review, or a combination.
 
@@ -320,7 +341,11 @@ See the [deployment and rollback runbook](docs/deployment-runbook.md) and [produ
 
 ## Enforced release gates
 
-The default policy requires current pricing, workload-measured quality and latency, stronger external generalisation, a passing live benchmark for every role, an approved enforcement decision, a pinned Switchyard build, and a trusted direct-provider bypass.
+The default policy requires current provider-verified pricing, evidence bound to the
+exact catalogue and router artifact, workload-measured quality and latency, stronger
+external generalisation, a passing immutable live benchmark for every role, an
+approved case-set digest and enforcement decision, a pinned Switchyard build, and a
+trusted direct-provider bypass.
 
 Current expected failures are:
 
@@ -328,6 +353,7 @@ Current expected failures are:
 - quality and latency are not workload-measured;
 - only 455 truly novel multi-turn examples are available and performance is below threshold;
 - no paid live response benchmark has been run;
+- no live case-set digest has been approved;
 - the current Switchyard build has not been pinned and qualified; and
 - a direct-provider bypass has not been configured.
 
@@ -350,6 +376,7 @@ These failures are intentional safety controls, not hidden TODOs.
 │   ├── drift.py            # prompt-free distribution-drift reports
 │   ├── live_eval.py        # response, cost, TTFT, and validator harness
 │   ├── observability.py    # Prometheus metrics
+│   ├── pricing.py          # official-source catalogue verifier
 │   ├── readiness.py        # executable production release gates
 │   ├── router.py           # eligibility and utility policy
 │   ├── switchyard.py       # resilient gateway client and executor

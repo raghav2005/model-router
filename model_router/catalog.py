@@ -72,6 +72,22 @@ def _validated_model(item: dict[str, Any]) -> ModelProfile:
         raise ValueError(f"model {item['id']!r} needs an HTTPS pricing source")
     if int(item["max_output_tokens"]) > int(item["context_window"]):
         raise ValueError(f"model {item['id']!r} max output exceeds context window")
+    if float(item["cached_input_price_per_million"]) > float(
+        item["input_price_per_million"]
+    ):
+        raise ValueError(f"model {item['id']!r} cached input exceeds input price")
+    if float(item["cache_write_price_per_million"]) < float(
+        item["input_price_per_million"]
+    ):
+        raise ValueError(f"model {item['id']!r} cache write is below input price")
+    if any(not 0 <= float(score) <= 1 for score in dict(item["skills"]).values()):
+        raise ValueError(f"model {item['id']!r} has a skill outside [0, 1]")
+    for multiplier in (
+        item.get("long_context_input_multiplier", 1.0),
+        item.get("long_context_output_multiplier", 1.0),
+    ):
+        if float(multiplier) < 1:
+            raise ValueError(f"model {item['id']!r} has an invalid price multiplier")
 
     return ModelProfile(
         id=item["id"],

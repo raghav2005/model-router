@@ -3,10 +3,13 @@ from __future__ import annotations
 import json
 from dataclasses import asdict, dataclass
 from datetime import UTC, date, datetime
+from hashlib import sha256
 from pathlib import Path
 from typing import Any
 
-from .catalog import load_catalog, load_catalog_document
+from .catalog import catalog_sha256, load_catalog, load_catalog_document
+from .learned import MODEL_SCHEMA_VERSION, default_artifact_path
+from .router import POLICY_VERSION
 
 
 @dataclass(frozen=True)
@@ -28,12 +31,22 @@ def _pricing_age_days(as_of: str, today: date) -> int:
     return (today - date.fromisoformat(as_of)).days
 
 
+def _sha256_file(path: Path) -> str:
+    digest = sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
 def evaluate_release_gates(
     *,
     policy_path: str | Path = "config/release_policy.json",
     catalog_path: str | Path | None = None,
     training_report_path: str | Path = "reports/complexity_router_v2.json",
     live_summary_path: str | Path = "reports/live_eval_summary.json",
+    pricing_report_path: str | Path = "reports/pricing_verification.json",
+    artifact_path: str | Path = default_artifact_path(),
     today: date | None = None,
 ) -> dict[str, object]:
     policy = _read_json(policy_path)
@@ -56,8 +69,55 @@ def evaluate_release_gates(
     gates.append(
         ReleaseGate(
             "pricing is current and sourced",
-            all(age <= maximum_age for age in ages),
-            f"maximum pricing age is {max(ages)} days; limit is {maximum_age}",
+            all(0 <= age <= maximum_age for age in ages),
+            f"pricing age range is {min(ages)} to {max(ages)} days; "
+            f"limit is 0 to {maximum_age}",
+        )
+    )
+
+    pricing_path = Path(pricing_report_path)
+    if pricing_path.exists():
+        pricing = _read_json(pricing_path)
+        raw_verification_models = pricing.get("models", [])
+        verification_models = (
+            raw_verification_models if isinstance(raw_verification_models, list) else []
+        )
+        expected_models = {model.id: model.provider_model for model in models}
+        expected_roles = set(expected_models)
+        verified_roles = {
+            str(result.get("role"))
+            for result in verification_models
+            if isinstance(result, dict)
+            and result.get("passed") is True
+            and result.get("provider_model")
+            == expected_models.get(str(result.get("role")))
+        }
+        verified_at = str(pricing.get("verified_at", ""))
+        try:
+            verification_age = _pricing_age_days(verified_at[:10], actual_today)
+        except ValueError:
+            verification_age = maximum_age + 1
+        verification_passed = (
+            pricing.get("schema_version") == "model-router-pricing-verification-v1"
+            and pricing.get("passed") is True
+            and pricing.get("catalog_sha256") == catalog_sha256(catalog_path)
+            and verified_roles == expected_roles
+            and len(verification_models) == len(expected_models)
+            and 0 <= verification_age <= maximum_age
+        )
+        verification_detail = (
+            f"verified roles={len(verified_roles)}/{len(expected_roles)}, "
+            f"age={verification_age} days, catalogue digest "
+            f"{'matches' if pricing.get('catalog_sha256') == catalog_sha256(catalog_path) else 'differs'}"
+        )
+    else:
+        verification_passed = False
+        verification_detail = f"pricing verification not found: {pricing_path}"
+    gates.append(
+        ReleaseGate(
+            "pricing verification matches catalogue",
+            verification_passed,
+            verification_detail,
         )
     )
 
@@ -121,6 +181,58 @@ def evaluate_release_gates(
         ReleaseGate("router generalises to external data", external_passed, detail)
     )
 
+    artifact = Path(artifact_path)
+    if training_path.exists() and artifact.exists():
+        training = _read_json(training_path)
+        provenance = training.get("provenance", {})
+        artifact_evidence = (
+            provenance.get("artifact", {}) if isinstance(provenance, dict) else {}
+        )
+        catalog_evidence = (
+            provenance.get("catalog", {}) if isinstance(provenance, dict) else {}
+        )
+        artifact_matches = (
+            isinstance(artifact_evidence, dict)
+            and artifact_evidence.get("sha256") == _sha256_file(artifact)
+            and artifact_evidence.get("schema_version") == MODEL_SCHEMA_VERSION
+        )
+        catalog_matches = (
+            isinstance(catalog_evidence, dict)
+            and catalog_evidence.get("sha256") == catalog_sha256(catalog_path)
+            and catalog_evidence.get("schema_version")
+            == catalog_document["schema_version"]
+        )
+        policy_matches = (
+            isinstance(provenance, dict)
+            and provenance.get("routing_policy_version") == POLICY_VERSION
+        )
+        evidence_passed = (
+            training.get("schema_version") == "router-training-report-v2"
+            and artifact_matches
+            and catalog_matches
+            and policy_matches
+        )
+        evidence_detail = (
+            f"artifact={'matches' if artifact_matches else 'differs'}, "
+            f"catalogue={'matches' if catalog_matches else 'differs'}, "
+            f"policy={'matches' if policy_matches else 'differs'}"
+        )
+    else:
+        evidence_passed = False
+        missing = []
+        if not training_path.exists():
+            missing.append(str(training_path))
+        if not artifact.exists():
+            missing.append(str(artifact))
+        evidence_detail = "missing release evidence: " + ", ".join(missing)
+    gates.append(
+        ReleaseGate(
+            "router evidence matches deployed artifact",
+            evidence_passed,
+            evidence_detail,
+        )
+    )
+
     live_path = Path(live_summary_path)
     if live_path.exists():
         live = _read_json(live_path)
@@ -129,6 +241,10 @@ def evaluate_release_gates(
             targets = {}
         minimum_cases = int(policy["minimum_live_cases_per_target"])
         minimum_pass = float(policy["minimum_live_all_validators_pass_rate"])
+        minimum_call_success = float(policy["minimum_live_call_success_rate"])
+        maximum_model_mismatches = int(
+            policy["maximum_live_response_model_mismatch_count"]
+        )
         missing = []
         for model in models:
             result = targets.get(model.switchyard_target, {})
@@ -138,10 +254,27 @@ def evaluate_release_gates(
                 if isinstance(result, dict)
                 else None
             )
+            scored_runs = (
+                int(result.get("validator_scored_runs", 0))
+                if isinstance(result, dict)
+                else 0
+            )
+            call_success_rate = (
+                result.get("call_success_rate") if isinstance(result, dict) else None
+            )
+            model_mismatches = (
+                int(result.get("response_model_mismatch_count", 0))
+                if isinstance(result, dict)
+                else maximum_model_mismatches + 1
+            )
             if (
                 runs < minimum_cases
+                or scored_runs < minimum_cases
                 or pass_rate is None
                 or float(pass_rate) < minimum_pass
+                or call_success_rate is None
+                or float(call_success_rate) < minimum_call_success
+                or model_mismatches > maximum_model_mismatches
             ):
                 missing.append(model.id)
         live_passed = not missing
@@ -155,6 +288,51 @@ def evaluate_release_gates(
         live_detail = f"live evaluation summary not found: {live_path}"
     gates.append(
         ReleaseGate("live response benchmark passes", live_passed, live_detail)
+    )
+
+    approved_case_set = policy.get("approved_live_case_set_sha256")
+    if live_path.exists():
+        live = _read_json(live_path)
+        live_provenance = live.get("provenance", {})
+        switchyard = policy.get("switchyard", {})
+        tested_switchyard_revision = (
+            switchyard.get("tested_version_or_commit")
+            if isinstance(switchyard, dict)
+            else None
+        )
+        provenance_targets = (
+            live_provenance.get("targets", [])
+            if isinstance(live_provenance, dict)
+            else []
+        )
+        live_evidence_passed = (
+            live.get("schema_version") == "switchyard-live-eval-summary-v2"
+            and isinstance(live_provenance, dict)
+            and live_provenance.get("schema_version")
+            == "switchyard-live-eval-provenance-v1"
+            and live_provenance.get("catalog_sha256") == catalog_sha256(catalog_path)
+            and bool(approved_case_set)
+            and live_provenance.get("case_set_sha256") == approved_case_set
+            and isinstance(provenance_targets, list)
+            and all(isinstance(target, str) for target in provenance_targets)
+            and set(provenance_targets) == {model.switchyard_target for model in models}
+            and bool(tested_switchyard_revision)
+            and live_provenance.get("switchyard_revision") == tested_switchyard_revision
+        )
+        live_evidence_detail = (
+            "live summary matches the exact catalogue and approved case set"
+            if live_evidence_passed
+            else "live summary is unbound, stale, or not from the approved case set"
+        )
+    else:
+        live_evidence_passed = False
+        live_evidence_detail = f"live evaluation summary not found: {live_path}"
+    gates.append(
+        ReleaseGate(
+            "live benchmark evidence is approved and immutable",
+            live_evidence_passed,
+            live_evidence_detail,
+        )
     )
 
     switchyard = policy.get("switchyard", {})

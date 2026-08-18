@@ -7,6 +7,9 @@
   "maximum_external_tier_underroute_rate": 0.05,
   "minimum_live_cases_per_target": 100,
   "minimum_live_all_validators_pass_rate": 0.9,
+  "minimum_live_call_success_rate": 0.99,
+  "maximum_live_response_model_mismatch_count": 0,
+  "approved_live_case_set_sha256": null,
   "require_workload_measured_quality": true,
   "require_workload_measured_latency": true,
   "switchyard": {

@@ -1,4 +1,428 @@
 {
+  "adaptive_policy_tuning": {
+    "candidates": [
+      {
+        "average_estimated_cost_usd": 0.008959,
+        "confidence_threshold": 0.3,
+        "count": 8604,
+        "route_counts": {
+          "balanced": 2497,
+          "capable": 3839,
+          "efficient": 2268
+        },
+        "route_errors": 0,
+        "tier_overroute_rate": 0.096932,
+        "tier_underroute_rate": 0.029521,
+        "underroute_tolerance": 0.05
+      },
+      {
+        "average_estimated_cost_usd": 0.00895143,
+        "confidence_threshold": 0.3,
+        "count": 8604,
+        "route_counts": {
+          "balanced": 2504,
+          "capable": 3832,
+          "efficient": 2268
+        },
+        "route_errors": 0,
+        "tier_overroute_rate": 0.096351,
+        "tier_underroute_rate": 0.029521,
+        "underroute_tolerance": 0.1
+      },
+      {
+        "average_estimated_cost_usd": 0.00895143,
+        "confidence_threshold": 0.3,
+        "count": 8604,
+        "route_counts": {
+          "balanced": 2504,
+          "capable": 3832,
+          "efficient": 2268
+        },
+        "route_errors": 0,
+        "tier_overroute_rate": 0.096351,
+        "tier_underroute_rate": 0.029521,
+        "underroute_tolerance": 0.15
+      },
+      {
+        "average_estimated_cost_usd": 0.00895143,
+        "confidence_threshold": 0.3,
+        "count": 8604,
+        "route_counts": {
+          "balanced": 2504,
+          "capable": 3832,
+          "efficient": 2268
+        },
+        "route_errors": 0,
+        "tier_overroute_rate": 0.096351,
+        "tier_underroute_rate": 0.029521,
+        "underroute_tolerance": 0.2
+      },
+      {
+        "average_estimated_cost_usd": 0.00896223,
+        "confidence_threshold": 0.35,
+        "count": 8604,
+        "route_counts": {
+          "balanced": 2494,
+          "capable": 3842,
+          "efficient": 2268
+        },
+        "route_errors": 0,
+        "tier_overroute_rate": 0.096932,
+        "tier_underroute_rate": 0.029405,
+        "underroute_tolerance": 0.05
+      },
+      {
+        "average_estimated_cost_usd": 0.00895467,
+        "confidence_threshold": 0.35,
+        "count": 8604,
+        "route_counts": {
+          "balanced": 2501,
+          "capable": 3835,
+          "efficient": 2268
+        },
+        "route_errors": 0,
+        "tier_overroute_rate": 0.096351,
+        "tier_underroute_rate": 0.029405,
+        "underroute_tolerance": 0.1
+      },
+      {
+        "average_estimated_cost_usd": 0.00895467,
+        "confidence_threshold": 0.35,
+        "count": 8604,
+        "route_counts": {
+          "balanced": 2501,
+          "capable": 3835,
+          "efficient": 2268
+        },
+        "route_errors": 0,
+        "tier_overroute_rate": 0.096351,
+        "tier_underroute_rate": 0.029405,
+        "underroute_tolerance": 0.15
+      },
+      {
+        "average_estimated_cost_usd": 0.00895467,
+        "confidence_threshold": 0.35,
+        "count": 8604,
+        "route_counts": {
+          "balanced": 2501,
+          "capable": 3835,
+          "efficient": 2268
+        },
+        "route_errors": 0,
+        "tier_overroute_rate": 0.096351,
+        "tier_underroute_rate": 0.029405,
+        "underroute_tolerance": 0.2
+      },
+      {
+        "average_estimated_cost_usd": 0.00897535,
+        "confidence_threshold": 0.4,
+        "count": 8604,
+        "route_counts": {
+          "balanced": 2485,
+          "capable": 3853,
+          "efficient": 2266
+        },
+        "route_errors": 0,
+        "tier_overroute_rate": 0.097048,
+        "tier_underroute_rate": 0.028359,
+        "underroute_tolerance": 0.05
+      },
+      {
+        "average_estimated_cost_usd": 0.0089667,
+        "confidence_threshold": 0.4,
+        "count": 8604,
+        "route_counts": {
+          "balanced": 2493,
+          "capable": 3845,
+          "efficient": 2266
+        },
+        "route_errors": 0,
+        "tier_overroute_rate": 0.096467,
+        "tier_underroute_rate": 0.028475,
+        "underroute_tolerance": 0.1
+      },
+      {
+        "average_estimated_cost_usd": 0.00896563,
+        "confidence_threshold": 0.4,
+        "count": 8604,
+        "route_counts": {
+          "balanced": 2494,
+          "capable": 3844,
+          "efficient": 2266
+        },
+        "route_errors": 0,
+        "tier_overroute_rate": 0.096467,
+        "tier_underroute_rate": 0.028475,
+        "underroute_tolerance": 0.15
+      },
+      {
+        "average_estimated_cost_usd": 0.00896563,
+        "confidence_threshold": 0.4,
+        "count": 8604,
+        "route_counts": {
+          "balanced": 2494,
+          "capable": 3844,
+          "efficient": 2266
+        },
+        "route_errors": 0,
+        "tier_overroute_rate": 0.096467,
+        "tier_underroute_rate": 0.028475,
+        "underroute_tolerance": 0.2
+      },
+      {
+        "average_estimated_cost_usd": 0.00899642,
+        "confidence_threshold": 0.45,
+        "count": 8604,
+        "route_counts": {
+          "balanced": 2475,
+          "capable": 3869,
+          "efficient": 2260
+        },
+        "route_errors": 0,
+        "tier_overroute_rate": 0.097978,
+        "tier_underroute_rate": 0.027429,
+        "underroute_tolerance": 0.05
+      },
+      {
+        "average_estimated_cost_usd": 0.00898671,
+        "confidence_threshold": 0.45,
+        "count": 8604,
+        "route_counts": {
+          "balanced": 2484,
+          "capable": 3860,
+          "efficient": 2260
+        },
+        "route_errors": 0,
+        "tier_overroute_rate": 0.097397,
+        "tier_underroute_rate": 0.027545,
+        "underroute_tolerance": 0.1
+      },
+      {
+        "average_estimated_cost_usd": 0.00898456,
+        "confidence_threshold": 0.45,
+        "count": 8604,
+        "route_counts": {
+          "balanced": 2486,
+          "capable": 3858,
+          "efficient": 2260
+        },
+        "route_errors": 0,
+        "tier_overroute_rate": 0.09728,
+        "tier_underroute_rate": 0.027545,
+        "underroute_tolerance": 0.15
+      },
+      {
+        "average_estimated_cost_usd": 0.00898392,
+        "confidence_threshold": 0.45,
+        "count": 8604,
+        "route_counts": {
+          "balanced": 2485,
+          "capable": 3858,
+          "efficient": 2261
+        },
+        "route_errors": 0,
+        "tier_overroute_rate": 0.097164,
+        "tier_underroute_rate": 0.027545,
+        "underroute_tolerance": 0.2
+      },
+      {
+        "average_estimated_cost_usd": 0.00904538,
+        "confidence_threshold": 0.5,
+        "count": 8604,
+        "route_counts": {
+          "balanced": 2452,
+          "capable": 3906,
+          "efficient": 2246
+        },
+        "route_errors": 0,
+        "tier_overroute_rate": 0.10007,
+        "tier_underroute_rate": 0.025802,
+        "underroute_tolerance": 0.05
+      },
+      {
+        "average_estimated_cost_usd": 0.00902688,
+        "confidence_threshold": 0.5,
+        "count": 8604,
+        "route_counts": {
+          "balanced": 2466,
+          "capable": 3890,
+          "efficient": 2248
+        },
+        "route_errors": 0,
+        "tier_overroute_rate": 0.099372,
+        "tier_underroute_rate": 0.026151,
+        "underroute_tolerance": 0.1
+      },
+      {
+        "average_estimated_cost_usd": 0.00901825,
+        "confidence_threshold": 0.5,
+        "count": 8604,
+        "route_counts": {
+          "balanced": 2466,
+          "capable": 3885,
+          "efficient": 2253
+        },
+        "route_errors": 0,
+        "tier_overroute_rate": 0.098791,
+        "tier_underroute_rate": 0.026383,
+        "underroute_tolerance": 0.15
+      },
+      {
+        "average_estimated_cost_usd": 0.00901419,
+        "confidence_threshold": 0.5,
+        "count": 8604,
+        "route_counts": {
+          "balanced": 2465,
+          "capable": 3883,
+          "efficient": 2256
+        },
+        "route_errors": 0,
+        "tier_overroute_rate": 0.098559,
+        "tier_underroute_rate": 0.026383,
+        "underroute_tolerance": 0.2
+      },
+      {
+        "average_estimated_cost_usd": 0.00910035,
+        "confidence_threshold": 0.55,
+        "count": 8604,
+        "route_counts": {
+          "balanced": 2425,
+          "capable": 3948,
+          "efficient": 2231
+        },
+        "route_errors": 0,
+        "tier_overroute_rate": 0.102743,
+        "tier_underroute_rate": 0.02371,
+        "underroute_tolerance": 0.05
+      },
+      {
+        "average_estimated_cost_usd": 0.00907177,
+        "confidence_threshold": 0.55,
+        "count": 8604,
+        "route_counts": {
+          "balanced": 2442,
+          "capable": 3925,
+          "efficient": 2237
+        },
+        "route_errors": 0,
+        "tier_overroute_rate": 0.101464,
+        "tier_underroute_rate": 0.024291,
+        "underroute_tolerance": 0.1
+      },
+      {
+        "average_estimated_cost_usd": 0.00905969,
+        "confidence_threshold": 0.55,
+        "count": 8604,
+        "route_counts": {
+          "balanced": 2442,
+          "capable": 3918,
+          "efficient": 2244
+        },
+        "route_errors": 0,
+        "tier_overroute_rate": 0.100535,
+        "tier_underroute_rate": 0.02464,
+        "underroute_tolerance": 0.15
+      },
+      {
+        "average_estimated_cost_usd": 0.0090511,
+        "confidence_threshold": 0.55,
+        "count": 8604,
+        "route_counts": {
+          "balanced": 2442,
+          "capable": 3913,
+          "efficient": 2249
+        },
+        "route_errors": 0,
+        "tier_overroute_rate": 0.10007,
+        "tier_underroute_rate": 0.024756,
+        "underroute_tolerance": 0.2
+      },
+      {
+        "average_estimated_cost_usd": 0.00917109,
+        "confidence_threshold": 0.6,
+        "count": 8604,
+        "route_counts": {
+          "balanced": 2396,
+          "capable": 4000,
+          "efficient": 2208
+        },
+        "route_errors": 0,
+        "tier_overroute_rate": 0.105997,
+        "tier_underroute_rate": 0.020921,
+        "underroute_tolerance": 0.05
+      },
+      {
+        "average_estimated_cost_usd": 0.00912841,
+        "confidence_threshold": 0.6,
+        "count": 8604,
+        "route_counts": {
+          "balanced": 2415,
+          "capable": 3968,
+          "efficient": 2221
+        },
+        "route_errors": 0,
+        "tier_overroute_rate": 0.103789,
+        "tier_underroute_rate": 0.021618,
+        "underroute_tolerance": 0.1
+      },
+      {
+        "average_estimated_cost_usd": 0.00910725,
+        "confidence_threshold": 0.6,
+        "count": 8604,
+        "route_counts": {
+          "balanced": 2417,
+          "capable": 3955,
+          "efficient": 2232
+        },
+        "route_errors": 0,
+        "tier_overroute_rate": 0.102278,
+        "tier_underroute_rate": 0.022083,
+        "underroute_tolerance": 0.15
+      },
+      {
+        "average_estimated_cost_usd": 0.00909201,
+        "confidence_threshold": 0.6,
+        "count": 8604,
+        "route_counts": {
+          "balanced": 2420,
+          "capable": 3945,
+          "efficient": 2239
+        },
+        "route_errors": 0,
+        "tier_overroute_rate": 0.101581,
+        "tier_underroute_rate": 0.022548,
+        "underroute_tolerance": 0.2
+      }
+    ],
+    "external_confirmation": {
+      "decision": "retain current production default and continue shadow evaluation",
+      "default_tier_underroute_rate": 0.171429,
+      "examples": 455,
+      "maximum_tier_underroute_rate": 0.05,
+      "minimum_examples": 1000,
+      "passed": false,
+      "selected_tier_underroute_rate": 0.184615
+    },
+    "feasible_candidates": 28,
+    "maximum_tier_underroute_rate": 0.03,
+    "note": "The selected settings must first pass held-out and external prompt-distribution checks, then response-level evaluation before enforcement.",
+    "objective": "minimise estimated cost subject to tier under-route risk cap",
+    "selected": {
+      "average_estimated_cost_usd": 0.00895143,
+      "confidence_threshold": 0.3,
+      "count": 8604,
+      "route_counts": {
+        "balanced": 2504,
+        "capable": 3832,
+        "efficient": 2268
+      },
+      "route_errors": 0,
+      "tier_overroute_rate": 0.096351,
+      "tier_underroute_rate": 0.029521,
+      "underroute_tolerance": 0.1
+    },
+    "selection_split": "validation"
+  },
   "dataset": {
     "categories": 29,
     "conflicting_duplicate_labels": 0,
@@ -49,10 +473,10 @@
   },
   "evaluation": {
     "classifier_latency_us": {
-      "median_us": 115.645,
+      "median_us": 166.166,
       "note": "Single-process local measurement; rerun in the deployment environment.",
-      "p95_us": 168.458,
-      "p99_us": 205.458,
+      "p95_us": 234.708,
+      "p99_us": 268.167,
       "samples": 1000
     },
     "end_to_end_router": {
@@ -70,10 +494,10 @@
         "tier_underroute_rate": 0.0
       },
       "heuristic": {
-        "average_estimated_cost_usd": 0.00532865,
+        "average_estimated_cost_usd": 0.0032806,
         "average_latency_prior_ms": 1129.876,
         "count": 8522,
-        "estimated_cost_saving_vs_always_capable": 0.65765,
+        "estimated_cost_saving_vs_always_capable": 0.789231,
         "route_counts": {
           "balanced": 3656,
           "capable": 140,
@@ -85,10 +509,10 @@
         "tier_underroute_rate": 0.550927
       },
       "hybrid_adaptive_p15": {
-        "average_estimated_cost_usd": 0.01011677,
+        "average_estimated_cost_usd": 0.00902634,
         "average_latency_prior_ms": 1814.703,
         "count": 8522,
-        "estimated_cost_saving_vs_always_capable": 0.350028,
+        "estimated_cost_saving_vs_always_capable": 0.420085,
         "route_counts": {
           "balanced": 2551,
           "capable": 3812,
@@ -99,11 +523,26 @@
         "tier_success_proxy": 0.974302,
         "tier_underroute_rate": 0.025698
       },
+      "hybrid_adaptive_validation_selected": {
+        "average_estimated_cost_usd": 0.00898612,
+        "average_latency_prior_ms": 1809.88,
+        "count": 8522,
+        "estimated_cost_saving_vs_always_capable": 0.422669,
+        "route_counts": {
+          "balanced": 2572,
+          "capable": 3781,
+          "efficient": 2169
+        },
+        "route_errors": 0,
+        "tier_overroute_rate": 0.097278,
+        "tier_success_proxy": 0.971486,
+        "tier_underroute_rate": 0.028514
+      },
       "hybrid_argmax": {
-        "average_estimated_cost_usd": 0.01007225,
+        "average_estimated_cost_usd": 0.00897291,
         "average_latency_prior_ms": 1808.331,
         "count": 8522,
-        "estimated_cost_saving_vs_always_capable": 0.352888,
+        "estimated_cost_saving_vs_always_capable": 0.423518,
         "route_counts": {
           "balanced": 2584,
           "capable": 3769,
@@ -115,10 +554,10 @@
         "tier_underroute_rate": 0.028749
       },
       "hybrid_conservative_p80": {
-        "average_estimated_cost_usd": 0.01032834,
+        "average_estimated_cost_usd": 0.00928023,
         "average_latency_prior_ms": 1844.872,
         "count": 8522,
-        "estimated_cost_saving_vs_always_capable": 0.336435,
+        "estimated_cost_saving_vs_always_capable": 0.403773,
         "route_counts": {
           "balanced": 2386,
           "capable": 4019,
@@ -130,10 +569,10 @@
         "tier_underroute_rate": 0.015255
       },
       "hybrid_tier_risk_p15": {
-        "average_estimated_cost_usd": 0.01041191,
+        "average_estimated_cost_usd": 0.00938051,
         "average_latency_prior_ms": 1856.865,
         "count": 8522,
-        "estimated_cost_saving_vs_always_capable": 0.331066,
+        "estimated_cost_saving_vs_always_capable": 0.39733,
         "route_counts": {
           "balanced": 2334,
           "capable": 4096,
@@ -145,10 +584,10 @@
         "tier_underroute_rate": 0.012673
       },
       "learned_argmax": {
-        "average_estimated_cost_usd": 0.01034987,
+        "average_estimated_cost_usd": 0.00930607,
         "average_latency_prior_ms": 1850.293,
         "count": 8522,
-        "estimated_cost_saving_vs_always_capable": 0.335052,
+        "estimated_cost_saving_vs_always_capable": 0.402113,
         "route_counts": {
           "balanced": 3100,
           "capable": 3767,
@@ -3759,15 +4198,23 @@
     "overlap_with_primary_dataset": 7829,
     "routing_policies": {
       "hybrid_adaptive_p15": {
-        "average_estimated_cost_usd": 0.01124725,
+        "average_estimated_cost_usd": 0.01039348,
         "count": 455,
         "route_errors": 0,
         "tier_accuracy": 0.602198,
         "tier_overroute_rate": 0.226374,
         "tier_underroute_rate": 0.171429
       },
+      "hybrid_adaptive_validation_selected": {
+        "average_estimated_cost_usd": 0.0101541,
+        "count": 455,
+        "route_errors": 0,
+        "tier_accuracy": 0.593407,
+        "tier_overroute_rate": 0.221978,
+        "tier_underroute_rate": 0.184615
+      },
       "hybrid_argmax": {
-        "average_estimated_cost_usd": 0.01104777,
+        "average_estimated_cost_usd": 0.0101541,
         "count": 455,
         "route_errors": 0,
         "tier_accuracy": 0.593407,
@@ -3775,7 +4222,7 @@
         "tier_underroute_rate": 0.184615
       },
       "hybrid_tier_risk_p15": {
-        "average_estimated_cost_usd": 0.01208611,
+        "average_estimated_cost_usd": 0.01140011,
         "count": 455,
         "route_errors": 0,
         "tier_accuracy": 0.61978,
@@ -3784,15 +4231,28 @@
       }
     },
     "source_rows": 8284,
+    "source_sha256": "71c9b9c521a12fbf7675430f938b9559eb6a1a40e96762a16f99b72b6c08fddd",
     "warning": "This slice is generated from the same synthetic process and is not a production-distribution benchmark. Overlapping rows were excluded."
   },
-  "generated_at": "2026-08-13T08:04:01.369340+00:00",
+  "generated_at": "2026-08-17T11:36:55.036830+00:00",
   "limitations": [
     "Labels represent synthetic prompt complexity, not measured candidate-model success.",
     "Prompts were generated to fit the label rubric and may contain learnable stylistic cues.",
     "An LLM audit is not equivalent to expert or task-outcome ground truth.",
     "The cost index is illustrative and is not provider billing."
   ],
+  "provenance": {
+    "artifact": {
+      "file": "complexity_router_v2.npz",
+      "schema_version": "complexity-router-nb-v2",
+      "sha256": "b893eaa86e744e86eb3efa195a9b8fa56cc702286bc1cc78bc294c773375f650"
+    },
+    "catalog": {
+      "schema_version": "model-router-catalog-v2",
+      "sha256": "6a4120bf2232c52c34dd4175aab69eabc6b13219194ef5e1972c49db8bb4e7d1"
+    },
+    "routing_policy_version": "hybrid-utility-policy-v4"
+  },
   "schema_version": "router-training-report-v2",
   "training": {
     "algorithm": "weighted multinomial naive Bayes",

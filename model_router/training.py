@@ -13,7 +13,7 @@ from typing import Iterator
 
 import numpy as np
 
-from .catalog import load_catalog
+from .catalog import catalog_sha256, load_catalog, load_catalog_document
 from .classifier import classify_request
 from .evaluation import (
     LEVEL_TO_TIER,
@@ -24,11 +24,13 @@ from .evaluation import (
 )
 from .learned import (
     DEFAULT_FEATURE_DIMENSION,
+    MODEL_SCHEMA_VERSION,
     HashedTextVectorizer,
     NaiveBayesComplexityModel,
     final_user_turn,
     normalize_prompt,
 )
+from .router import POLICY_VERSION
 from .types import RoutingRequest
 
 
@@ -208,6 +210,7 @@ def _external_context_evaluation(
     model: NaiveBayesComplexityModel,
     external_path: Path,
     training_prompts: set[str],
+    adaptive_policy: dict[str, object] | None = None,
 ) -> dict[str, object]:
     rows = list(read_dataset(external_path))
     novel = [
@@ -215,6 +218,7 @@ def _external_context_evaluation(
     ]
     overlap = len(rows) - len(novel)
     result: dict[str, object] = {
+        "source_sha256": sha256_file(external_path),
         "source_rows": len(rows),
         "overlap_with_primary_dataset": overlap,
         "novel_rows": len(novel),
@@ -228,12 +232,17 @@ def _external_context_evaluation(
         result["metrics"] = classification_metrics(
             [row.level for row in novel], predictions, probabilities
         )
-        result["routing_policies"] = _routing_policy_evaluation(model, novel)
+        result["routing_policies"] = _routing_policy_evaluation(
+            model, novel, adaptive_policy=adaptive_policy
+        )
     return result
 
 
 def _routing_policy_evaluation(
-    model: NaiveBayesComplexityModel, rows: list[DatasetRow]
+    model: NaiveBayesComplexityModel,
+    rows: list[DatasetRow],
+    *,
+    adaptive_policy: dict[str, object] | None = None,
 ) -> dict[str, object]:
     from .router import ModelRouter, NoEligibleModel
 
@@ -261,6 +270,17 @@ def _routing_policy_evaluation(
             underroute_tolerance=0.15,
         ),
     }
+    if adaptive_policy:
+        routers["hybrid_adaptive_validation_selected"] = ModelRouter(
+            catalog,
+            complexity_model=model,
+            classifier_mode="hybrid",
+            decision_policy="adaptive",
+            underroute_tolerance=float(adaptive_policy["underroute_tolerance"]),
+            adaptive_confidence_threshold=float(
+                adaptive_policy["confidence_threshold"]
+            ),
+        )
     results: dict[str, object] = {}
     for name, router in routers.items():
         selected_tiers: list[int] = []
@@ -303,7 +323,10 @@ def _routing_policy_evaluation(
 
 
 def _end_to_end_router_evaluation(
-    model: NaiveBayesComplexityModel, rows: list[DatasetRow]
+    model: NaiveBayesComplexityModel,
+    rows: list[DatasetRow],
+    *,
+    adaptive_policy: dict[str, object] | None = None,
 ) -> dict[str, object]:
     # Imported here to keep the reusable dataset/evaluation helpers lightweight.
     from .router import ModelRouter, NoEligibleModel
@@ -346,6 +369,17 @@ def _end_to_end_router_evaluation(
             underroute_tolerance=0.15,
         ),
     }
+    if adaptive_policy:
+        routers["hybrid_adaptive_validation_selected"] = ModelRouter(
+            catalog,
+            complexity_model=model,
+            classifier_mode="hybrid",
+            decision_policy="adaptive",
+            underroute_tolerance=float(adaptive_policy["underroute_tolerance"]),
+            adaptive_confidence_threshold=float(
+                adaptive_policy["confidence_threshold"]
+            ),
+        )
     results: dict[str, object] = {}
     for name, router in routers.items():
         selected_tiers: list[int] = []
@@ -422,6 +456,136 @@ def _end_to_end_router_evaluation(
         "estimated_cost_saving_vs_always_capable": 0.0,
     }
     return results
+
+
+def _tune_adaptive_policy(
+    model: NaiveBayesComplexityModel,
+    validation_rows: list[DatasetRow],
+    *,
+    maximum_tier_underroute_rate: float = 0.03,
+) -> dict[str, object]:
+    """Select a validation policy while reusing the expensive route decisions."""
+    from .router import ModelRouter, NoEligibleModel
+
+    if not validation_rows:
+        raise ValueError("adaptive policy tuning requires validation rows")
+    confidence_thresholds = (0.30, 0.35, 0.40, 0.45, 0.50, 0.55, 0.60)
+    underroute_tolerances = (0.05, 0.10, 0.15, 0.20)
+    catalog = load_catalog()
+    tier_by_model = {profile.id: profile.tier for profile in catalog}
+    argmax_router = ModelRouter(
+        catalog,
+        complexity_model=model,
+        classifier_mode="hybrid",
+        decision_policy="argmax",
+    )
+    risk_routers = {
+        tolerance: ModelRouter(
+            catalog,
+            complexity_model=model,
+            classifier_mode="hybrid",
+            decision_policy="tier_risk",
+            underroute_tolerance=tolerance,
+        )
+        for tolerance in underroute_tolerances
+    }
+    accumulators: dict[tuple[float, float], dict[str, object]] = {
+        (threshold, tolerance): {
+            "under": 0,
+            "over": 0,
+            "errors": 0,
+            "total_cost": 0.0,
+            "route_counts": Counter(),
+        }
+        for threshold in confidence_thresholds
+        for tolerance in underroute_tolerances
+    }
+    for row in validation_rows:
+        request = RoutingRequest(prompt=row.prompt, expected_output_tokens=500)
+        try:
+            argmax = argmax_router.route(request)
+            risk_decisions = {
+                tolerance: router.route(request)
+                for tolerance, router in risk_routers.items()
+            }
+        except NoEligibleModel:
+            for accumulator in accumulators.values():
+                accumulator["under"] = int(accumulator["under"]) + 1
+                accumulator["errors"] = int(accumulator["errors"]) + 1
+            continue
+        required_tier = LEVEL_TO_TIER[row.level]
+        for threshold in confidence_thresholds:
+            use_risk = (
+                argmax.features.risk == "high"
+                or float(argmax.features.classifier_confidence or 0.0) < threshold
+            )
+            for tolerance in underroute_tolerances:
+                decision = risk_decisions[tolerance] if use_risk else argmax
+                selected_tier = tier_by_model[decision.model_id]
+                accumulator = accumulators[(threshold, tolerance)]
+                accumulator["under"] = int(accumulator["under"]) + int(
+                    selected_tier < required_tier
+                )
+                accumulator["over"] = int(accumulator["over"]) + int(
+                    selected_tier > required_tier
+                )
+                accumulator["total_cost"] = (
+                    float(accumulator["total_cost"]) + decision.estimated_cost_usd
+                )
+                route_counts = accumulator["route_counts"]
+                assert isinstance(route_counts, Counter)
+                route_counts[decision.model_id] += 1
+
+    count = len(validation_rows)
+    candidates: list[dict[str, object]] = []
+    for threshold in confidence_thresholds:
+        for tolerance in underroute_tolerances:
+            accumulator = accumulators[(threshold, tolerance)]
+            route_counts = accumulator["route_counts"]
+            assert isinstance(route_counts, Counter)
+            candidates.append(
+                {
+                    "confidence_threshold": threshold,
+                    "underroute_tolerance": tolerance,
+                    "count": count,
+                    "route_errors": int(accumulator["errors"]),
+                    "tier_underroute_rate": round(int(accumulator["under"]) / count, 6),
+                    "tier_overroute_rate": round(int(accumulator["over"]) / count, 6),
+                    "average_estimated_cost_usd": round(
+                        float(accumulator["total_cost"]) / count, 8
+                    ),
+                    "route_counts": dict(sorted(route_counts.items())),
+                }
+            )
+    feasible = [
+        candidate
+        for candidate in candidates
+        if float(candidate["tier_underroute_rate"]) <= maximum_tier_underroute_rate
+    ]
+    pool = feasible or candidates
+    selected = min(
+        pool,
+        key=lambda candidate: (
+            float(candidate["average_estimated_cost_usd"]),
+            float(candidate["tier_underroute_rate"]),
+            float(candidate["tier_overroute_rate"]),
+            float(candidate["confidence_threshold"]),
+            float(candidate["underroute_tolerance"]),
+        ),
+    )
+    return {
+        "selection_split": "validation",
+        "objective": "minimise estimated cost subject to tier under-route risk cap",
+        "maximum_tier_underroute_rate": maximum_tier_underroute_rate,
+        "feasible_candidates": len(feasible),
+        "selected": selected,
+        "candidates": candidates,
+        "note": (
+            "The selected settings must first pass held-out and external "
+            "prompt-distribution checks, then response-level evaluation before "
+            "enforcement."
+        ),
+    }
 
 
 def _classifier_latency_benchmark(
@@ -532,6 +696,31 @@ def _markdown_report(report: dict[str, object]) -> str:
             f"{float(metrics['tier_overroute_rate']):.2%} | "
             f"${float(metrics['average_estimated_cost_usd']):.5f} | "
             f"{float(metrics['estimated_cost_saving_vs_always_capable']):.2%} | {mix} |"
+        )
+    tuning = report.get("adaptive_policy_tuning")
+    if isinstance(tuning, dict) and isinstance(tuning.get("selected"), dict):
+        selected = tuning["selected"]
+        confirmation = tuning.get("external_confirmation", {})
+        assert isinstance(confirmation, dict)
+        lines.extend(
+            [
+                "",
+                "## Validation-selected adaptive policy",
+                "",
+                "The confidence threshold and posterior risk tolerance were selected "
+                "using only the validation split. The objective minimises estimated "
+                "cost while respecting the declared validation under-routing cap.",
+                "",
+                f"- Confidence threshold: {float(selected['confidence_threshold']):.2f}",
+                f"- Posterior under-route tolerance: {float(selected['underroute_tolerance']):.2f}",
+                f"- Validation tier under-route: {float(selected['tier_underroute_rate']):.2%}",
+                f"- Validation tier over-route: {float(selected['tier_overroute_rate']):.2%}",
+                f"- Validation estimated cost/request: ${float(selected['average_estimated_cost_usd']):.5f}",
+                f"- Feasible candidates: {int(tuning['feasible_candidates'])}/{len(tuning['candidates'])}",
+                f"- External confirmation: {'passed' if confirmation.get('passed') else 'not passed'}",
+                f"- Decision: {confirmation.get('decision', 'external confirmation pending')}",
+                "- This is a validation candidate, not a deployment recommendation.",
+            ]
         )
     lines.extend(
         [
@@ -680,6 +869,9 @@ def train_and_evaluate(
     validation_predictions, validation_probabilities, _ = _predict_rows(
         model, split_rows["validation"]
     )
+    adaptive_policy_tuning = _tune_adaptive_policy(model, split_rows["validation"])
+    selected_adaptive_policy = adaptive_policy_tuning["selected"]
+    assert isinstance(selected_adaptive_policy, dict)
 
     test_rows = split_rows["test"]
     labels = [row.level for row in test_rows]
@@ -747,10 +939,15 @@ def train_and_evaluate(
             validation_predictions,
             validation_probabilities,
         ),
+        "adaptive_policy_tuning": adaptive_policy_tuning,
         "evaluation": {
             "split": "test",
             "strategies": strategies,
-            "end_to_end_router": _end_to_end_router_evaluation(model, test_rows),
+            "end_to_end_router": _end_to_end_router_evaluation(
+                model,
+                test_rows,
+                adaptive_policy=selected_adaptive_policy,
+            ),
             "slices": {
                 "audit_status": slice_metrics(
                     labels,
@@ -784,7 +981,48 @@ def train_and_evaluate(
             model,
             Path(external_context_path),
             {normalize_prompt(row.prompt) for row in rows},
+            adaptive_policy=selected_adaptive_policy,
         )
+        external = report["external_context_slice"]
+        assert isinstance(external, dict)
+        external_policies = external.get("routing_policies", {})
+        assert isinstance(external_policies, dict)
+        selected_external = external_policies.get(
+            "hybrid_adaptive_validation_selected", {}
+        )
+        default_external = external_policies.get("hybrid_adaptive_p15", {})
+        assert isinstance(selected_external, dict)
+        assert isinstance(default_external, dict)
+        selected_external_underroute = float(
+            selected_external.get("tier_underroute_rate", 1.0)
+        )
+        default_external_underroute = float(
+            default_external.get("tier_underroute_rate", 1.0)
+        )
+        external_confirmation_passed = (
+            int(external.get("novel_rows", 0)) >= 1_000
+            and selected_external_underroute <= 0.05
+            and selected_external_underroute <= default_external_underroute
+        )
+        adaptive_policy_tuning["external_confirmation"] = {
+            "passed": external_confirmation_passed,
+            "minimum_examples": 1_000,
+            "maximum_tier_underroute_rate": 0.05,
+            "examples": int(external.get("novel_rows", 0)),
+            "selected_tier_underroute_rate": selected_external_underroute,
+            "default_tier_underroute_rate": default_external_underroute,
+            "decision": (
+                "eligible for further response-level validation"
+                if external_confirmation_passed
+                else "retain current production default and continue shadow evaluation"
+            ),
+        }
+    else:
+        external_confirmation_passed = False
+        adaptive_policy_tuning["external_confirmation"] = {
+            "passed": False,
+            "decision": "external confirmation dataset was not supplied",
+        }
 
     model.metadata.update(
         {
@@ -793,9 +1031,35 @@ def train_and_evaluate(
             "test_tier_underroute_rate": strategies["learned_argmax"][
                 "tier_underroute_rate"
             ],
+            "adaptive_policy_validation_selected": {
+                "confidence_threshold": selected_adaptive_policy[
+                    "confidence_threshold"
+                ],
+                "underroute_tolerance": selected_adaptive_policy[
+                    "underroute_tolerance"
+                ],
+                "maximum_tier_underroute_rate": adaptive_policy_tuning[
+                    "maximum_tier_underroute_rate"
+                ],
+                "external_confirmation_passed": external_confirmation_passed,
+            },
         }
     )
     model.save(artifact_path)
+    artifact = Path(artifact_path)
+    catalog_document = load_catalog_document()
+    report["provenance"] = {
+        "artifact": {
+            "file": artifact.name,
+            "sha256": sha256_file(artifact),
+            "schema_version": MODEL_SCHEMA_VERSION,
+        },
+        "catalog": {
+            "sha256": catalog_sha256(),
+            "schema_version": catalog_document["schema_version"],
+        },
+        "routing_policy_version": POLICY_VERSION,
+    }
 
     json_path = Path(report_json_path)
     markdown_path = Path(report_markdown_path)

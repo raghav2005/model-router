@@ -114,14 +114,14 @@ class RouterTests(unittest.TestCase):
 
     def test_cost_formula(self) -> None:
         efficient = next(model for model in load_catalog() if model.id == "efficient")
-        self.assertAlmostEqual(efficient.estimate_cost(100_000, 100_000), 0.7)
+        self.assertAlmostEqual(efficient.estimate_cost(100_000, 100_000), 0.14)
 
     def test_cached_and_long_context_pricing(self) -> None:
         efficient = next(model for model in load_catalog() if model.id == "efficient")
         cached = efficient.estimate_cost(100_000, 10_000, cached_input_tokens=80_000)
-        self.assertAlmostEqual(cached, 0.088)
+        self.assertAlmostEqual(cached, 0.0176)
         long_context = efficient.estimate_cost(300_000, 10_000)
-        self.assertAlmostEqual(long_context, 0.69)
+        self.assertAlmostEqual(long_context, 0.138)
 
     def test_latency_sla_rejects_unmeasured_priors(self) -> None:
         with self.assertRaises(NoEligibleModel):
@@ -139,6 +139,12 @@ class RouterTests(unittest.TestCase):
                 cached_input_tokens=8,
                 cache_write_tokens=3,
             )
+
+    def test_router_rejects_invalid_risk_controls(self) -> None:
+        with self.assertRaises(ValueError):
+            ModelRouter(underroute_tolerance=1.0)
+        with self.assertRaises(ValueError):
+            ModelRouter(adaptive_confidence_threshold=1.1)
 
 
 if __name__ == "__main__":
