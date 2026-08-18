@@ -1,6 +1,6 @@
 # Model research and catalogue rationale
 
-**Research date:** 17 August 2026
+**Research date:** 18 August 2026
 
 **Scope:** Initial OpenAI deployment candidate behind NVIDIA NeMo Switchyard
 
@@ -70,6 +70,30 @@ Before enforcement, the live harness must measure at least:
 
 Measurements must be repeated in the intended deployment region and provider service tier. Published relative-speed descriptions are not sufficient for an SLA.
 
+## Evaluation-harness approach
+
+The local, versioned harness remains the release system of record. This follows
+OpenAI's [evaluation best practices](https://developers.openai.com/api/docs/guides/evaluation-best-practices):
+define task-specific success criteria, use production-like inputs, combine automated
+checks with calibrated human judgement, and evaluate continuously. The harness uses
+deterministic validators where an objectively correct outcome exists and reserves
+open-ended work for an approved [grader](https://developers.openai.com/api/docs/guides/graders),
+executable task outcome, or blinded human rubric.
+
+The initial 120-case synthetic live baseline is large enough to exercise repeated
+quality, latency, throughput, and cost measurement, but it is deliberately not the
+approved production case set. Representative coding, reasoning, tool-use, refusal,
+and long-context cases still need to come from the intended workload. The local
+harness also avoids coupling release evidence to the hosted OpenAI Evals platform,
+which the official documentation says will become read-only on 31 October 2026 and
+shut down on 30 November 2026.
+
+Latency work follows OpenAI's
+[latency-optimization guidance](https://developers.openai.com/api/docs/guides/latency-optimization)
+while retaining end-to-end measurements at our own boundary. Provider-side speed
+techniques are useful, but only client-observed TTFT, completion latency, output
+rate, error rate, and concurrency behaviour can establish this service's SLO.
+
 ## Recent routing research and design implications
 
 Recent preprints reinforce the direction of the prototype while also showing why
@@ -100,28 +124,36 @@ to keep the selector simple, calibrated, and benchmarked against strong baseline
 until application outcomes show that a more complex router earns its operational
 cost.
 
-## Switchyard production position
+## Switchyard deployment position
 
-[NVIDIA NeMo Switchyard](https://github.com/NVIDIA-NeMo/Switchyard) supplies protocol translation, routing algorithms, operational metrics, and context-overflow fallback. Its upstream README currently labels the project pre-alpha, warns that APIs may change before v1.0, and says it is not for production use.
+[NVIDIA NeMo Switchyard](https://github.com/NVIDIA-NeMo/Switchyard) supplies
+protocol translation, routing algorithms, operational metrics, and fallback
+behaviour. For this design, Switchyard is an approved dependency. The repository
+pins v0.2.0 and its immutable source commit rather than treating gateway maturity as
+a release blocker.
 
-For that reason, the architecture keeps Switchyard behind a narrow OpenAI-compatible adapter. A deployment should:
+The architecture keeps Switchyard behind a narrow OpenAI-compatible adapter. A deployment should:
 
-1. pin the exact tested Switchyard release or commit;
-2. validate its TOML configuration during CI and startup;
+1. use the approved v0.2.0 package and source commit;
+2. validate its TOML, health, statistics, and exposed routes during CI and startup;
 3. run it as an isolated service with resource limits;
 4. monitor `/health`, `/v1/stats`, errors, latency, and selected-model headers;
 5. keep a trusted direct-provider fail-open path outside Switchyard; and
 6. load-test and fault-inject the pinned build before production approval.
 
-The current `config/switchyard_routes.toml` follows the current Rust-server schema. The legacy YAML remains only to reproduce the earlier `nemo-switchyard==0.1.0` prototype.
+The current `config/switchyard_routes.toml` passes the v0.2.0 native Rust-server
+contract. A duplicate Luna target found during native startup testing was removed;
+the classifier and efficient route now intentionally share one target definition.
+The legacy YAML remains only to reproduce the earlier `nemo-switchyard==0.1.0`
+prototype.
 
 ## Remaining research and measurement
 
 The OpenAI family is an initial controlled candidate, not a permanent provider decision. Before multi-provider routing, benchmark approved Anthropic, Google, NVIDIA NIM, or self-hosted candidates under identical prompts, validators, reasoning budgets, and concurrency. Include contractual data retention, regional availability, quotas, support, deprecation policy, and incident history in the selection—not only token price.
 
-The current multi-view classifier improves internal accuracy to 91.14% and internal
-tier under-routing to 3.56%, but the non-overlapping multi-turn slice remains at
-57.14% exact accuracy and 18.68% tier under-routing. Better calibration loss on
+The augmentation-trained multi-view classifier improves internal accuracy to 91.57%
+and internal tier under-routing to 3.13%, but the non-overlapping multi-turn slice
+remains at 57.80% exact accuracy and 18.02% tier under-routing. Better calibration loss on
 that external slice does not remove this generalisation failure. The next research
 priority is therefore real, time- or customer-separated traffic with response-level
 outcomes, not further optimization against the existing synthetic generator.

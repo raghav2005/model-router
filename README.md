@@ -12,7 +12,12 @@ This repository contains a trained, explainable LLM router and the controls need
 
 The project is ready for integration and shadow evaluation. It is **not approved for enforced production routing**. The supplied data labels prompt complexity but contains no candidate-model answers or real production outcomes, and the independent multi-turn slice exposes significant distribution shift.
 
-Switchyard itself currently describes its upstream project as pre-alpha and explicitly not for production use. The architecture therefore keeps it behind a narrow adapter and requires a pinned build plus a separately tested direct-provider bypass before production enforcement.
+Switchyard is treated as an approved gateway dependency. The project pins release
+`v0.2.0` and immutable source commit
+`1fc9ab887d1c663b0048ae24d5f473d15ed8daaa`, validates the native server and
+route contract in CI, and provides a pinned gateway image and Kubernetes service.
+The narrow adapter and separately tested direct-provider recovery path remain
+defence-in-depth controls rather than statements about Switchyard maturity.
 
 ## Current evidence
 
@@ -26,18 +31,23 @@ The selected classifier was trained on 86,967 audited examples using a determini
 
 | Evaluation | Exact accuracy | Tier under-route |
 |---|---:|---:|
-| Internal hash-held-out test | 91.14% | 3.56% |
-| Genuinely non-overlapping multi-turn slice | 57.14% | 18.68% |
+| Internal hash-held-out test | 91.57% | 3.13% |
+| Genuinely non-overlapping multi-turn slice | 57.80% | 18.02% |
 
 The multi-turn result is a release blocker. The internal result shows that the model learned the supplied synthetic rubric; it does not demonstrate production generalisation.
 
 The selected model combines complete-conversation and final-turn predictions with
-a validation-selected 0.10 final-turn weight and temperature 3.668. After correcting
-the provider prices, the default adaptive end-to-end policy has 2.57% internal tier
-under-routing and an estimated cost 42.01% below the always-capable reference. These
+a validation-selected 0.05 final-turn weight and temperature 4.362. Training-only
+prompt-envelope augmentation improves robustness without changing validation, test,
+or external prompts. The default adaptive end-to-end policy has 2.23% internal tier
+under-routing and an estimated cost 41.73% below the always-capable reference. These
 are offline proxies, not measured production savings.
 
-The current test suite contains 74 credential-free tests. Linting, formatting,
+Classifier-only latency on this development machine was 169 µs median, 241 µs p95,
+and 274 µs p99 over 1,000 prompts. This is recorded for regression purposes and
+does not include Switchyard, network, or model-generation time.
+
+The current test suite contains 79 credential-free tests. Linting, formatting,
 source compilation, CLI operation, wheel packaging, catalogue validation, API
 behaviour, resilience, audit privacy, drift detection, streaming parsing,
 evaluation resumability, adversarial regression, and release gates are covered.
@@ -128,6 +138,7 @@ Run the deterministic design regression suite:
 
 ```bash
 model-router adversarial-eval
+model-router metamorphic-eval
 ```
 
 ## CLI commands
@@ -145,6 +156,7 @@ model-router adversarial-eval
 | `release-gates` | Evaluate production-enforcement evidence | No |
 | `verify-pricing` | Verify catalogue economics against official model pages | Provider docs only |
 | `adversarial-eval` | Run 167 deterministic routing regression cases | No |
+| `metamorphic-eval` | Run 1,336 meaning-preserving routing invariance cases | No |
 | `drift-baseline` | Create an approved baseline from prompt-free audit events | No |
 | `drift-report` | Compare recent audit events with the approved baseline | No |
 
@@ -187,17 +199,34 @@ Production containers use Gunicorn. API and metrics bearer tokens, the audit HMA
 
 ### Current Rust server
 
-`config/switchyard_routes.toml` follows the current native server schema. It defines:
+`config/switchyard_routes.toml` follows the pinned v0.2.0 native server schema. It defines:
 
 - passthrough routes named `efficient`, `balanced`, and `capable`;
 - capability-classifier experiments named `smart-general` and `smart-coding`;
 - a quality-first stage route named `smart-agent-stage`; and
 - a seeded random control named `benchmark-random`.
 
-Build or install an explicitly approved Switchyard revision, then validate and run:
+Install the pinned package and validate the exact runtime/configuration contract:
 
 ```bash
+python -m pip install -e '.[switchyard]'
 export OPENAI_API_KEY="replace-me"
+python -m model_router.switchyard_contract \
+  --output reports/switchyard_contract.json
+```
+
+Build and run the separately deployable native server image:
+
+```bash
+docker build -f Dockerfile.switchyard -t model-router-switchyard:v0.2.0 .
+docker run --rm -p 4000:4000 \
+  -e OPENAI_API_KEY \
+  model-router-switchyard:v0.2.0
+```
+
+For a source installation of the official Rust binary:
+
+```bash
 switchyard-server --config config/switchyard_routes.toml --dry-run
 switchyard-server --config config/switchyard_routes.toml \
   --host 127.0.0.1 \
@@ -223,7 +252,9 @@ unigrams, bigrams, and conversation-structure features. `borderline` examples
 receive reduced weight. Validation data, rather than the test split, selects the
 full-conversation/final-turn ensemble weight and probability temperature. The same
 validation split selects a candidate adaptive escalation policy under a predeclared
-tier-risk cap; external confirmation is required before adoption.
+tier-risk cap; external confirmation is required before adoption. Each train-split
+prompt receives one deterministic, half-weight prompt-envelope augmentation. No
+validation, test, or external prompt is augmented, preventing split leakage.
 
 Reproduce the selected artifact:
 
@@ -263,9 +294,24 @@ over-routing fell from 45.51% to 14.97%, and all concise-hard/high-stakes cases
 remained on the capable tier. See
 `reports/experiments/adversarial_regression_v1.md`.
 
+The metamorphic suite applies eight meaning-preserving presentation changes to all
+167 adversarial cases. Five exact application-envelope contracts are normalized;
+three transformations remain unseen robustness checks. On the promoted default
+policy, tier invariance is 88.92%, tier under-routing is 5.16%, and exact tier
+accuracy is 73.35%. These synthetic metrics are a regression gate, never a
+substitute for real workload outcomes.
+
 ### Response-level benchmark
 
 The live harness runs each frozen case against every specified direct target. It is concurrent, resumable, and supports repeated trials. By default it does not store response content.
+
+`examples/live_eval_cases.jsonl` now contains 120 generated, machine-checkable
+baseline cases across arithmetic, structured extraction, string handling, logic,
+and code comprehension. Its canonical digest is
+`bff04cf245b2a441bf83560cdaea41765d656e538f1b1b0ba9b922ac65a0a311`.
+The digest is deliberately not approved in the release policy: this set proves the
+harness and supplies repeatable latency/cost measurements, but it must be extended
+with privacy-reviewed real workloads before production approval.
 
 ```bash
 model-router live-eval \
@@ -275,7 +321,7 @@ model-router live-eval \
   --target capable \
   --concurrency 3 \
   --repetitions 3 \
-  --switchyard-revision <qualified-version-or-commit> \
+  --switchyard-revision 1fc9ab887d1c663b0048ae24d5f473d15ed8daaa \
   --stream
 ```
 
@@ -288,7 +334,11 @@ It records:
 - estimated actual cost from the versioned catalogue;
 - total completion latency;
 - streaming time to first token; and
-- finish reason.
+- finish reason;
+- p50/p95/p99 latency and TTFT;
+- end-to-end and generation output-token throughput;
+- Wilson 95% intervals for call success and validator pass rates; and
+- per-category, use-case, risk, and complexity slices.
 
 Compute and approve the frozen case digest before spending on a live run:
 
@@ -300,9 +350,12 @@ The summary is cryptographically bound to the exact canonical case set, catalogu
 targets, repetition count, streaming mode, and content-retention setting. Resume is
 refused when any of those inputs or the Switchyard revision changed. Enforcement
 additionally requires the case-set digest to be explicitly approved in
-`config/release_policy.json` and the run to use the qualified Switchyard revision.
+`config/release_policy.json` and the run to use the approved Switchyard revision.
 
-Supported validators are exact text, required substrings, regular expression, valid JSON, and required JSON keys. Open-ended reasoning, writing, and coding still require executable task outcomes, an approved independent judge rubric, blinded human review, or a combination.
+Supported validators are exact text, required substrings, regular expression,
+valid JSON, required JSON keys, exact JSON values, and numeric tolerance. Open-ended
+reasoning, writing, and coding still require executable task outcomes, an approved
+independent judge rubric, blinded human review, or a combination.
 
 ## Resilience and observability
 
@@ -344,8 +397,9 @@ See the [deployment and rollback runbook](docs/deployment-runbook.md) and [produ
 The default policy requires current provider-verified pricing, evidence bound to the
 exact catalogue and router artifact, workload-measured quality and latency, stronger
 external generalisation, a passing immutable live benchmark for every role, an
-approved case-set digest and enforcement decision, a pinned Switchyard build, and a
-trusted direct-provider bypass.
+approved case-set digest and enforcement decision, a passing metamorphic regression,
+the pinned Switchyard runtime/configuration contract, and a trusted direct-provider
+bypass.
 
 Current expected failures are:
 
@@ -354,7 +408,6 @@ Current expected failures are:
 - only 455 truly novel multi-turn examples are available and performance is below threshold;
 - no paid live response benchmark has been run;
 - no live case-set digest has been approved;
-- the current Switchyard build has not been pinned and qualified; and
 - a direct-provider bypass has not been configured.
 
 These failures are intentional safety controls, not hidden TODOs.
@@ -375,11 +428,14 @@ These failures are intentional safety controls, not hidden TODOs.
 │   ├── classifier.py       # learned and deterministic feature integration
 │   ├── drift.py            # prompt-free distribution-drift reports
 │   ├── live_eval.py        # response, cost, TTFT, and validator harness
+│   ├── metamorphic.py      # prompt-envelope invariance regression
+│   ├── normalization.py    # exact supported envelope contracts
 │   ├── observability.py    # Prometheus metrics
 │   ├── pricing.py          # official-source catalogue verifier
 │   ├── readiness.py        # executable production release gates
 │   ├── router.py           # eligibility and utility policy
 │   ├── switchyard.py       # resilient gateway client and executor
+│   ├── switchyard_contract.py # pinned native runtime/config check
 │   └── training.py         # audit, split, train, calibrate, and report
 ├── reports/                # reproducible training and challenger evidence
 └── tests/                  # credential-free unit and integration tests

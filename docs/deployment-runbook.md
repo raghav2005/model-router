@@ -8,18 +8,27 @@ ruff check .
 ruff format --check .
 python -m unittest discover -s tests -v
 model-router verify-pricing
+python -m pip install -e '.[switchyard]'
+OPENAI_API_KEY=contract-validation-only \
+  python -m model_router.switchyard_contract \
+  --output reports/switchyard_contract.json
 model-router release-gates
 python -m build
 docker build -t model-router:<immutable-version> .
+docker build -f Dockerfile.switchyard \
+  -t model-router-switchyard:<immutable-version> .
 ```
 
 Record the source commit, image digest, model-artifact SHA-256, catalogue SHA-256, Switchyard commit/version, release-gate report, and live-evaluation report in the release ticket.
 
 ## 2. Prepare Switchyard
 
-1. Build or install the approved pinned Switchyard version.
+1. Build `Dockerfile.switchyard`, which fetches and verifies approved commit
+   `1fc9ab887d1c663b0048ae24d5f473d15ed8daaa`, or install the equivalent pinned
+   `switchyard-server` binary.
 2. Export `OPENAI_API_KEY` through the secret manager.
-3. Validate `config/switchyard_routes.toml` using `switchyard-server --dry-run`.
+3. Validate `config/switchyard_routes.toml` using both
+   `python -m model_router.switchyard_contract` and `switchyard-server --dry-run`.
 4. Start Switchyard on the private service network.
 5. Confirm `/health`, `/v1/models`, and `/v1/stats`.
 6. Verify that `efficient`, `balanced`, and `capable` resolve to the exact catalogue model IDs.
@@ -44,7 +53,7 @@ MODEL_ROUTER_ADAPTIVE_CONFIDENCE_THRESHOLD=0.45
 MODEL_ROUTER_ARTIFACT=model_router/artifacts/complexity_router_v2.npz
 MODEL_ROUTER_PRICING_REPORT=reports/pricing_verification.json
 SWITCHYARD_URL=http://switchyard:4000
-SWITCHYARD_REVISION=<qualified-version-or-commit>
+SWITCHYARD_REVISION=1fc9ab887d1c663b0048ae24d5f473d15ed8daaa
 ```
 
 In shadow mode, `X-Model-Router-Proposed-Role` reports the proposed target while the capable baseline is executed. Compare proposed decisions with observed outcomes without changing customer behaviour.
