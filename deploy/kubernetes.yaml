@@ -10,6 +10,7 @@ data:
   MODEL_ROUTER_AUDIT_PATH: "-"
   SWITCHYARD_URL: "http://switchyard:4000"
   SWITCHYARD_TIMEOUT_SECONDS: "120"
+  SWITCHYARD_REVISION: "1fc9ab887d1c663b0048ae24d5f473d15ed8daaa"
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -107,3 +108,101 @@ spec:
     - name: http
       port: 8080
       targetPort: http
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: switchyard
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: switchyard
+  template:
+    metadata:
+      labels:
+        app: switchyard
+    spec:
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: switchyard
+          image: ghcr.io/replace-owner/model-router-switchyard:replace-with-immutable-tag
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: OPENAI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: model-router-secrets
+                  key: openai-api-key
+          ports:
+            - name: http
+              containerPort: 4000
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 3
+            periodSeconds: 10
+            timeoutSeconds: 2
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 20
+            timeoutSeconds: 2
+            failureThreshold: 3
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: "1"
+              memory: 512Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+            readOnlyRootFilesystem: true
+          volumeMounts:
+            - name: temporary-files
+              mountPath: /tmp
+      volumes:
+        - name: temporary-files
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: switchyard
+spec:
+  selector:
+    app: switchyard
+  ports:
+    - name: http
+      port: 4000
+      targetPort: http
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: switchyard-ingress
+spec:
+  podSelector:
+    matchLabels:
+      app: switchyard
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: model-router
+      ports:
+        - protocol: TCP
+          port: 4000

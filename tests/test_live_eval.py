@@ -6,8 +6,10 @@ import unittest
 from pathlib import Path
 from typing import Any, Sequence
 
+from model_router.eval_cases import build_baseline_cases, write_baseline_cases
 from model_router.live_eval import (
     EvaluationCase,
+    _validate,
     evaluate_one,
     load_cases,
     run_benchmark,
@@ -59,6 +61,10 @@ class LiveEvaluationTests(unittest.TestCase):
         self.assertEqual(
             summary["targets"]["efficient"]["all_validators_pass_rate"], 1.0
         )
+        target = summary["targets"]["efficient"]
+        self.assertLess(target["all_validators_pass_rate_wilson_95"]["lower"], 1.0)
+        self.assertIsNotNone(target["latency_ms"]["p99"])
+        self.assertEqual(target["slices"]["category"]["math"]["runs"], 1)
 
     def test_load_cases_and_resumable_benchmark(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -107,6 +113,7 @@ class LiveEvaluationTests(unittest.TestCase):
                 first["provenance"]["benchmark_fingerprint"],
                 second["provenance"]["benchmark_fingerprint"],
             )
+            self.assertEqual(first["schema_version"], "switchyard-live-eval-summary-v3")
 
     def test_resume_rejects_changed_case_set(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -135,6 +142,35 @@ class LiveEvaluationTests(unittest.TestCase):
                     output_path=result_path,
                     summary_path=summary_path,
                 )
+
+    def test_extended_machine_validators(self) -> None:
+        self.assertTrue(
+            _validate(
+                '{"name":"Ada","city":"London"}',
+                {
+                    "type": "json_equals",
+                    "value": {"name": "Ada", "city": "London"},
+                },
+            ).passed
+        )
+        self.assertTrue(
+            _validate(
+                "3.1416",
+                {"type": "numeric_tolerance", "value": 3.14, "tolerance": 0.01},
+            ).passed
+        )
+
+    def test_generated_baseline_has_release_scale_and_slices(self) -> None:
+        self.assertEqual(len(build_baseline_cases()), 120)
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "cases.jsonl"
+            write_baseline_cases(path)
+            cases = load_cases(path)
+        self.assertEqual(len(cases), 120)
+        self.assertEqual(
+            {case.metadata["use_case"] for case in cases},
+            {"general_qa", "reasoning", "coding"},
+        )
 
 
 if __name__ == "__main__":

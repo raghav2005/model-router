@@ -110,7 +110,7 @@ class ReleaseGateTests(unittest.TestCase):
             live_path.write_text(
                 json.dumps(
                     {
-                        "schema_version": "switchyard-live-eval-summary-v2",
+                        "schema_version": "switchyard-live-eval-summary-v3",
                         "targets": {
                             role: {
                                 "runs": 20,

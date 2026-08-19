@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import math
 import re
 import statistics
 import time
@@ -232,6 +233,41 @@ def _validate(content: str, specification: Mapping[str, Any]) -> ValidatorResult
             "all keys present" if not missing else f"missing keys: {missing}",
         )
 
+    if validator_type == "json_equals":
+        try:
+            parsed = json.loads(content)
+        except json.JSONDecodeError:
+            return ValidatorResult(validator_type, False, "response was not valid JSON")
+        if "value" not in specification:
+            raise ValueError("json_equals requires value")
+        passed = parsed == specification["value"]
+        return ValidatorResult(
+            validator_type,
+            passed,
+            "JSON value matched" if passed else "JSON value differed",
+        )
+
+    if validator_type == "numeric_tolerance":
+        if specification.get("value") is None:
+            raise ValueError("numeric_tolerance requires value")
+        tolerance = float(specification.get("tolerance", 0.0))
+        if tolerance < 0:
+            raise ValueError("numeric_tolerance tolerance cannot be negative")
+        candidate = content.strip().replace(",", "")
+        try:
+            actual = float(candidate)
+            expected = float(specification["value"])
+        except ValueError:
+            return ValidatorResult(
+                validator_type, False, "response was not a single number"
+            )
+        passed = abs(actual - expected) <= tolerance
+        return ValidatorResult(
+            validator_type,
+            passed,
+            "number within tolerance" if passed else "number outside tolerance",
+        )
+
     raise ValueError(f"Unsupported validator type: {validator_type!r}")
 
 
@@ -357,6 +393,77 @@ def _percentile(values: list[float], percentile: float) -> float | None:
     return ordered[index]
 
 
+def _wilson_95(successes: int, total: int) -> dict[str, float] | None:
+    """Return a 95% Wilson interval for a binomial outcome."""
+
+    if total <= 0:
+        return None
+    z = 1.959963984540054
+    observed = successes / total
+    denominator = 1 + (z * z / total)
+    centre = (observed + z * z / (2 * total)) / denominator
+    margin = (
+        z
+        * math.sqrt(observed * (1 - observed) / total + z * z / (4 * total * total))
+        / denominator
+    )
+    return {
+        "lower": round(max(0.0, centre - margin), 6),
+        "upper": round(min(1.0, centre + margin), 6),
+    }
+
+
+def _distribution(values: list[float]) -> dict[str, float | None]:
+    return {
+        "p50": round(statistics.median(values), 3) if values else None,
+        "p95": (
+            round(value, 3)
+            if (value := _percentile(values, 0.95)) is not None
+            else None
+        ),
+        "p99": (
+            round(value, 3)
+            if (value := _percentile(values, 0.99)) is not None
+            else None
+        ),
+    }
+
+
+def _slice_summary(runs: list[CandidateRun]) -> dict[str, object]:
+    successful = [run for run in runs if run.success]
+    scored = [run for run in successful if run.score is not None]
+    perfect = sum(run.score == 1.0 for run in scored)
+    return {
+        "runs": len(runs),
+        "successful_calls": len(successful),
+        "call_success_rate": round(len(successful) / len(runs), 6),
+        "call_success_rate_wilson_95": _wilson_95(len(successful), len(runs)),
+        "validator_scored_runs": len(scored),
+        "all_validators_pass_rate": (
+            round(perfect / len(scored), 6) if scored else None
+        ),
+        "all_validators_pass_rate_wilson_95": _wilson_95(perfect, len(scored)),
+        "latency_ms": _distribution([round(run.latency_ms, 3) for run in successful]),
+    }
+
+
+def _metadata_slices(runs: list[CandidateRun]) -> dict[str, object]:
+    dimensions: dict[str, dict[str, list[CandidateRun]]] = {}
+    for dimension in ("category", "use_case", "risk", "complexity"):
+        values: dict[str, list[CandidateRun]] = {}
+        for run in runs:
+            raw = run.metadata.get(dimension)
+            if raw is None or isinstance(raw, (dict, list)):
+                continue
+            values.setdefault(str(raw), []).append(run)
+        if values:
+            dimensions[dimension] = {
+                value: _slice_summary(selected)
+                for value, selected in sorted(values.items())
+            }
+    return dimensions
+
+
 def summarize(runs: Sequence[CandidateRun]) -> dict[str, object]:
     targets = sorted({run.target for run in runs})
     expected_models = {
@@ -382,15 +489,30 @@ def summarize(runs: Sequence[CandidateRun]) -> dict[str, object]:
             for run in successful
             if run.estimated_cost_usd is not None
         ]
+        end_to_end_rates = [
+            run.output_tokens / (round(run.latency_ms, 3) / 1_000)
+            for run in successful
+            if run.output_tokens is not None and round(run.latency_ms, 3) > 0
+        ]
+        generation_rates = [
+            run.output_tokens
+            / ((round(run.latency_ms, 3) - round(run.ttft_ms, 3)) / 1_000)
+            for run in successful
+            if run.output_tokens is not None
+            and run.ttft_ms is not None
+            and round(run.latency_ms, 3) > round(run.ttft_ms, 3)
+        ]
         mismatched_models = sum(
             run.response_model
             not in {None, run.target, expected_models.get(run.target)}
             for run in successful
         )
+        perfect = sum(run.score == 1.0 for run in scored)
         by_target[target] = {
             "runs": len(selected),
             "successful_calls": len(successful),
             "call_success_rate": round(len(successful) / len(selected), 6),
+            "call_success_rate_wilson_95": _wilson_95(len(successful), len(selected)),
             "validator_scored_runs": len(scored),
             "average_validator_score": (
                 round(statistics.mean(run.score for run in scored), 6)
@@ -398,41 +520,51 @@ def summarize(runs: Sequence[CandidateRun]) -> dict[str, object]:
                 else None
             ),
             "all_validators_pass_rate": (
-                round(sum(run.score == 1.0 for run in scored) / len(scored), 6)
-                if scored
-                else None
+                round(perfect / len(scored), 6) if scored else None
             ),
-            "latency_ms": {
-                "p50": round(statistics.median(latencies), 3) if latencies else None,
-                "p95": (
-                    round(value, 3)
-                    if (value := _percentile(latencies, 0.95)) is not None
-                    else None
-                ),
-            },
-            "ttft_ms": {
-                "p50": round(statistics.median(ttfts), 3) if ttfts else None,
-                "p95": (
-                    round(value, 3)
-                    if (value := _percentile(ttfts, 0.95)) is not None
-                    else None
-                ),
-            },
+            "all_validators_pass_rate_wilson_95": _wilson_95(perfect, len(scored)),
+            "latency_ms": _distribution(latencies),
+            "ttft_ms": _distribution(ttfts),
+            "end_to_end_output_tokens_per_second": _distribution(end_to_end_rates),
+            "generation_output_tokens_per_second": _distribution(generation_rates),
             "total_input_tokens": sum(input_tokens),
             "total_output_tokens": sum(output_tokens),
+            "cached_input_token_rate": (
+                round(
+                    sum(
+                        run.cached_input_tokens or 0
+                        for run in successful
+                        if run.input_tokens is not None
+                    )
+                    / sum(input_tokens),
+                    6,
+                )
+                if input_tokens and sum(input_tokens) > 0
+                else None
+            ),
             "estimated_total_cost_usd": (round(sum(costs), 8) if costs else None),
             "response_model_mismatch_count": mismatched_models,
+            "finish_reasons": dict(
+                sorted(
+                    Counter(
+                        run.finish_reason or "unknown" for run in successful
+                    ).items()
+                )
+            ),
+            "slices": _metadata_slices(selected),
             "errors": Counter(
                 run.error or "unknown" for run in selected if not run.success
             ),
         }
     return {
-        "schema_version": "switchyard-live-eval-summary-v2",
+        "schema_version": "switchyard-live-eval-summary-v3",
         "total_runs": len(runs),
         "targets": by_target,
         "caveat": (
             "Deterministic validators cover only cases with machine-checkable outcomes. "
             "Open-ended tasks require an approved judge or human evaluation rubric. "
+            "Wilson intervals quantify sampling uncertainty but do not correct for "
+            "benchmark representativeness or correlated repetitions. "
             "Estimated cost uses provider-reported token counts and the versioned "
             "catalog; the provider invoice remains authoritative."
         ),

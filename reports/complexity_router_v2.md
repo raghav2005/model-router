@@ -1,6 +1,6 @@
 # Learned Complexity Router — Training and Evaluation Report
 
-**Generated:** 2026-08-17T11:36:55.036830+00:00
+**Generated:** 2026-08-18T09:34:53.948121+00:00
 
 ## Result summary
 
@@ -8,9 +8,9 @@ The trained model predicts the audited Level 1–5 complexity label from the fla
 
 | Strategy | Accuracy | Macro F1 | MAE | Tier success proxy | Tier under-route | Relative cost index |
 |---|---:|---:|---:|---:|---:|---:|
-| learned_argmax | 91.14% | 0.911 | 0.130 | 96.44% | 3.56% | 3.102 |
-| learned_expected | 88.59% | 0.887 | 0.143 | 96.00% | 4.00% | 3.099 |
-| learned_conservative_p80 | 89.32% | 0.891 | 0.152 | 98.29% | 1.71% | 3.212 |
+| learned_argmax | 91.57% | 0.915 | 0.124 | 96.87% | 3.13% | 3.118 |
+| learned_expected | 88.90% | 0.889 | 0.138 | 96.44% | 3.56% | 3.113 |
+| learned_conservative_p80 | 89.17% | 0.890 | 0.157 | 98.57% | 1.43% | 3.237 |
 | heuristic | 25.57% | 0.225 | 1.227 | 46.10% | 53.90% | 1.700 |
 | majority_level | 23.29% | 0.076 | 1.252 | 100.00% | 0.00% | 5.000 |
 | always_efficient_tier | 18.19% | 0.062 | 1.473 | 33.34% | 66.66% | 1.000 |
@@ -28,18 +28,19 @@ The trained model predicts the audited Level 1–5 complexity label from the fla
 - Split method: normalized-prompt SHA-256 hash; duplicates would remain in one split.
 - Duplicate prompts: 0
 - Borderline rows: 42,759; down-weighted during training.
+- Training-only augmented views: 69,841; original validation, test, and external prompts were unchanged.
 
 ## Learned model test metrics
 
-- Exact five-level accuracy: 91.14%
-- Macro F1: 0.911
-- Mean absolute level error: 0.130
-- Within one level: 96.84%
-- Severe error rate: 3.16%
-- Collapsed tier accuracy: 93.53%
-- Collapsed tier under-route rate: 3.56%
-- Expected calibration error: 0.023
-- Local inference latency: median 166.2 µs; p95 234.7 µs over 1,000 prompts
+- Exact five-level accuracy: 91.57%
+- Macro F1: 0.915
+- Mean absolute level error: 0.124
+- Within one level: 96.93%
+- Severe error rate: 3.07%
+- Collapsed tier accuracy: 93.86%
+- Collapsed tier under-route rate: 3.13%
+- Expected calibration error: 0.015
+- Local inference latency: median 168.8 µs; p95 240.6 µs over 1,000 prompts
 
 ## End-to-end router simulation
 
@@ -48,12 +49,12 @@ This section runs the complete policy router, including hard gates and catalogue
 | Router mode | Tier success proxy | Tier under-route | Tier over-route | Est. cost/request | Saving vs capable | Route mix |
 |---|---:|---:|---:|---:|---:|---|
 | heuristic | 44.91% | 55.09% | 9.14% | $0.00328 | 78.92% | balanced: 3656, capable: 140, efficient: 4726 |
-| learned_argmax | 97.32% | 2.68% | 15.45% | $0.00931 | 40.21% | balanced: 3100, capable: 3767, efficient: 1655 |
-| hybrid_argmax | 97.13% | 2.87% | 9.63% | $0.00897 | 42.35% | balanced: 2584, capable: 3769, efficient: 2169 |
-| hybrid_conservative_p80 | 98.47% | 1.53% | 11.24% | $0.00928 | 40.38% | balanced: 2386, capable: 4019, efficient: 2117 |
-| hybrid_adaptive_p15 | 97.43% | 2.57% | 9.83% | $0.00903 | 42.01% | balanced: 2551, capable: 3812, efficient: 2159 |
-| hybrid_tier_risk_p15 | 98.73% | 1.27% | 11.84% | $0.00938 | 39.73% | balanced: 2334, capable: 4096, efficient: 2092 |
-| hybrid_adaptive_validation_selected | 97.15% | 2.85% | 9.73% | $0.00899 | 42.27% | balanced: 2572, capable: 3781, efficient: 2169 |
+| learned_argmax | 97.70% | 2.30% | 15.96% | $0.00938 | 39.76% | balanced: 3108, capable: 3804, efficient: 1610 |
+| hybrid_argmax | 97.51% | 2.49% | 9.69% | $0.00902 | 42.04% | balanced: 2556, capable: 3807, efficient: 2159 |
+| hybrid_conservative_p80 | 98.73% | 1.27% | 11.52% | $0.00935 | 39.91% | balanced: 2352, capable: 4073, efficient: 2097 |
+| hybrid_adaptive_p15 | 97.77% | 2.23% | 9.87% | $0.00907 | 41.73% | balanced: 2526, capable: 3846, efficient: 2150 |
+| hybrid_tier_risk_p15 | 98.97% | 1.03% | 12.13% | $0.00944 | 39.33% | balanced: 2307, capable: 4142, efficient: 2073 |
+| hybrid_adaptive_validation_selected | 97.54% | 2.46% | 9.79% | $0.00903 | 41.96% | balanced: 2545, capable: 3818, efficient: 2159 |
 | always_capable_reference | 100.00% | 0.00% | 55.60% | $0.01556 | 0.00% | capable: 8522 |
 
 ## Validation-selected adaptive policy
@@ -62,9 +63,9 @@ The confidence threshold and posterior risk tolerance were selected using only t
 
 - Confidence threshold: 0.30
 - Posterior under-route tolerance: 0.10
-- Validation tier under-route: 2.95%
-- Validation tier over-route: 9.64%
-- Validation estimated cost/request: $0.00895
+- Validation tier under-route: 2.71%
+- Validation tier over-route: 9.77%
+- Validation estimated cost/request: $0.00898
 - Feasible candidates: 28/28
 - External confirmation: not passed
 - Decision: retain current production default and continue shadow evaluation
@@ -85,11 +86,11 @@ Rows are true levels and columns are predicted levels.
 
 | True \ Predicted | 1 | 2 | 3 | 4 | 5 |
 |---:|---:|---:|---:|---:|---:|
-| 1 | 1183 | 60 | 15 | 26 | 7 |
-| 2 | 65 | 1374 | 55 | 45 | 11 |
-| 3 | 22 | 79 | 1707 | 59 | 30 |
-| 4 | 8 | 36 | 89 | 1814 | 38 |
-| 5 | 7 | 12 | 50 | 41 | 1689 |
+| 1 | 1183 | 56 | 16 | 29 | 7 |
+| 2 | 62 | 1377 | 53 | 44 | 14 |
+| 3 | 24 | 70 | 1710 | 59 | 34 |
+| 4 | 5 | 31 | 79 | 1830 | 40 |
+| 5 | 3 | 10 | 45 | 37 | 1704 |
 
 ## Release recommendation
 
@@ -101,8 +102,8 @@ Use this artifact in shadow mode as a complexity signal behind the existing hard
 - Source rows: 8,284
 - Rows overlapping the primary dataset and excluded: 7,829
 - Novel rows evaluated: 455
-- Exact accuracy: 57.14%
-- Macro F1: 0.548
-- Tier under-route rate: 18.68%
+- Exact accuracy: 57.80%
+- Macro F1: 0.555
+- Tier under-route rate: 18.02%
 
 **Warning:** This slice is generated from the same synthetic process and is not a production-distribution benchmark. Overlapping rows were excluded. The large drop from the hash-held-out test is evidence that the main test result is not sufficient for a production release.

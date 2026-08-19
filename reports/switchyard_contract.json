@@ -1,0 +1,31 @@
+{
+  "config": "config/switchyard_routes.toml",
+  "config_sha256": "94ff0a717ebccc7bedda5a47df51551d10a6a76d132a58c70dd0193ad0187416",
+  "expected_routes": [
+    "balanced",
+    "benchmark-random",
+    "capable",
+    "efficient",
+    "smart-agent-stage",
+    "smart-coding",
+    "smart-general"
+  ],
+  "exposed_routes": [
+    "balanced",
+    "benchmark-random",
+    "capable",
+    "efficient",
+    "smart-agent-stage",
+    "smart-coding",
+    "smart-general"
+  ],
+  "health": {
+    "status": "ok"
+  },
+  "passed": true,
+  "platform": "macOS-15.5-x86_64-i386-64bit",
+  "python_version": "3.12.2",
+  "schema_version": "model-router-switchyard-contract-v1",
+  "switchyard_version": "0.2.0",
+  "validated_at": "2026-08-18T09:39:50.546949+00:00"
+}

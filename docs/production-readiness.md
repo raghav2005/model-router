@@ -30,7 +30,11 @@ flowchart LR
     S -. trusted bypass .-> M3
 ```
 
-The custom service owns decisions and business controls. Switchyard owns the provider-facing protocol boundary. This separation is especially important because Switchyard is currently pre-alpha: its failure or upgrade must not require rewriting the learned router.
+The custom service owns decisions and business controls. Switchyard owns the
+provider-facing protocol boundary. Switchyard v0.2.0 is an approved dependency,
+pinned to immutable commit `1fc9ab887d1c663b0048ae24d5f473d15ed8daaa`.
+The adapter boundary still prevents a gateway failure or upgrade from requiring a
+rewrite of the learned router.
 
 ## Implemented safeguards
 
@@ -59,6 +63,11 @@ catalogue, external dataset, and routing-policy version. A stale report cannot
 approve a different artifact or policy. Live benchmark summaries carry a fingerprint
 of their cases, catalogue, targets, repetitions, and execution settings; resume and
 release approval both fail on a mismatch.
+
+The pinned Switchyard package is started in CI against the exact TOML. Its health,
+statistics payload, route table, version, and configuration digest are recorded in
+`reports/switchyard_contract.json`. Duplicate upstream target definitions fail the
+contract check.
 
 ### Dependency resilience
 
@@ -103,13 +112,17 @@ The default release policy requires:
 4. workload-measured response quality for every role;
 5. workload-measured latency for every role;
 6. at least 1,000 independent external examples, at least 75% exact complexity accuracy, and no more than 5% tier under-routing;
-7. a training report matching the exact router artifact, catalogue, and policy version;
-8. at least 100 scored live responses per role, at least a 99% call-success rate,
-   at least a 90% all-validator pass rate, and no unexpected response-model substitutions;
-9. live evidence matching the exact catalogue, qualified Switchyard revision, and
+7. a passing 1,000+ case metamorphic regression with bounded under-routing and
+   tier-invariance thresholds;
+8. a training report matching the exact router artifact, catalogue, and policy version;
+9. at least 100 scored live responses per role, at least a 99% call-success rate,
+   at least a 90% all-validator pass rate, required Wilson-interval lower bounds,
+   and no unexpected response-model substitutions;
+10. live evidence matching the exact catalogue, approved Switchyard revision, and
    an explicitly approved case-set digest;
-10. a pinned and tested Switchyard release or commit; and
-11. a trusted direct-provider bypass.
+11. an approved, pinned Switchyard release or commit;
+12. a passing Switchyard native runtime/configuration contract; and
+13. a trusted direct-provider bypass.
 
 Thresholds are initial release criteria and must be approved against business risk. Open-ended work also needs blinded human review or an approved judge model; deterministic validators alone are insufficient.
 
@@ -122,7 +135,8 @@ Thresholds are initial release criteria and must be approved against business ri
 - Run all three models on every eligible response-level case.
 - Measure quality, TTFT, completion latency, output rate, tokens, price, errors, and refusal rate by slice.
 - Replace every `heuristic_prior_pending_workload_eval` and `unmeasured_bootstrap_prior` marker only after the underlying report is reviewed and versioned.
-- Retrain or recalibrate the complexity model because the current novel multi-turn result is below the release threshold.
+- Continue retraining or recalibration because the promoted augmentation model
+  improves the novel multi-turn slice but remains below the release threshold.
 
 ### Platform and security
 
@@ -135,7 +149,7 @@ Thresholds are initial release criteria and must be approved against business ri
 
 ### Reliability
 
-- Pin and fault-test Switchyard; its upstream project currently warns against production use.
+- Fault-test the pinned Switchyard image under the expected load and failure modes.
 - Implement and exercise a direct-provider bypass independently of Switchyard.
 - Load-test the entire path at expected peak concurrency.
 - Define SLOs and alerts for success, p95/p99 latency, under-routing, fallback, cost, token use, and distribution drift.

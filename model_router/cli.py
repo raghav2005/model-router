@@ -21,6 +21,9 @@ from .live_eval import case_set_sha256
 from .live_eval import load_cases as load_live_eval_cases
 from .live_eval import run_benchmark as run_live_benchmark
 from .messages import copy_messages, flatten_messages
+from .metamorphic import evaluate_metamorphic_suite
+from .metamorphic import write_cases as write_metamorphic_cases
+from .metamorphic import write_report as write_metamorphic_report
 from .pricing import verify_catalog_pricing
 from .pricing import write_report as write_pricing_report
 from .readiness import evaluate_release_gates
@@ -219,6 +222,8 @@ def build_parser() -> argparse.ArgumentParser:
     train.add_argument(
         "--class-prior", choices=["uniform", "empirical"], default="uniform"
     )
+    train.add_argument("--augmentation-copies", type=int, default=1)
+    train.add_argument("--augmentation-weight", type=float, default=0.5)
 
     live_eval = subparsers.add_parser(
         "live-eval",
@@ -265,6 +270,12 @@ def build_parser() -> argparse.ArgumentParser:
     release_gates.add_argument(
         "--pricing-report", default="reports/pricing_verification.json"
     )
+    release_gates.add_argument(
+        "--metamorphic-report", default="reports/metamorphic_routing_eval.json"
+    )
+    release_gates.add_argument(
+        "--switchyard-contract-report", default="reports/switchyard_contract.json"
+    )
     release_gates.add_argument("--model-artifact", default=str(default_artifact_path()))
 
     verify_pricing = subparsers.add_parser(
@@ -285,6 +296,18 @@ def build_parser() -> argparse.ArgumentParser:
     )
     adversarial.add_argument(
         "--report-output", default="reports/adversarial_routing_eval.json"
+    )
+
+    metamorphic = subparsers.add_parser(
+        "metamorphic-eval",
+        help="Test routing invariance under meaning-preserving prompt transformations",
+    )
+    metamorphic.add_argument("--model-artifact", default=str(default_artifact_path()))
+    metamorphic.add_argument(
+        "--cases-output", default="data/metamorphic_routing_cases.jsonl"
+    )
+    metamorphic.add_argument(
+        "--report-output", default="reports/metamorphic_routing_eval.json"
     )
 
     drift_baseline = subparsers.add_parser(
@@ -363,12 +386,21 @@ def main() -> None:
             print(json.dumps(report, indent=2))
             return
 
+        if args.command == "metamorphic-eval":
+            report = evaluate_metamorphic_suite(artifact_path=args.model_artifact)
+            write_metamorphic_cases(args.cases_output)
+            write_metamorphic_report(args.report_output, report)
+            print(json.dumps(report, indent=2))
+            return
+
         if args.command == "release-gates":
             report = evaluate_release_gates(
                 policy_path=args.policy,
                 training_report_path=args.training_report,
                 live_summary_path=args.live_summary,
                 pricing_report_path=args.pricing_report,
+                metamorphic_report_path=args.metamorphic_report,
+                switchyard_contract_report_path=args.switchyard_contract_report,
                 artifact_path=args.model_artifact,
             )
             print(json.dumps(report, indent=2))
@@ -387,6 +419,8 @@ def main() -> None:
                     feature_dimension=args.feature_dimension,
                     borderline_weight=args.borderline_weight,
                     class_prior=args.class_prior,
+                    augmentation_copies_per_train_row=args.augmentation_copies,
+                    augmentation_weight=args.augmentation_weight,
                 ),
             )
             print(

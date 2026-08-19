@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.7.0 — 2026-08-18
+
+- Promoted Switchyard v0.2.0 as an approved, exact dependency and pinned its
+  immutable source commit for the native server image and live evidence.
+- Added a native Switchyard contract that verifies package version, TOML digest,
+  target uniqueness, health, statistics, and all expected routes; fixed the
+  duplicate Luna target found by the first native startup test.
+- Added a pinned Switchyard container, Kubernetes Deployment/Service/NetworkPolicy,
+  and CI jobs for the runtime contract and gateway container.
+- Added deterministic train-only prompt-envelope augmentation and promoted the
+  resulting artifact after it improved the untouched internal and external slices
+  and reduced adversarial under-routing.
+- Added exact normalization for five supported application envelopes plus a 1,336-
+  case metamorphic regression gate. Default tier invariance improved from 65.87%
+  to 88.92% and transformed-case under-routing fell to 5.16%.
+- Expanded live evaluation with p99 latency and TTFT, token throughput, cache rate,
+  finish-reason counts, Wilson 95% intervals, and workload-slice summaries.
+
 ## 0.6.0 — 2026-08-17
 
 - Corrected Luna and Terra token prices from the official model pages and added

@@ -1,5 +1,5 @@
 {
-  "schema_version": "model-router-release-policy-v1",
+  "schema_version": "model-router-release-policy-v2",
   "deployment_mode": "shadow",
   "maximum_pricing_age_days": 30,
   "minimum_external_examples": 1000,
@@ -7,13 +7,24 @@
   "maximum_external_tier_underroute_rate": 0.05,
   "minimum_live_cases_per_target": 100,
   "minimum_live_all_validators_pass_rate": 0.9,
+  "minimum_live_all_validators_pass_wilson_lower_bound": 0.85,
   "minimum_live_call_success_rate": 0.99,
+  "minimum_live_call_success_wilson_lower_bound": 0.95,
   "maximum_live_response_model_mismatch_count": 0,
   "approved_live_case_set_sha256": null,
   "require_workload_measured_quality": true,
   "require_workload_measured_latency": true,
+  "synthetic_regression": {
+    "policy": "hybrid_adaptive_p15",
+    "minimum_cases": 1000,
+    "maximum_tier_underroute_rate": 0.1,
+    "minimum_tier_invariance_rate": 0.85
+  },
   "switchyard": {
-    "tested_version_or_commit": null,
+    "release": "v0.2.0",
+    "approved_version_or_commit": "1fc9ab887d1c663b0048ae24d5f473d15ed8daaa",
+    "release_url": "https://github.com/NVIDIA-NeMo/Switchyard/releases/tag/v0.2.0",
+    "contract_report_required": true,
     "trusted_direct_provider_fallback_configured": false
   }
 }

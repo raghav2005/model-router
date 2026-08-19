@@ -1,10 +1,11 @@
-# Current Switchyard Rust-server deployment candidate.
+# Switchyard v0.2.0 deployment configuration. Approved source commit:
+# 1fc9ab887d1c663b0048ae24d5f473d15ed8daaa
 # Validate before every deployment:
 #   switchyard-server --config config/switchyard_routes.toml --dry-run
 #
-# Switchyard is pre-alpha and explicitly not production-ready upstream. Keep it
-# isolated behind the model-router service, pin the tested commit/release, and
-# retain a trusted direct-provider fallback before enabling production traffic.
+# Keep the gateway isolated behind the model-router policy service and deploy
+# only the approved immutable version. A direct-provider recovery path remains
+# a separate defence-in-depth release requirement.
 schema_version = 1
 
 [llm_clients.openai]
@@ -24,30 +25,35 @@ llm_client = "openai"
 id = "gpt-5.6-luna"
 llm_client = "openai"
 
-[targets.classifier]
-id = "gpt-5.6-luna"
-llm_client = "openai"
-
 [routes.capable]
 id = "capable"
 type = "passthrough"
 target = "capable"
+context_window = 1050000
+tool_calling = true
+reasoning = true
 
 [routes.balanced]
 id = "balanced"
 type = "passthrough"
 target = "balanced"
+context_window = 1050000
+tool_calling = true
+reasoning = true
 
 [routes.efficient]
 id = "efficient"
 type = "passthrough"
 target = "efficient"
+context_window = 1050000
+tool_calling = true
+reasoning = true
 
 [routes.smart_general]
 id = "smart-general"
 type = "llm_classifier"
 mode = "capability"
-classifier_target = "classifier"
+classifier_target = "efficient"
 strong_target = "capable"
 weak_target = "efficient"
 base_threshold = 0.6
@@ -56,12 +62,15 @@ recent_turn_window = 4
 session_affinity = true
 message_hash_fallback = false
 max_output_tokens = 1024
+context_window = 1050000
+tool_calling = true
+reasoning = true
 
 [routes.smart_coding]
 id = "smart-coding"
 type = "llm_classifier"
 mode = "capability"
-classifier_target = "classifier"
+classifier_target = "efficient"
 strong_target = "capable"
 weak_target = "efficient"
 base_threshold = 0.7
@@ -70,6 +79,9 @@ recent_turn_window = 4
 session_affinity = true
 message_hash_fallback = false
 max_output_tokens = 1024
+context_window = 1050000
+tool_calling = true
+reasoning = true
 
 [routes.smart_agent_stage]
 id = "smart-agent-stage"
@@ -79,6 +91,9 @@ efficient_target = "efficient"
 picker = "capable_first"
 confidence_threshold = 0.5
 recent_turn_window = 3
+context_window = 1050000
+tool_calling = true
+reasoning = true
 
 [routes.benchmark_random]
 id = "benchmark-random"
@@ -86,3 +101,6 @@ type = "random"
 targets = ["capable", "efficient"]
 weights = [1, 1]
 seed = 42
+context_window = 1050000
+tool_calling = true
+reasoning = true

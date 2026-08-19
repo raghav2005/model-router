@@ -53,6 +53,8 @@ class TrainingConfig:
     train_percentage: int = 80
     validation_percentage: int = 10
     class_prior: str = "uniform"
+    augmentation_copies_per_train_row: int = 1
+    augmentation_weight: float = 0.5
 
     def validate(self) -> None:
         if self.feature_dimension < 1_024:
@@ -67,6 +69,10 @@ class TrainingConfig:
             raise ValueError("the split must leave a non-empty test percentage")
         if self.class_prior not in {"uniform", "empirical"}:
             raise ValueError("class_prior must be uniform or empirical")
+        if self.augmentation_copies_per_train_row < 0:
+            raise ValueError("augmentation_copies_per_train_row cannot be negative")
+        if not 0 < self.augmentation_weight <= 1:
+            raise ValueError("augmentation_weight must be in (0, 1]")
 
 
 def sha256_file(path: Path) -> str:
@@ -147,6 +153,20 @@ def _row_weight(row: DatasetRow, config: TrainingConfig) -> float:
         else config.appropriate_weight
     )
     return max(0.05, min(1.0, row.confidence)) * status_weight
+
+
+def _augmented_prompts(prompt: str, copies: int) -> list[str]:
+    if copies == 0:
+        return []
+    from .normalization import TRANSFORMATIONS, transform_prompt
+
+    offset = int(hashlib.sha256(prompt.encode("utf-8")).hexdigest()[:8], 16)
+    return [
+        transform_prompt(
+            prompt, TRANSFORMATIONS[(offset + index) % len(TRANSFORMATIONS)]
+        )
+        for index in range(copies)
+    ]
 
 
 def _predict_rows(
@@ -649,6 +669,10 @@ def _markdown_report(report: dict[str, object]) -> str:
     assert isinstance(end_to_end, dict)
     latency = test["classifier_latency_us"]
     assert isinstance(latency, dict)
+    training = report["training"]
+    assert isinstance(training, dict)
+    augmentation = training.get("augmentation", {})
+    assert isinstance(augmentation, dict)
     lines.extend(
         [
             "",
@@ -663,6 +687,7 @@ def _markdown_report(report: dict[str, object]) -> str:
             "- Split method: normalized-prompt SHA-256 hash; duplicates would remain in one split.",
             f"- Duplicate prompts: {dataset['duplicate_rows']}",
             f"- Borderline rows: {dataset['statuses'].get('borderline', 0):,}; down-weighted during training.",
+            f"- Training-only augmented views: {int(augmentation.get('augmented_training_views', 0)):,}; original validation, test, and external prompts were unchanged.",
             "",
             "## Learned model test metrics",
             "",
@@ -817,6 +842,19 @@ def train_and_evaluate(
         weight = _row_weight(row, training_config)
         np.add.at(feature_counts[row.level - 1], indices, values * weight)
         class_weights[row.level - 1] += weight
+        for augmented_prompt in _augmented_prompts(
+            row.prompt, training_config.augmentation_copies_per_train_row
+        ):
+            augmented_indices, augmented_values = vectorizer.transform_one(
+                augmented_prompt
+            )
+            augmented_weight = weight * training_config.augmentation_weight
+            np.add.at(
+                feature_counts[row.level - 1],
+                augmented_indices,
+                augmented_values * augmented_weight,
+            )
+            class_weights[row.level - 1] += augmented_weight
 
     log_feature_probability = np.log(
         feature_counts / feature_counts.sum(axis=1, keepdims=True)
@@ -857,6 +895,10 @@ def train_and_evaluate(
         "final_turn_weight": final_turn_weight,
         "class_prior": training_config.class_prior,
         "borderline_weight": training_config.borderline_weight,
+        "augmentation_copies_per_train_row": (
+            training_config.augmentation_copies_per_train_row
+        ),
+        "augmentation_weight": training_config.augmentation_weight,
         "label_semantics": "synthetic, LLM-audited prompt complexity level 1-5",
     }
     model = NaiveBayesComplexityModel(
@@ -931,6 +973,18 @@ def train_and_evaluate(
             "borderline_weight": training_config.borderline_weight,
             "appropriate_weight": training_config.appropriate_weight,
             "class_prior": training_config.class_prior,
+            "augmentation": {
+                "method": "deterministic meaning-preserving prompt envelopes",
+                "copies_per_train_row": (
+                    training_config.augmentation_copies_per_train_row
+                ),
+                "weight": training_config.augmentation_weight,
+                "augmented_training_views": (
+                    len(split_rows["train"])
+                    * training_config.augmentation_copies_per_train_row
+                ),
+                "split_safety": "only train-split rows were augmented",
+            },
             "temperature": temperature,
             "final_turn_weight": final_turn_weight,
         },
@@ -1089,6 +1143,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--class-prior", choices=["uniform", "empirical"], default="uniform"
     )
+    parser.add_argument("--augmentation-copies", type=int, default=1)
+    parser.add_argument("--augmentation-weight", type=float, default=0.5)
     return parser
 
 
@@ -1104,6 +1160,8 @@ def main() -> None:
             feature_dimension=args.feature_dimension,
             borderline_weight=args.borderline_weight,
             class_prior=args.class_prior,
+            augmentation_copies_per_train_row=args.augmentation_copies,
+            augmentation_weight=args.augmentation_weight,
         ),
     )
     learned = report["evaluation"]["strategies"]["learned_argmax"]

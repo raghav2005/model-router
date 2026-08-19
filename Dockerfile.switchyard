@@ -1,0 +1,26 @@
+ARG RUST_VERSION=1.96.1
+FROM rust:${RUST_VERSION}-bookworm AS builder
+
+ARG SWITCHYARD_COMMIT=1fc9ab887d1c663b0048ae24d5f473d15ed8daaa
+WORKDIR /opt/switchyard
+RUN git init . \
+    && git remote add origin https://github.com/NVIDIA-NeMo/Switchyard.git \
+    && git fetch --depth 1 origin "${SWITCHYARD_COMMIT}" \
+    && git checkout --detach FETCH_HEAD \
+    && test "$(git rev-parse HEAD)" = "${SWITCHYARD_COMMIT}"
+RUN cargo build --locked --release -p switchyard-server
+
+FROM debian:bookworm-slim AS runtime
+RUN apt-get update \
+    && apt-get install --no-install-recommends -y ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY --from=builder /opt/switchyard/target/release/switchyard-server /usr/local/bin/
+COPY --from=builder /opt/switchyard/LICENSE /licenses/Switchyard/LICENSE
+COPY --from=builder /opt/switchyard/NOTICE /licenses/Switchyard/NOTICE
+COPY config/switchyard_routes.toml /etc/switchyard/routes.toml
+
+USER 10001:10001
+EXPOSE 4000
+ENTRYPOINT ["switchyard-server"]
+CMD ["--config", "/etc/switchyard/routes.toml", "--host", "0.0.0.0", "--port", "4000"]
