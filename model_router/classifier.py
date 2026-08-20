@@ -153,11 +153,12 @@ def classify_request(request: RoutingRequest) -> RequestFeatures:
         signals.append("general question/answer pattern")
 
     input_tokens = request.input_tokens or estimate_tokens(raw_text)
+    semantic_tokens = estimate_tokens(text) if envelope is not None else input_tokens
     complexity = 0.12
-    if input_tokens > 250:
+    if semantic_tokens > 250:
         complexity += 0.12
         signals.append("long prompt")
-    if input_tokens > 1_000:
+    if semantic_tokens > 1_000:
         complexity += 0.13
         signals.append("very long prompt")
     if has_code:
@@ -274,7 +275,8 @@ def classify_request_with_model(
     minimum_tier = 1 if bounded_simple else prediction.minimum_tier
     complexity_level = 1 if bounded_simple else prediction.level
     dataset_hash = str(model.metadata.get("training_dataset_sha256", "unknown"))
-    model_version = f"{MODEL_SCHEMA_VERSION}:{dataset_hash[:12]}"
+    recipe_hash = str(model.metadata.get("training_recipe_sha256", "legacy"))
+    model_version = f"{MODEL_SCHEMA_VERSION}:{dataset_hash[:12]}:{recipe_hash[:12]}"
     return replace(
         heuristic,
         complexity=complexity,

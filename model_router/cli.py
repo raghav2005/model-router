@@ -9,6 +9,8 @@ from typing import Any
 from .adversarial import evaluate_adversarial_suite, write_cases, write_report
 from .benchmark import run_benchmark
 from .classifier import DEFAULT_ADAPTIVE_CONFIDENCE_THRESHOLD
+from .dataset_audit import audit_datagen_directory
+from .dataset_audit import write_report as write_dataset_audit_report
 from .drift import (
     build_baseline,
     compare_to_baseline,
@@ -212,18 +214,27 @@ def build_parser() -> argparse.ArgumentParser:
     )
     train.add_argument("dataset")
     train.add_argument(
-        "--artifact", default="model_router/artifacts/complexity_router_v2.npz"
+        "--artifact", default="model_router/artifacts/complexity_router_v3.npz"
     )
-    train.add_argument("--report-json", default="reports/complexity_router_v2.json")
-    train.add_argument("--report-markdown", default="reports/complexity_router_v2.md")
+    train.add_argument("--report-json", default="reports/complexity_router_v3.json")
+    train.add_argument("--report-markdown", default="reports/complexity_router_v3.md")
     train.add_argument("--external-context-dataset")
     train.add_argument("--feature-dimension", type=int, default=32_768)
     train.add_argument("--borderline-weight", type=float, default=0.65)
+    train.add_argument("--borderline-suggested-weight", type=float, default=0.0)
     train.add_argument(
         "--class-prior", choices=["uniform", "empirical"], default="uniform"
     )
-    train.add_argument("--augmentation-copies", type=int, default=1)
+    train.add_argument("--augmentation-copies", type=int, default=2)
     train.add_argument("--augmentation-weight", type=float, default=0.5)
+
+    dataset_audit = subparsers.add_parser(
+        "dataset-audit",
+        help="Create a prompt-free aggregate audit of the private datagen folder",
+    )
+    dataset_audit.add_argument("directory")
+    dataset_audit.add_argument("--report-json", default="reports/dataset_audit.json")
+    dataset_audit.add_argument("--report-markdown", default="reports/dataset_audit.md")
 
     live_eval = subparsers.add_parser(
         "live-eval",
@@ -262,7 +273,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     release_gates.add_argument("--policy", default="config/release_policy.json")
     release_gates.add_argument(
-        "--training-report", default="reports/complexity_router_v2.json"
+        "--training-report", default="reports/complexity_router_v3.json"
     )
     release_gates.add_argument(
         "--live-summary", default="reports/live_eval_summary.json"
@@ -418,6 +429,7 @@ def main() -> None:
                 config=TrainingConfig(
                     feature_dimension=args.feature_dimension,
                     borderline_weight=args.borderline_weight,
+                    borderline_suggested_weight=args.borderline_suggested_weight,
                     class_prior=args.class_prior,
                     augmentation_copies_per_train_row=args.augmentation_copies,
                     augmentation_weight=args.augmentation_weight,
@@ -435,6 +447,16 @@ def main() -> None:
                     indent=2,
                 )
             )
+            return
+
+        if args.command == "dataset-audit":
+            report = audit_datagen_directory(args.directory)
+            write_dataset_audit_report(
+                report,
+                args.report_json,
+                args.report_markdown,
+            )
+            print(json.dumps(report, indent=2))
             return
 
         if args.command == "live-eval":

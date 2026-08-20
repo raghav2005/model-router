@@ -52,7 +52,7 @@ def normalize_prompt(text: str) -> str:
 
 def default_artifact_path() -> Path:
     return Path(
-        str(files("model_router").joinpath("artifacts/complexity_router_v2.npz"))
+        str(files("model_router").joinpath("artifacts/complexity_router_v3.npz"))
     )
 
 

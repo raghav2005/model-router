@@ -4,6 +4,7 @@ import unittest
 
 from model_router.catalog import load_catalog
 from model_router.classifier import classify_request, estimate_tokens
+from model_router.normalization import transform_prompt
 from model_router.router import ModelRouter, NoEligibleModel
 from model_router.types import ModelProfile, RoutingRequest
 
@@ -44,6 +45,14 @@ class ClassifierTests(unittest.TestCase):
         self.assertEqual(features.use_case, "reasoning")
         self.assertGreaterEqual(features.complexity_level, 3)
         self.assertNotIn("bounded simple request", features.signals)
+
+    def test_supported_wrapper_does_not_change_semantic_complexity(self) -> None:
+        prompt = "Summarize this text: " + " ".join(["x"] * 246)
+        wrapped = transform_prompt(prompt, "quoted_task")
+        plain_features = classify_request(RoutingRequest(prompt))
+        wrapped_features = classify_request(RoutingRequest(wrapped))
+        self.assertEqual(wrapped_features.complexity, plain_features.complexity)
+        self.assertGreater(wrapped_features.input_tokens, plain_features.input_tokens)
 
 
 class RouterTests(unittest.TestCase):

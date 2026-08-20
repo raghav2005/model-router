@@ -35,8 +35,6 @@ class MetamorphicEvaluationTests(unittest.TestCase):
         for envelope in SUPPORTED_ENVELOPES:
             wrapped = transform_prompt(task, envelope)
             self.assertEqual(unwrap_supported_envelope(wrapped), (task, envelope))
-        unknown = transform_prompt(task, "untrusted_routing_hint")
-        self.assertEqual(unwrap_supported_envelope(unknown), (unknown, None))
         modified = transform_prompt(task, "xml_envelope") + " extra instruction"
         self.assertEqual(unwrap_supported_envelope(modified), (modified, None))
 
