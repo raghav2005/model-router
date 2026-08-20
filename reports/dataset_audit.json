@@ -1,0 +1,323 @@
+{
+  "balanced_subset": {
+    "all_rows_in_primary": true,
+    "coverage_of_primary": 0.765348
+  },
+  "cross_file_overlap": {
+    "routing_dataset_100k_valid_balanced_equal_levels.jsonl|routing_dataset_multiturn.jsonl": {
+      "label_conflicts": 0,
+      "shared_prompts": 6127
+    },
+    "routing_dataset_100k_valid_balanced_equal_levels.jsonl|routing_dataset_multiturn_100k.jsonl": {
+      "label_conflicts": 0,
+      "shared_prompts": 6127
+    },
+    "routing_dataset_100k_valid_balanced_equal_levels.jsonl|routing_dataset_multiturn_with_models.jsonl": {
+      "label_conflicts": 0,
+      "shared_prompts": 6127
+    },
+    "routing_dataset_100k_valid_balanced_equal_levels.jsonl|routing_dataset_openai_backoff_test.jsonl": {
+      "label_conflicts": 0,
+      "shared_prompts": 6124
+    },
+    "routing_dataset_100k_valid_only.jsonl|routing_dataset_100k_valid_balanced_equal_levels.jsonl": {
+      "label_conflicts": 0,
+      "shared_prompts": 66560
+    },
+    "routing_dataset_100k_valid_only.jsonl|routing_dataset_multiturn.jsonl": {
+      "label_conflicts": 0,
+      "shared_prompts": 7827
+    },
+    "routing_dataset_100k_valid_only.jsonl|routing_dataset_multiturn_100k.jsonl": {
+      "label_conflicts": 0,
+      "shared_prompts": 7827
+    },
+    "routing_dataset_100k_valid_only.jsonl|routing_dataset_multiturn_with_models.jsonl": {
+      "label_conflicts": 0,
+      "shared_prompts": 7827
+    },
+    "routing_dataset_100k_valid_only.jsonl|routing_dataset_openai_backoff_test.jsonl": {
+      "label_conflicts": 0,
+      "shared_prompts": 7824
+    },
+    "routing_dataset_multiturn.jsonl|routing_dataset_multiturn_100k.jsonl": {
+      "label_conflicts": 0,
+      "shared_prompts": 8282
+    },
+    "routing_dataset_multiturn.jsonl|routing_dataset_multiturn_with_models.jsonl": {
+      "label_conflicts": 0,
+      "shared_prompts": 8282
+    },
+    "routing_dataset_multiturn.jsonl|routing_dataset_openai_backoff_test.jsonl": {
+      "label_conflicts": 0,
+      "shared_prompts": 8279
+    },
+    "routing_dataset_multiturn_100k.jsonl|routing_dataset_multiturn_with_models.jsonl": {
+      "label_conflicts": 0,
+      "shared_prompts": 8282
+    },
+    "routing_dataset_multiturn_100k.jsonl|routing_dataset_openai_backoff_test.jsonl": {
+      "label_conflicts": 0,
+      "shared_prompts": 8279
+    },
+    "routing_dataset_multiturn_with_models.jsonl|routing_dataset_openai_backoff_test.jsonl": {
+      "label_conflicts": 0,
+      "shared_prompts": 8279
+    }
+  },
+  "files": {
+    "routing_dataset_100k_valid_balanced_equal_levels.jsonl": {
+      "bytes": 45508152,
+      "categories": 29,
+      "conflicting_duplicate_labels": 0,
+      "duplicate_rows": 0,
+      "fields": {
+        "category": 66560,
+        "complexity_audit_confidence": 66560,
+        "complexity_audit_status": 66560,
+        "complexity_audit_suggested_level": 66560,
+        "complexity_level": 66560,
+        "complexity_valid_for_training": 66560,
+        "prompt": 66560,
+        "row_id": 66560
+      },
+      "levels": {
+        "1": 13312,
+        "2": 13312,
+        "3": 13312,
+        "4": 13312,
+        "5": 13312
+      },
+      "mean_audit_confidence": 0.849216,
+      "novel_vs_primary": 0,
+      "overlap_with_primary": 66560,
+      "prompt_characters": {
+        "max": 1524,
+        "median": 418.0,
+        "min": 78,
+        "p95": 739
+      },
+      "rows": 66560,
+      "sha256": "78ec17032a7995f9fa12cd2ebed6e34c3e3ef277f615673b35b5ec93bed05cc1",
+      "statuses": {
+        "appropriate": 33251,
+        "borderline": 33309
+      },
+      "unique_normalized_prompts": 66560
+    },
+    "routing_dataset_100k_valid_only.jsonl": {
+      "bytes": 60228915,
+      "categories": 29,
+      "conflicting_duplicate_labels": 0,
+      "duplicate_rows": 0,
+      "fields": {
+        "category": 86967,
+        "complexity_audit_confidence": 86967,
+        "complexity_audit_status": 86967,
+        "complexity_audit_suggested_level": 86967,
+        "complexity_level": 86967,
+        "complexity_valid_for_training": 86967,
+        "prompt": 86967,
+        "row_id": 86967
+      },
+      "levels": {
+        "1": 13312,
+        "2": 16043,
+        "3": 19023,
+        "4": 19931,
+        "5": 18658
+      },
+      "mean_audit_confidence": 0.851943,
+      "novel_vs_primary": 0,
+      "overlap_with_primary": 86967,
+      "prompt_characters": {
+        "max": 1524,
+        "median": 428,
+        "min": 78,
+        "p95": 747
+      },
+      "rows": 86967,
+      "sha256": "bca11574006fac48d17f1efb67cd471822911e366b9a580755b68964499aa30e",
+      "statuses": {
+        "appropriate": 44208,
+        "borderline": 42759
+      },
+      "unique_normalized_prompts": 86967
+    },
+    "routing_dataset_multiturn.jsonl": {
+      "bytes": 3934038,
+      "categories": 29,
+      "conflicting_duplicate_labels": 0,
+      "duplicate_rows": 2,
+      "fields": {
+        "category": 8284,
+        "complexity_level": 8284,
+        "prompt": 8284
+      },
+      "levels": {
+        "1": 1612,
+        "2": 1642,
+        "3": 1674,
+        "4": 1695,
+        "5": 1661
+      },
+      "mean_audit_confidence": null,
+      "novel_vs_primary": 455,
+      "overlap_with_primary": 7827,
+      "prompt_characters": {
+        "max": 1463,
+        "median": 380.5,
+        "min": 78,
+        "p95": 698
+      },
+      "rows": 8284,
+      "sha256": "880782984f55d875480b4868b0cdd8d7099de89c543b9d9d5c16c9410c5e518d",
+      "statuses": {
+        "missing": 8284
+      },
+      "unique_normalized_prompts": 8282
+    },
+    "routing_dataset_multiturn_100k.jsonl": {
+      "bytes": 3934038,
+      "categories": 29,
+      "conflicting_duplicate_labels": 0,
+      "duplicate_rows": 2,
+      "fields": {
+        "category": 8284,
+        "complexity_level": 8284,
+        "prompt": 8284
+      },
+      "levels": {
+        "1": 1612,
+        "2": 1642,
+        "3": 1674,
+        "4": 1695,
+        "5": 1661
+      },
+      "mean_audit_confidence": null,
+      "novel_vs_primary": 455,
+      "overlap_with_primary": 7827,
+      "prompt_characters": {
+        "max": 1463,
+        "median": 380.5,
+        "min": 78,
+        "p95": 698
+      },
+      "rows": 8284,
+      "sha256": "880782984f55d875480b4868b0cdd8d7099de89c543b9d9d5c16c9410c5e518d",
+      "statuses": {
+        "missing": 8284
+      },
+      "unique_normalized_prompts": 8282
+    },
+    "routing_dataset_multiturn_with_models.jsonl": {
+      "bytes": 5722368,
+      "categories": 29,
+      "conflicting_duplicate_labels": 0,
+      "duplicate_rows": 2,
+      "fields": {
+        "category": 8284,
+        "complexity_level": 8284,
+        "prompt": 8284,
+        "recommended_model": 8284,
+        "routing_reason": 8284,
+        "routing_tier": 8284,
+        "rubric_version": 8284
+      },
+      "levels": {
+        "1": 1612,
+        "2": 1642,
+        "3": 1674,
+        "4": 1695,
+        "5": 1661
+      },
+      "mean_audit_confidence": null,
+      "novel_vs_primary": 455,
+      "overlap_with_primary": 7827,
+      "prompt_characters": {
+        "max": 1463,
+        "median": 380.5,
+        "min": 78,
+        "p95": 698
+      },
+      "rows": 8284,
+      "sha256": "71c9b9c521a12fbf7675430f938b9559eb6a1a40e96762a16f99b72b6c08fddd",
+      "statuses": {
+        "missing": 8284
+      },
+      "unique_normalized_prompts": 8282
+    },
+    "routing_dataset_openai_backoff_test.jsonl": {
+      "bytes": 6034862,
+      "categories": 29,
+      "conflicting_duplicate_labels": 0,
+      "duplicate_rows": 2,
+      "fields": {
+        "category": 8281,
+        "complexity_level": 8281,
+        "generation_source": 8281,
+        "prompt": 8281,
+        "recommended_model": 8281,
+        "routing_reason": 8281,
+        "routing_tier": 8281,
+        "rubric_version": 8281
+      },
+      "levels": {
+        "1": 1612,
+        "2": 1642,
+        "3": 1673,
+        "4": 1694,
+        "5": 1660
+      },
+      "mean_audit_confidence": null,
+      "novel_vs_primary": 455,
+      "overlap_with_primary": 7824,
+      "prompt_characters": {
+        "max": 1463,
+        "median": 380,
+        "min": 78,
+        "p95": 698
+      },
+      "rows": 8281,
+      "sha256": "1aa3f009caaa72d14ee8b293c9328e443af84d8a126ff968396566dc40197f00",
+      "statuses": {
+        "missing": 8281
+      },
+      "unique_normalized_prompts": 8279
+    }
+  },
+  "generated_at": "2026-08-20T09:56:44.515923+00:00",
+  "limitations": [
+    "This audit measures data structure, overlap, and labels, not response quality.",
+    "The smaller multi-turn family shares its synthetic generation process with the primary dataset.",
+    "Audit suggestions indicate ambiguity; they are not independent human labels."
+  ],
+  "multiturn_family": {
+    "independent_sources": 1,
+    "interpretation": "The files are metadata/schema variants of one prompt family and must not be counted as independent datasets.",
+    "intersection_unique_prompts": 8279,
+    "label_conflicts": 0,
+    "novel_union_vs_primary": 455,
+    "union_unique_prompts": 8282
+  },
+  "primary_audit_annotations": {
+    "borderline_with_adjacent_suggestion": 42759,
+    "status_assigned_suggested": {
+      "appropriate:1->1": 5443,
+      "appropriate:2->2": 5997,
+      "appropriate:3->3": 8991,
+      "appropriate:4->4": 10739,
+      "appropriate:5->5": 13038,
+      "borderline:1->2": 7869,
+      "borderline:2->1": 606,
+      "borderline:2->3": 9440,
+      "borderline:3->2": 1663,
+      "borderline:3->4": 8369,
+      "borderline:4->3": 3873,
+      "borderline:4->5": 5319,
+      "borderline:5->4": 5620
+    }
+  },
+  "privacy": "Aggregate counts and hashes only; no prompt text is emitted.",
+  "schema_version": "model-router-datagen-audit-v1"
+}
