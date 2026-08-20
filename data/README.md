@@ -17,9 +17,9 @@ The optional contextual slice was:
 
 The equal-level file, `routing_dataset_100k_valid_balanced_equal_levels.jsonl`, was trained as a controlled challenger. It contains 66,560 rows. It was not selected because it performed worse than the full audited model on both the common primary test set and the same 455-row novel multi-turn slice. Results are recorded in `reports/experiments/champion_selection.md`.
 
-Other supplied files were treated as source/audit variants rather than independent test evidence. They were not combined blindly because overlapping generated prompts would leak near-identical examples between training and evaluation.
+Other supplied files were treated as source/audit variants rather than independent test evidence. The prompt-free aggregate audit in `reports/dataset_audit.*` confirms that the four multi-turn files are one 8,282-prompt metadata family, not four independent sources. They were not combined blindly because overlapping generated prompts would leak near-identical examples between training and evaluation.
 
-The promoted model adds one deterministic, half-weight prompt-envelope view for
+The promoted model adds two deterministic, half-weight prompt-envelope views for
 each train-split row. These views are produced in memory and are not published as
 training data. Validation, test, and external rows remain unmodified. The public
 `metamorphic_routing_cases.jsonl` file contains only generated regression cases

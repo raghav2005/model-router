@@ -151,9 +151,10 @@ prototype.
 
 The OpenAI family is an initial controlled candidate, not a permanent provider decision. Before multi-provider routing, benchmark approved Anthropic, Google, NVIDIA NIM, or self-hosted candidates under identical prompts, validators, reasoning budgets, and concurrency. Include contractual data retention, regional availability, quotas, support, deprecation policy, and incident history in the selection—not only token price.
 
-The augmentation-trained multi-view classifier improves internal accuracy to 91.57%
-and internal tier under-routing to 3.13%, but the non-overlapping multi-turn slice
-remains at 57.80% exact accuracy and 18.02% tier under-routing. Better calibration loss on
-that external slice does not remove this generalisation failure. The next research
+The v3 augmentation-trained multi-view classifier improves internal accuracy to
+91.95% and internal tier under-routing to 2.79%, but the non-overlapping multi-turn
+slice remains at 59.12% exact accuracy and 17.36% tier under-routing. Better
+calibration loss on that external slice does not remove this generalisation
+failure. The next research
 priority is therefore real, time- or customer-separated traffic with response-level
 outcomes, not further optimization against the existing synthetic generator.

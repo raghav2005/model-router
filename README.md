@@ -31,23 +31,23 @@ The selected classifier was trained on 86,967 audited examples using a determini
 
 | Evaluation | Exact accuracy | Tier under-route |
 |---|---:|---:|
-| Internal hash-held-out test | 91.57% | 3.13% |
-| Genuinely non-overlapping multi-turn slice | 57.80% | 18.02% |
+| Internal hash-held-out test | 91.95% | 2.79% |
+| Genuinely non-overlapping multi-turn slice | 59.12% | 17.36% |
 
 The multi-turn result is a release blocker. The internal result shows that the model learned the supplied synthetic rubric; it does not demonstrate production generalisation.
 
 The selected model combines complete-conversation and final-turn predictions with
 a validation-selected 0.05 final-turn weight and temperature 4.362. Training-only
 prompt-envelope augmentation improves robustness without changing validation, test,
-or external prompts. The default adaptive end-to-end policy has 2.23% internal tier
-under-routing and an estimated cost 41.73% below the always-capable reference. These
+or external prompts. The default adaptive end-to-end policy has 2.03% internal tier
+under-routing and an estimated cost 41.62% below the always-capable reference. These
 are offline proxies, not measured production savings.
 
-Classifier-only latency on this development machine was 169 µs median, 241 µs p95,
-and 274 µs p99 over 1,000 prompts. This is recorded for regression purposes and
+Classifier-only latency on this development machine was 112 µs median, 160 µs p95,
+and 197 µs p99 over 1,000 prompts. This is recorded for regression purposes and
 does not include Switchyard, network, or model-generation time.
 
-The current test suite contains 79 credential-free tests. Linting, formatting,
+The current test suite contains 82 credential-free tests. Linting, formatting,
 source compilation, CLI operation, wheel packaging, catalogue validation, API
 behaviour, resilience, audit privacy, drift detection, streaming parsing,
 evaluation resumability, adversarial regression, and release gates are covered.
@@ -253,7 +253,7 @@ receive reduced weight. Validation data, rather than the test split, selects the
 full-conversation/final-turn ensemble weight and probability temperature. The same
 validation split selects a candidate adaptive escalation policy under a predeclared
 tier-risk cap; external confirmation is required before adoption. Each train-split
-prompt receives one deterministic, half-weight prompt-envelope augmentation. No
+prompt receives two deterministic, half-weight prompt-envelope augmentations. No
 validation, test, or external prompt is augmented, preventing split leakage.
 
 Reproduce the selected artifact:
@@ -266,14 +266,20 @@ model-router train \
 
 The command writes:
 
-- `model_router/artifacts/complexity_router_v2.npz`;
-- `reports/complexity_router_v2.json`; and
-- `reports/complexity_router_v2.md`.
+- `model_router/artifacts/complexity_router_v3.npz`;
+- `reports/complexity_router_v3.json`; and
+- `reports/complexity_router_v3.md`.
 
-The previous model and equal-level dataset remain challengers. The version-two
-champion improves internal accuracy, macro F1, negative log likelihood, expected
-calibration error, and external negative log likelihood; see
-`reports/experiments/champion_selection_v2.md`.
+The previous models and equal-level dataset remain challengers. The datagen
+re-audit, rejected soft-label experiment, augmentation grid, and v3 promotion are
+documented in `reports/experiments/datagen_reaudit_v3.md`.
+
+Generate a privacy-safe structural audit of the private datagen folder without
+emitting prompt text:
+
+```bash
+model-router dataset-audit /path/to/model-routing-datagen
+```
 
 ## Evaluation
 
@@ -288,17 +294,17 @@ model-router benchmark --iterations 300
 ```
 
 The separate adversarial suite is deterministic and never enters training or the
-independent release gate. It exposed a keyword-driven over-routing pattern; after
-the guarded fix, default-policy exact tier accuracy improved from 47.31% to 77.84%,
-over-routing fell from 45.51% to 14.97%, and all concise-hard/high-stakes cases
-remained on the capable tier. See
+independent release gate. It exposed a keyword-driven over-routing pattern; the
+v3 default retains 2.99% under-routing, and all concise-hard/high-stakes cases
+remain on the capable tier. See
 `reports/experiments/adversarial_regression_v1.md`.
 
 The metamorphic suite applies eight meaning-preserving presentation changes to all
-167 adversarial cases. Five exact application-envelope contracts are normalized;
-three transformations remain unseen robustness checks. On the promoted default
-policy, tier invariance is 88.92%, tier under-routing is 5.16%, and exact tier
-accuracy is 73.35%. These synthetic metrics are a regression gate, never a
+167 adversarial cases. All eight exact, versioned application-envelope contracts
+are normalized before semantic classification while raw tokens remain available
+for cost estimation. On the promoted default policy, tier and model invariance are
+100%, tier under-routing is 2.99%, and exact tier accuracy is 75.45%. These
+synthetic metrics are a regression gate, never a
 substitute for real workload outcomes.
 
 ### Response-level benchmark

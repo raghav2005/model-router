@@ -1,13 +1,18 @@
 # Complexity router artifacts
 
-`complexity_router_v2.npz` is the current default. It is a five-class weighted
+`complexity_router_v3.npz` is the current default. It is a five-class weighted
 multinomial Naive Bayes model trained from the audited
 `routing_dataset_100k_valid_only.jsonl` snapshot.
 
-Artifact SHA-256: `b893eaa86e744e86eb3efa195a9b8fa56cc702286bc1cc78bc294c773375f650`
+Artifact SHA-256: `61723945b1469461e6dc88484c5e2c0d88895501a4c240fc22e42e1e74849d9d`
 
-`complexity_router_v1.npz` is retained as the frozen baseline. Git history and
-`reports/complexity_router_v1.*` preserve its original evidence.
+Training recipe SHA-256: `a73d4d4742623dd8bbb948174e2ed542fad890954a79f1fa550b20f9cd5be7ce`
+
+Training implementation SHA-256: `8b297237157a6f215b4c00296337aa475d372c2d90d5e93e31ae055b120384ef`
+
+V1 and v2 are retained as frozen baselines. Git history and the matching
+`reports/complexity_router_v1.*` and `reports/complexity_router_v2.*` files
+preserve their original evidence.
 
 ## Provenance
 
@@ -21,26 +26,28 @@ Artifact SHA-256: `b893eaa86e744e86eb3efa195a9b8fa56cc702286bc1cc78bc294c773375f
 - Feature dimension: 32,768
 - Audit weighting: `appropriate=1.0`; `borderline=0.65`; multiplied by audit confidence
 - Class prior: uniform
-- Multi-view inference: 90% complete conversation and 10% latest user turn
+- Training-only augmentation: two deterministic meaning-preserving views per row, each at 0.5 weight
+- Multi-view inference: 95% complete conversation and 5% latest user turn
 - Probability calibration: ensemble weight and temperature selected by validation log loss
 - Adaptive policy search: 28 confidence/risk settings evaluated on validation only
 - The validation-selected candidate was rejected for deployment because external confirmation failed
 
 ## Champion evidence
 
-| Measure | v1 | v2 |
+| Measure | v2 | v3 |
 |---|---:|---:|
-| Internal test accuracy | 90.93% | 91.14% |
-| Internal test macro F1 | 0.909 | 0.911 |
-| Internal tier under-route | 3.64% | 3.56% |
-| Internal negative log loss | 0.268 | 0.257 |
-| Novel multi-turn accuracy | 57.14% | 57.14% |
-| Novel multi-turn negative log loss | 1.619 | 1.468 |
+| Internal test accuracy | 91.57% | 91.95% |
+| Internal test macro F1 | 0.915 | 0.919 |
+| Internal tier under-route | 3.13% | 2.79% |
+| Internal negative log loss | 0.244 | 0.236 |
+| Novel multi-turn accuracy | 57.80% | 59.12% |
+| Novel multi-turn tier under-route | 18.02% | 17.36% |
+| Novel multi-turn negative log loss | 1.447 | 1.426 |
 
-V2 was promoted because it improves untouched internal accuracy, tier safety,
-and probabilistic log loss without reducing novel multi-turn accuracy. The
-external calibration error is still poor and the novel slice remains too small;
-the artifact therefore remains shadow-only.
+V3 was selected by validation accuracy, macro F1, under-routing, log loss, and
+calibration error. The held-out internal and novel multi-turn slices then
+confirmed the improvement. The external calibration error is still poor and the
+novel slice remains too small; the artifact therefore remains shadow-only.
 
 ## Intended use
 

@@ -1,5 +1,25 @@
 # Changelog
 
+## 0.8.0 — 2026-08-20
+
+- Added a prompt-free audit command and aggregate report for the private datagen
+  folder. It proves that the smaller multi-turn files are metadata variants of
+  one 8,282-prompt family with only 455 prompts novel to the primary dataset.
+- Tested the 42,759 audit-suggested adjacent labels as soft supervision and
+  rejected the change because validation, held-out, and external results worsened.
+- Selected two half-weight, training-only augmented views using validation
+  metrics and promoted `complexity_router_v3.npz`. Internal accuracy rose from
+  91.57% to 91.95%, while external accuracy rose from 57.80% to 59.12%.
+- Reduced classifier tier under-routing from 3.13% to 2.79% internally and from
+  18.02% to 17.36% on the 455-row external diagnostic slice.
+- Added a training-recipe fingerprint to runtime model identity so artifacts
+  trained on the same source data but with different recipes remain distinguishable.
+- Normalized all eight exact, versioned application envelopes before semantic
+  classification while retaining raw token counts for cost estimation. Tier and
+  model invariance on the 1,336-case metamorphic suite are now 100%.
+- Expanded the credential-free suite to 82 tests and kept enforcement blocked
+  pending representative response-quality, latency, and operational evidence.
+
 ## 0.7.0 — 2026-08-18
 
 - Promoted Switchyard v0.2.0 as an approved, exact dependency and pinned its

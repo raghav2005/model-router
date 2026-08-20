@@ -1,6 +1,6 @@
 # Model router: production-readiness update
 
-**Date:** 18 August 2026
+**Date:** 20 August 2026
 
 **Status:** Deployable for integration and shadow evaluation; blocked from enforced production routing
 
@@ -13,19 +13,22 @@ The first model set is OpenAI GPT-5.6 Luna, Terra, and Sol in efficient, balance
 ## Evidence available now
 
 - 86,967 audited training examples.
-- 91.57% exact accuracy and 3.13% tier under-routing on the internal 8,522-row test set.
-- 57.80% exact accuracy and 18.02% tier under-routing on the 455 genuinely non-overlapping multi-turn examples.
-- Local classifier-only latency over 1,000 prompts: 169 µs median, 241 µs p95,
-  and 274 µs p99. This excludes Switchyard and model-generation latency.
-- 79 passing credential-free tests, plus a native Switchyard runtime/configuration contract in CI.
+- 91.95% exact accuracy and 2.79% tier under-routing on the internal 8,522-row test set.
+- 59.12% exact accuracy and 17.36% tier under-routing on the 455 genuinely non-overlapping multi-turn examples.
+- Local classifier-only latency over 1,000 prompts: 112 µs median, 160 µs p95,
+  and 197 µs p99. This excludes Switchyard and model-generation latency.
+- 82 passing credential-free tests, plus a native Switchyard runtime/configuration contract in CI.
 - A live harness capable of measuring validator outcomes, p50/p95/p99 TTFT and completion latency, token throughput, Wilson confidence intervals, category/use-case/risk/complexity slices, cached tokens, estimated cost, errors, finish reason, and actual response model across repeated trials.
 - A frozen 120-case machine-checkable synthetic live baseline, sufficient to run
   the harness at release-scale sample counts but intentionally not approved as a
   substitute for representative workload evidence.
 - A 167-case adversarial regression suite that found and fixed a major keyword-driven over-routing pattern; it remains separate from release evidence.
-- A 1,336-case metamorphic suite. Default-policy tier invariance improved from
-  65.87% to 88.92%, with 5.16% under-routing after train-only augmentation and
-  exact supported-envelope normalization.
+- A 1,336-case metamorphic suite. Exact normalization of all eight versioned
+  application envelopes raises tier and model invariance to 100%, with 2.99%
+  under-routing.
+- A reproducible prompt-free datagen audit proving that the four multi-turn files
+  are one metadata family, plus a controlled training grid that selected two
+  half-weight train-only augmentations and rejected audit-suggested soft labels.
 - A startup interlock that prevents enforcement from bypassing the release gates.
 - Cryptographic binding between release reports, the exact catalogue, trained artifact, routing policy, and live case set.
 - A validation-only 28-point confidence/risk policy search. Its cheaper candidate was correctly rejected because external multi-turn under-routing worsened from 17.14% to 18.46%.
