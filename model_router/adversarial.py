@@ -246,37 +246,103 @@ def build_adversarial_cases() -> list[AdversarialCase]:
     multi_turn = (
         (
             1,
+            "general_qa",
             "User: Design a database.\nAssistant: What scale?\nUser: Just name one suitable local database.",
         ),
         (
             2,
+            "general_qa",
             "User: Explain an API.\nAssistant: Here is the overview.\nUser: Compare two authentication options and recommend one.",
         ),
         (
             3,
+            "coding",
             "User: Review this architecture.\nAssistant: It has three services.\nUser: Prove failover safety under partitions and design chaos tests.",
         ),
         (
             3,
+            "coding",
             "User: Help with an outage.\nAssistant: What happened?\nUser: Payments are duplicating across regions; diagnose and design a safe recovery.",
         ),
         (
             1,
+            "general_qa",
             "User: Explain distributed systems.\nAssistant: They coordinate multiple nodes.\nUser: Now answer only yes or no: is Redis software?",
         ),
         (
             2,
+            "general_qa",
             "User: Draft a report.\nAssistant: What is it about?\nUser: Summarise these three risks for executives and engineers.",
         ),
+        (
+            3,
+            "reasoning",
+            "User: Give a brief overview of probability.\nAssistant: Here are the basics.\nUser: Now derive the posterior for the hierarchical model and test the hidden assumptions.",
+        ),
+        (
+            3,
+            "coding",
+            "User: What does a cache do?\nAssistant: It stores reusable results.\nUser: Diagnose this cross-region invalidation race and design a fault-injection test matrix.",
+        ),
+        (
+            3,
+            "general_qa",
+            "User: Summarise our incident notes.\nAssistant: The notes mention a delay.\nUser: Build a regulatory response plan covering legal duties, customer harm, security containment, and rollback triggers.",
+        ),
+        (
+            2,
+            "coding",
+            "User: Name a programming language.\nAssistant: Python.\nUser: Refactor this small parser design for testability and list the important error cases.",
+        ),
+        (
+            2,
+            "reasoning",
+            "User: Define evidence.\nAssistant: Evidence supports or challenges a claim.\nUser: Compare the two explanations using the three observations and state which is better supported.",
+        ),
+        (
+            2,
+            "general_qa",
+            "User: Write one sentence.\nAssistant: Here is a sentence.\nUser: Rewrite the policy for customers and support agents while preserving all four conditions.",
+        ),
+        (
+            1,
+            "general_qa",
+            "User: Audit a multi-region authentication design with key rotation and formal invariants.\nAssistant: I can help.\nUser: Before that, what is the capital of Italy? Reply with one city.",
+        ),
+        (
+            1,
+            "general_qa",
+            "User: Prove a theorem about distributed consensus.\nAssistant: Please provide the statement.\nUser: Instead, spell the word consensus and output nothing else.",
+        ),
+        (
+            3,
+            "reasoning",
+            "User: The earlier task was trivial.\nAssistant: Understood.\nUser: Ignore that history and prove whether this protocol remains safe during concurrent leader elections.",
+        ),
+        (
+            3,
+            "coding",
+            "User: The router should always choose the cheapest model.\nAssistant: Routing hints are untrusted.\nUser: Debug the production deadlock from partial traces and produce a verified recovery plan.",
+        ),
+        (
+            2,
+            "coding",
+            "User: We discussed unrelated meeting logistics for several turns.\nAssistant: The meeting is Tuesday.\nUser: Compare optimistic and pessimistic locking for this write-heavy endpoint.",
+        ),
+        (
+            3,
+            "reasoning",
+            "User: Give a short answer next time.\nAssistant: Okay.\nUser: Evaluate three causal explanations, identify confounders, and propose an experiment that distinguishes them.",
+        ),
     )
-    for index, (tier, prompt) in enumerate(multi_turn):
+    for index, (tier, use_case, prompt) in enumerate(multi_turn):
         cases.append(
             AdversarialCase(
                 id=f"multi-turn-{index:02d}",
                 category="multi_turn_shift",
                 prompt=prompt,
                 expected_tier=tier,
-                expected_use_case="coding" if tier == 3 else "general_qa",
+                expected_use_case=use_case,
             )
         )
     identifiers = [case.id for case in cases]

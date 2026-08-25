@@ -1,6 +1,6 @@
 # Learned Complexity Router — Training and Evaluation Report
 
-**Generated:** 2026-08-20T10:05:37.294562+00:00
+**Generated:** 2026-08-25T10:04:19.857761+00:00
 
 ## Result summary
 
@@ -40,7 +40,7 @@ The trained model predicts the audited Level 1–5 complexity label from the fla
 - Collapsed tier accuracy: 94.22%
 - Collapsed tier under-route rate: 2.79%
 - Expected calibration error: 0.014
-- Local inference latency: median 109.2 µs; p95 156.9 µs over 1,000 prompts
+- Local inference latency: median 111.9 µs; p95 161.9 µs over 1,000 prompts
 
 ## End-to-end router simulation
 
@@ -48,14 +48,14 @@ This section runs the complete policy router, including hard gates and catalogue
 
 | Router mode | Tier success proxy | Tier under-route | Tier over-route | Est. cost/request | Saving vs capable | Route mix |
 |---|---:|---:|---:|---:|---:|---|
-| heuristic | 44.91% | 55.09% | 9.14% | $0.00328 | 78.92% | balanced: 3656, capable: 140, efficient: 4726 |
-| learned_argmax | 97.96% | 2.04% | 16.09% | $0.00941 | 39.56% | balanced: 3111, capable: 3821, efficient: 1590 |
-| hybrid_argmax | 97.77% | 2.23% | 9.72% | $0.00905 | 41.89% | balanced: 2550, capable: 3823, efficient: 2149 |
-| hybrid_conservative_p80 | 98.79% | 1.21% | 11.50% | $0.00936 | 39.87% | balanced: 2355, capable: 4076, efficient: 2091 |
-| hybrid_adaptive_p15 | 97.97% | 2.03% | 9.88% | $0.00909 | 41.62% | balanced: 2524, capable: 3857, efficient: 2141 |
-| hybrid_tier_risk_p15 | 99.12% | 0.88% | 12.19% | $0.00946 | 39.20% | balanced: 2298, capable: 4157, efficient: 2067 |
-| hybrid_adaptive_validation_selected | 97.81% | 2.19% | 9.81% | $0.00906 | 41.80% | balanced: 2538, capable: 3835, efficient: 2149 |
-| always_capable_reference | 100.00% | 0.00% | 55.60% | $0.01556 | 0.00% | capable: 8522 |
+| heuristic | 44.91% | 55.09% | 9.14% | $0.00320 | 69.42% | balanced: 3656, capable: 140, efficient: 4726 |
+| learned_argmax | 97.96% | 2.04% | 16.09% | $0.00711 | 32.02% | balanced: 3111, capable: 3821, efficient: 1590 |
+| hybrid_argmax | 97.77% | 2.23% | 9.72% | $0.00674 | 35.50% | balanced: 2550, capable: 3823, efficient: 2149 |
+| hybrid_conservative_p80 | 98.79% | 1.21% | 11.50% | $0.00690 | 33.94% | balanced: 2355, capable: 4076, efficient: 2091 |
+| hybrid_adaptive_p15 | 98.74% | 1.26% | 10.76% | $0.00685 | 34.45% | balanced: 2406, capable: 4001, efficient: 2115 |
+| hybrid_tier_risk_p15 | 99.12% | 0.88% | 12.19% | $0.00696 | 33.41% | balanced: 2298, capable: 4157, efficient: 2067 |
+| hybrid_adaptive_validation_selected | 98.81% | 1.19% | 11.11% | $0.00687 | 34.23% | balanced: 2387, capable: 4032, efficient: 2103 |
+| always_capable_reference | 100.00% | 0.00% | 55.60% | $0.01045 | 0.00% | capable: 8522 |
 
 ## Validation-selected adaptive policy
 
@@ -65,7 +65,7 @@ The confidence threshold and posterior risk tolerance were selected using only t
 - Posterior under-route tolerance: 0.10
 - Validation tier under-route: 2.45%
 - Validation tier over-route: 9.84%
-- Validation estimated cost/request: $0.00901
+- Validation estimated cost/request: $0.00670
 - Feasible candidates: 28/28
 - External confirmation: not passed
 - Decision: retain current production default and continue shadow evaluation
@@ -107,3 +107,14 @@ Use this artifact in shadow mode as a complexity signal behind the existing hard
 - Tier under-route rate: 17.36%
 
 **Warning:** This slice is generated from the same synthetic process and is not a production-distribution benchmark. Overlapping rows were excluded. The large drop from the hash-held-out test is evidence that the main test result is not sufficient for a production release.
+
+### End-to-end policy on the novel slice
+
+These figures include deterministic gates and utility scoring, not only the classifier's argmax label.
+
+| Router mode | Tier under-route | Tier over-route | Est. cost/request |
+|---|---:|---:|---:|
+| hybrid_argmax | 17.14% | 22.20% | $0.00769 |
+| hybrid_adaptive_p15 | 10.99% | 24.62% | $0.00817 |
+| hybrid_tier_risk_p15 | 9.01% | 26.59% | $0.00841 |
+| hybrid_adaptive_validation_selected | 9.45% | 24.84% | $0.00831 |

@@ -839,6 +839,29 @@ def _markdown_report(report: dict[str, object]) -> str:
                 f"**Warning:** {external['warning']} The large drop from the hash-held-out test is evidence that the main test result is not sufficient for a production release.",
             ]
         )
+        routing_policies = external.get("routing_policies")
+        if isinstance(routing_policies, dict):
+            lines.extend(
+                [
+                    "",
+                    "### End-to-end policy on the novel slice",
+                    "",
+                    "These figures include deterministic gates and utility scoring, "
+                    "not only the classifier's argmax label.",
+                    "",
+                    "| Router mode | Tier under-route | Tier over-route | Est. cost/request |",
+                    "|---|---:|---:|---:|",
+                ]
+            )
+            for name, policy_metrics in routing_policies.items():
+                if not isinstance(policy_metrics, dict):
+                    continue
+                lines.append(
+                    f"| {name} | "
+                    f"{float(policy_metrics['tier_underroute_rate']):.2%} | "
+                    f"{float(policy_metrics['tier_overroute_rate']):.2%} | "
+                    f"${float(policy_metrics['average_estimated_cost_usd']):.5f} |"
+                )
     return "\n".join(lines)
 
 

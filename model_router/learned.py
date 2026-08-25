@@ -71,6 +71,9 @@ class ComplexityPrediction:
     decision_policy: str
     minimum_tier: int
     tier_underroute_probability: float
+    full_view_tier: int
+    final_view_tier: int
+    view_tier_disagreement: bool
 
     def as_dict(self) -> dict[str, object]:
         return {
@@ -85,6 +88,9 @@ class ComplexityPrediction:
             "decision_policy": self.decision_policy,
             "minimum_tier": self.minimum_tier,
             "tier_underroute_probability": round(self.tier_underroute_probability, 5),
+            "full_view_tier": self.full_view_tier,
+            "final_view_tier": self.final_view_tier,
+            "view_tier_disagreement": self.view_tier_disagreement,
         }
 
 
@@ -194,14 +200,33 @@ class NaiveBayesComplexityModel:
         return self.log_class_prior + feature_scores
 
     def probabilities(self, prompt: str) -> np.ndarray:
-        probabilities = self._probabilities_for_view(prompt)
+        probabilities, _, _, _ = self.view_probabilities(prompt)
+        return probabilities
+
+    def view_probabilities(
+        self, prompt: str
+    ) -> tuple[np.ndarray, np.ndarray, np.ndarray, bool]:
+        """Return ensemble and component probabilities for routing diagnostics."""
+        full_probabilities = self._probabilities_for_view(prompt)
         latest = final_user_turn(prompt)
-        if self.final_turn_weight and latest != prompt:
-            latest_probabilities = self._probabilities_for_view(latest)
+        has_distinct_final_turn = latest != prompt
+        latest_probabilities = (
+            self._probabilities_for_view(latest)
+            if has_distinct_final_turn
+            else full_probabilities
+        )
+        probabilities = full_probabilities
+        if self.final_turn_weight and has_distinct_final_turn:
             probabilities = (
                 1.0 - self.final_turn_weight
-            ) * probabilities + self.final_turn_weight * latest_probabilities
-        return probabilities / probabilities.sum()
+            ) * full_probabilities + self.final_turn_weight * latest_probabilities
+        probabilities = probabilities / probabilities.sum()
+        return (
+            probabilities,
+            full_probabilities,
+            latest_probabilities,
+            has_distinct_final_turn,
+        )
 
     def _probabilities_for_view(self, prompt: str) -> np.ndarray:
         scores = self.raw_scores(prompt) / self.temperature
@@ -216,8 +241,18 @@ class NaiveBayesComplexityModel:
         decision_policy: DecisionPolicy = "argmax",
         underroute_tolerance: float = 0.20,
     ) -> ComplexityPrediction:
-        probabilities = self.probabilities(prompt)
+        (
+            probabilities,
+            full_probabilities,
+            final_probabilities,
+            has_distinct_final_turn,
+        ) = self.view_probabilities(prompt)
         expected_level = float(np.dot(probabilities, np.arange(1, 6, dtype=np.float64)))
+        full_view_tier = level_to_tier(int(np.argmax(full_probabilities)) + 1)
+        final_view_tier = level_to_tier(int(np.argmax(final_probabilities)) + 1)
+        view_tier_disagreement = (
+            has_distinct_final_turn and full_view_tier != final_view_tier
+        )
 
         if decision_policy == "argmax":
             level = int(np.argmax(probabilities)) + 1
@@ -265,6 +300,9 @@ class NaiveBayesComplexityModel:
             decision_policy=decision_policy,
             minimum_tier=minimum_tier,
             tier_underroute_probability=underroute_probability,
+            full_view_tier=full_view_tier,
+            final_view_tier=final_view_tier,
+            view_tier_disagreement=view_tier_disagreement,
         )
 
     def save(self, path: str | Path) -> None:

@@ -2,7 +2,7 @@
   "adaptive_policy_tuning": {
     "candidates": [
       {
-        "average_estimated_cost_usd": 0.0090149,
+        "average_estimated_cost_usd": 0.00670248,
         "confidence_threshold": 0.3,
         "count": 8604,
         "route_counts": {
@@ -16,7 +16,7 @@
         "underroute_tolerance": 0.05
       },
       {
-        "average_estimated_cost_usd": 0.00901382,
+        "average_estimated_cost_usd": 0.00670199,
         "confidence_threshold": 0.3,
         "count": 8604,
         "route_counts": {
@@ -30,7 +30,7 @@
         "underroute_tolerance": 0.1
       },
       {
-        "average_estimated_cost_usd": 0.00901382,
+        "average_estimated_cost_usd": 0.00670199,
         "confidence_threshold": 0.3,
         "count": 8604,
         "route_counts": {
@@ -44,7 +44,7 @@
         "underroute_tolerance": 0.15
       },
       {
-        "average_estimated_cost_usd": 0.00901382,
+        "average_estimated_cost_usd": 0.00670199,
         "confidence_threshold": 0.3,
         "count": 8604,
         "route_counts": {
@@ -58,7 +58,7 @@
         "underroute_tolerance": 0.2
       },
       {
-        "average_estimated_cost_usd": 0.00902028,
+        "average_estimated_cost_usd": 0.0067049,
         "confidence_threshold": 0.35,
         "count": 8604,
         "route_counts": {
@@ -72,7 +72,7 @@
         "underroute_tolerance": 0.05
       },
       {
-        "average_estimated_cost_usd": 0.0090192,
+        "average_estimated_cost_usd": 0.00670442,
         "confidence_threshold": 0.35,
         "count": 8604,
         "route_counts": {
@@ -86,7 +86,7 @@
         "underroute_tolerance": 0.1
       },
       {
-        "average_estimated_cost_usd": 0.0090192,
+        "average_estimated_cost_usd": 0.00670442,
         "confidence_threshold": 0.35,
         "count": 8604,
         "route_counts": {
@@ -100,7 +100,7 @@
         "underroute_tolerance": 0.15
       },
       {
-        "average_estimated_cost_usd": 0.0090192,
+        "average_estimated_cost_usd": 0.00670442,
         "confidence_threshold": 0.35,
         "count": 8604,
         "route_counts": {
@@ -114,7 +114,7 @@
         "underroute_tolerance": 0.2
       },
       {
-        "average_estimated_cost_usd": 0.00903492,
+        "average_estimated_cost_usd": 0.00671185,
         "confidence_threshold": 0.4,
         "count": 8604,
         "route_counts": {
@@ -128,7 +128,7 @@
         "underroute_tolerance": 0.05
       },
       {
-        "average_estimated_cost_usd": 0.00903384,
+        "average_estimated_cost_usd": 0.00671137,
         "confidence_threshold": 0.4,
         "count": 8604,
         "route_counts": {
@@ -142,7 +142,7 @@
         "underroute_tolerance": 0.1
       },
       {
-        "average_estimated_cost_usd": 0.00903384,
+        "average_estimated_cost_usd": 0.00671137,
         "confidence_threshold": 0.4,
         "count": 8604,
         "route_counts": {
@@ -156,7 +156,7 @@
         "underroute_tolerance": 0.15
       },
       {
-        "average_estimated_cost_usd": 0.00903384,
+        "average_estimated_cost_usd": 0.00671137,
         "confidence_threshold": 0.4,
         "count": 8604,
         "route_counts": {
@@ -170,7 +170,7 @@
         "underroute_tolerance": 0.2
       },
       {
-        "average_estimated_cost_usd": 0.00905353,
+        "average_estimated_cost_usd": 0.00672274,
         "confidence_threshold": 0.45,
         "count": 8604,
         "route_counts": {
@@ -184,7 +184,7 @@
         "underroute_tolerance": 0.05
       },
       {
-        "average_estimated_cost_usd": 0.00905138,
+        "average_estimated_cost_usd": 0.00672177,
         "confidence_threshold": 0.45,
         "count": 8604,
         "route_counts": {
@@ -198,7 +198,7 @@
         "underroute_tolerance": 0.1
       },
       {
-        "average_estimated_cost_usd": 0.00905138,
+        "average_estimated_cost_usd": 0.00672177,
         "confidence_threshold": 0.45,
         "count": 8604,
         "route_counts": {
@@ -212,7 +212,7 @@
         "underroute_tolerance": 0.15
       },
       {
-        "average_estimated_cost_usd": 0.00905074,
+        "average_estimated_cost_usd": 0.00672113,
         "confidence_threshold": 0.45,
         "count": 8604,
         "route_counts": {
@@ -226,7 +226,7 @@
         "underroute_tolerance": 0.2
       },
       {
-        "average_estimated_cost_usd": 0.00910414,
+        "average_estimated_cost_usd": 0.00675086,
         "confidence_threshold": 0.5,
         "count": 8604,
         "route_counts": {
@@ -240,7 +240,7 @@
         "underroute_tolerance": 0.05
       },
       {
-        "average_estimated_cost_usd": 0.00909599,
+        "average_estimated_cost_usd": 0.00674684,
         "confidence_threshold": 0.5,
         "count": 8604,
         "route_counts": {
@@ -254,7 +254,7 @@
         "underroute_tolerance": 0.1
       },
       {
-        "average_estimated_cost_usd": 0.00909342,
+        "average_estimated_cost_usd": 0.00674427,
         "confidence_threshold": 0.5,
         "count": 8604,
         "route_counts": {
@@ -268,7 +268,7 @@
         "underroute_tolerance": 0.15
       },
       {
-        "average_estimated_cost_usd": 0.00908977,
+        "average_estimated_cost_usd": 0.00674121,
         "confidence_threshold": 0.5,
         "count": 8604,
         "route_counts": {
@@ -282,7 +282,7 @@
         "underroute_tolerance": 0.2
       },
       {
-        "average_estimated_cost_usd": 0.00916034,
+        "average_estimated_cost_usd": 0.00678222,
         "confidence_threshold": 0.55,
         "count": 8604,
         "route_counts": {
@@ -296,7 +296,7 @@
         "underroute_tolerance": 0.05
       },
       {
-        "average_estimated_cost_usd": 0.00914275,
+        "average_estimated_cost_usd": 0.00677288,
         "confidence_threshold": 0.55,
         "count": 8604,
         "route_counts": {
@@ -310,7 +310,7 @@
         "underroute_tolerance": 0.1
       },
       {
-        "average_estimated_cost_usd": 0.00913439,
+        "average_estimated_cost_usd": 0.00676629,
         "confidence_threshold": 0.55,
         "count": 8604,
         "route_counts": {
@@ -324,7 +324,7 @@
         "underroute_tolerance": 0.15
       },
       {
-        "average_estimated_cost_usd": 0.00912513,
+        "average_estimated_cost_usd": 0.00675999,
         "confidence_threshold": 0.55,
         "count": 8604,
         "route_counts": {
@@ -338,7 +338,7 @@
         "underroute_tolerance": 0.2
       },
       {
-        "average_estimated_cost_usd": 0.00921528,
+        "average_estimated_cost_usd": 0.00681229,
         "confidence_threshold": 0.6,
         "count": 8604,
         "route_counts": {
@@ -352,7 +352,7 @@
         "underroute_tolerance": 0.05
       },
       {
-        "average_estimated_cost_usd": 0.00918716,
+        "average_estimated_cost_usd": 0.00679539,
         "confidence_threshold": 0.6,
         "count": 8604,
         "route_counts": {
@@ -366,7 +366,7 @@
         "underroute_tolerance": 0.1
       },
       {
-        "average_estimated_cost_usd": 0.00917666,
+        "average_estimated_cost_usd": 0.00678784,
         "confidence_threshold": 0.6,
         "count": 8604,
         "route_counts": {
@@ -380,7 +380,7 @@
         "underroute_tolerance": 0.15
       },
       {
-        "average_estimated_cost_usd": 0.00916418,
+        "average_estimated_cost_usd": 0.00678009,
         "confidence_threshold": 0.6,
         "count": 8604,
         "route_counts": {
@@ -396,19 +396,19 @@
     ],
     "external_confirmation": {
       "decision": "retain current production default and continue shadow evaluation",
-      "default_tier_underroute_rate": 0.149451,
+      "default_tier_underroute_rate": 0.10989,
       "examples": 455,
       "maximum_tier_underroute_rate": 0.05,
       "minimum_examples": 1000,
       "passed": false,
-      "selected_tier_underroute_rate": 0.171429
+      "selected_tier_underroute_rate": 0.094505
     },
     "feasible_candidates": 28,
     "maximum_tier_underroute_rate": 0.03,
     "note": "The selected settings must first pass held-out and external prompt-distribution checks, then response-level evaluation before enforcement.",
     "objective": "minimise estimated cost subject to tier under-route risk cap",
     "selected": {
-      "average_estimated_cost_usd": 0.00901382,
+      "average_estimated_cost_usd": 0.00670199,
       "confidence_threshold": 0.3,
       "count": 8604,
       "route_counts": {
@@ -473,15 +473,15 @@
   },
   "evaluation": {
     "classifier_latency_us": {
-      "median_us": 109.188,
+      "median_us": 111.874,
       "note": "Single-process local measurement; rerun in the deployment environment.",
-      "p95_us": 156.917,
-      "p99_us": 177.958,
+      "p95_us": 161.917,
+      "p99_us": 187.458,
       "samples": 1000
     },
     "end_to_end_router": {
       "always_capable_reference": {
-        "average_estimated_cost_usd": 0.01556493,
+        "average_estimated_cost_usd": 0.01045195,
         "average_latency_prior_ms": 2600,
         "count": 8522,
         "estimated_cost_saving_vs_always_capable": 0.0,
@@ -494,10 +494,10 @@
         "tier_underroute_rate": 0.0
       },
       "heuristic": {
-        "average_estimated_cost_usd": 0.0032806,
+        "average_estimated_cost_usd": 0.00319604,
         "average_latency_prior_ms": 1129.876,
         "count": 8522,
-        "estimated_cost_saving_vs_always_capable": 0.789231,
+        "estimated_cost_saving_vs_always_capable": 0.694216,
         "route_counts": {
           "balanced": 3656,
           "capable": 140,
@@ -509,40 +509,40 @@
         "tier_underroute_rate": 0.550927
       },
       "hybrid_adaptive_p15": {
-        "average_estimated_cost_usd": 0.00908739,
-        "average_latency_prior_ms": 1821.99,
+        "average_estimated_cost_usd": 0.00685175,
+        "average_latency_prior_ms": 1842.713,
         "count": 8522,
-        "estimated_cost_saving_vs_always_capable": 0.416163,
+        "estimated_cost_saving_vs_always_capable": 0.344452,
         "route_counts": {
-          "balanced": 2524,
-          "capable": 3857,
-          "efficient": 2141
+          "balanced": 2406,
+          "capable": 4001,
+          "efficient": 2115
         },
         "route_errors": 0,
-        "tier_overroute_rate": 0.098803,
-        "tier_success_proxy": 0.9797,
-        "tier_underroute_rate": 0.0203
+        "tier_overroute_rate": 0.107604,
+        "tier_success_proxy": 0.987444,
+        "tier_underroute_rate": 0.012556
       },
       "hybrid_adaptive_validation_selected": {
-        "average_estimated_cost_usd": 0.00905823,
-        "average_latency_prior_ms": 1818.493,
+        "average_estimated_cost_usd": 0.00687473,
+        "average_latency_prior_ms": 1847.7,
         "count": 8522,
-        "estimated_cost_saving_vs_always_capable": 0.418036,
+        "estimated_cost_saving_vs_always_capable": 0.342254,
         "route_counts": {
-          "balanced": 2538,
-          "capable": 3835,
-          "efficient": 2149
+          "balanced": 2387,
+          "capable": 4032,
+          "efficient": 2103
         },
         "route_errors": 0,
-        "tier_overroute_rate": 0.098099,
-        "tier_success_proxy": 0.978057,
-        "tier_underroute_rate": 0.021943
+        "tier_overroute_rate": 0.111124,
+        "tier_success_proxy": 0.988148,
+        "tier_underroute_rate": 0.011852
       },
       "hybrid_argmax": {
-        "average_estimated_cost_usd": 0.00904507,
+        "average_estimated_cost_usd": 0.00674169,
         "average_latency_prior_ms": 1816.944,
         "count": 8522,
-        "estimated_cost_saving_vs_always_capable": 0.418881,
+        "estimated_cost_saving_vs_always_capable": 0.354982,
         "route_counts": {
           "balanced": 2550,
           "capable": 3823,
@@ -554,10 +554,10 @@
         "tier_underroute_rate": 0.022295
       },
       "hybrid_conservative_p80": {
-        "average_estimated_cost_usd": 0.00935952,
+        "average_estimated_cost_usd": 0.00690457,
         "average_latency_prior_ms": 1854.365,
         "count": 8522,
-        "estimated_cost_saving_vs_always_capable": 0.398679,
+        "estimated_cost_saving_vs_always_capable": 0.339399,
         "route_counts": {
           "balanced": 2355,
           "capable": 4076,
@@ -569,10 +569,10 @@
         "tier_underroute_rate": 0.012086
       },
       "hybrid_tier_risk_p15": {
-        "average_estimated_cost_usd": 0.00946364,
+        "average_estimated_cost_usd": 0.00696018,
         "average_latency_prior_ms": 1866.792,
         "count": 8522,
-        "estimated_cost_saving_vs_always_capable": 0.39199,
+        "estimated_cost_saving_vs_always_capable": 0.334078,
         "route_counts": {
           "balanced": 2298,
           "capable": 4157,
@@ -584,10 +584,10 @@
         "tier_underroute_rate": 0.008801
       },
       "learned_argmax": {
-        "average_estimated_cost_usd": 0.0094077,
+        "average_estimated_cost_usd": 0.00710553,
         "average_latency_prior_ms": 1862.603,
         "count": 8522,
-        "estimated_cost_saving_vs_always_capable": 0.395584,
+        "estimated_cost_saving_vs_always_capable": 0.320172,
         "route_counts": {
           "balanced": 3111,
           "capable": 3821,
@@ -4198,23 +4198,23 @@
     "overlap_with_primary_dataset": 7829,
     "routing_policies": {
       "hybrid_adaptive_p15": {
-        "average_estimated_cost_usd": 0.01063245,
+        "average_estimated_cost_usd": 0.00817235,
         "count": 455,
         "route_errors": 0,
-        "tier_accuracy": 0.624176,
-        "tier_overroute_rate": 0.226374,
-        "tier_underroute_rate": 0.149451
+        "tier_accuracy": 0.643956,
+        "tier_overroute_rate": 0.246154,
+        "tier_underroute_rate": 0.10989
       },
       "hybrid_adaptive_validation_selected": {
-        "average_estimated_cost_usd": 0.01037379,
+        "average_estimated_cost_usd": 0.00831349,
         "count": 455,
         "route_errors": 0,
-        "tier_accuracy": 0.606593,
-        "tier_overroute_rate": 0.221978,
-        "tier_underroute_rate": 0.171429
+        "tier_accuracy": 0.657143,
+        "tier_overroute_rate": 0.248352,
+        "tier_underroute_rate": 0.094505
       },
       "hybrid_argmax": {
-        "average_estimated_cost_usd": 0.01037379,
+        "average_estimated_cost_usd": 0.00768997,
         "count": 455,
         "route_errors": 0,
         "tier_accuracy": 0.606593,
@@ -4222,7 +4222,7 @@
         "tier_underroute_rate": 0.171429
       },
       "hybrid_tier_risk_p15": {
-        "average_estimated_cost_usd": 0.01176601,
+        "average_estimated_cost_usd": 0.00841111,
         "count": 455,
         "route_errors": 0,
         "tier_accuracy": 0.643956,
@@ -4234,7 +4234,7 @@
     "source_sha256": "71c9b9c521a12fbf7675430f938b9559eb6a1a40e96762a16f99b72b6c08fddd",
     "warning": "This slice is generated from the same synthetic process and is not a production-distribution benchmark. Overlapping rows were excluded."
   },
-  "generated_at": "2026-08-20T10:05:37.294562+00:00",
+  "generated_at": "2026-08-25T10:04:19.857761+00:00",
   "limitations": [
     "Labels represent synthetic prompt complexity, not measured candidate-model success.",
     "Prompts were generated to fit the label rubric and may contain learnable stylistic cues.",
@@ -4245,13 +4245,13 @@
     "artifact": {
       "file": "complexity_router_v3.npz",
       "schema_version": "complexity-router-nb-v2",
-      "sha256": "61723945b1469461e6dc88484c5e2c0d88895501a4c240fc22e42e1e74849d9d"
+      "sha256": "39b8a46f2b88891587ec114e7f58c7cb4a42e8cfcb8c597404a9ea90c4f0191b"
     },
     "catalog": {
       "schema_version": "model-router-catalog-v2",
-      "sha256": "6a4120bf2232c52c34dd4175aab69eabc6b13219194ef5e1972c49db8bb4e7d1"
+      "sha256": "278f1e5f4a38d304abef28ed43d74bdb207aeb3b479c6947a0d2d1d01789f8dd"
     },
-    "routing_policy_version": "hybrid-utility-policy-v4"
+    "routing_policy_version": "hybrid-utility-policy-v5"
   },
   "schema_version": "router-training-report-v2",
   "training": {
@@ -4271,8 +4271,8 @@
     "final_turn_weight": 0.05,
     "smoothing": 1.0,
     "temperature": 4.362030930661031,
-    "training_implementation_sha256": "8b297237157a6f215b4c00296337aa475d372c2d90d5e93e31ae055b120384ef",
-    "training_recipe_sha256": "a73d4d4742623dd8bbb948174e2ed542fad890954a79f1fa550b20f9cd5be7ce",
+    "training_implementation_sha256": "644ccd43e4ffcfd024f7c92ce9c4de06b4b5431767254526776c1e0e05b00c63",
+    "training_recipe_sha256": "b81af54e1cfb0bcce94619217fb36d6dcd1fef50e5a7624d134c6a47cd5bcb77",
     "vectorizer": "stable hashed word unigrams, bigrams, and structural features"
   },
   "validation": {

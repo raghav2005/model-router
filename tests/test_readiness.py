@@ -9,11 +9,12 @@ from pathlib import Path
 
 from model_router.catalog import catalog_sha256, load_catalog_document
 from model_router.readiness import evaluate_release_gates
+from model_router.router import POLICY_VERSION
 
 
 class ReleaseGateTests(unittest.TestCase):
     def test_current_project_is_blocked_from_enforcement(self) -> None:
-        report = evaluate_release_gates(today=date(2026, 8, 11))
+        report = evaluate_release_gates(today=date(2026, 8, 25))
         self.assertFalse(report["ready_for_enforcement"])
         failures = {gate["name"] for gate in report["gates"] if not gate["passed"]}
         self.assertIn("model quality is workload-measured", failures)
@@ -74,7 +75,7 @@ class ReleaseGateTests(unittest.TestCase):
                                 "sha256": catalog_sha256(catalog_path),
                                 "schema_version": catalog["schema_version"],
                             },
-                            "routing_policy_version": "hybrid-utility-policy-v4",
+                            "routing_policy_version": POLICY_VERSION,
                         },
                     }
                 ),
@@ -86,7 +87,7 @@ class ReleaseGateTests(unittest.TestCase):
                 json.dumps(
                     {
                         "schema_version": "model-router-pricing-verification-v1",
-                        "verified_at": "2026-08-17T12:00:00+00:00",
+                        "verified_at": "2026-08-25T12:00:00+00:00",
                         "catalog_sha256": catalog_sha256(catalog_path),
                         "passed": True,
                         "models": [
@@ -139,7 +140,7 @@ class ReleaseGateTests(unittest.TestCase):
                 live_summary_path=live_path,
                 pricing_report_path=pricing_path,
                 artifact_path=artifact_path,
-                today=date(2026, 8, 17),
+                today=date(2026, 8, 25),
             )
         self.assertTrue(report["ready_for_enforcement"])
 
@@ -165,7 +166,7 @@ class ReleaseGateTests(unittest.TestCase):
                                     "schema_version"
                                 ],
                             },
-                            "routing_policy_version": "hybrid-utility-policy-v4",
+                            "routing_policy_version": POLICY_VERSION,
                         },
                     }
                 ),

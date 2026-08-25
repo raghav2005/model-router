@@ -118,6 +118,37 @@ class LearnedRouterTests(unittest.TestCase):
         self.assertIsNotNone(decision.features.classifier_entropy)
         self.assertIsNotNone(decision.features.tier_underroute_probability)
 
+    def test_adaptive_policy_escalates_on_multi_view_tier_disagreement(self) -> None:
+        prompt = (
+            "User: Explain an API.\n"
+            "Assistant: Here is the overview.\n"
+            "User: Compare two authentication options and recommend one."
+        )
+        model = NaiveBayesComplexityModel.load()
+        prediction = model.predict(prompt)
+        self.assertTrue(prediction.view_tier_disagreement)
+        self.assertNotEqual(prediction.full_view_tier, prediction.final_view_tier)
+
+        argmax = ModelRouter.from_artifact(decision_policy="argmax").route(
+            RoutingRequest(prompt)
+        )
+        adaptive = ModelRouter.from_artifact(decision_policy="adaptive").route(
+            RoutingRequest(prompt)
+        )
+        self.assertGreater(
+            adaptive.features.minimum_model_tier,
+            argmax.features.minimum_model_tier,
+        )
+        self.assertEqual(adaptive.features.classifier_full_view_tier, 1)
+        self.assertEqual(adaptive.features.classifier_final_view_tier, 3)
+        self.assertTrue(adaptive.features.classifier_view_tier_disagreement)
+        self.assertTrue(
+            any(
+                "multi-view tier disagreement" in item
+                for item in adaptive.features.signals
+            )
+        )
+
 
 class EvaluationTests(unittest.TestCase):
     def test_borderline_audit_suggestion_can_supply_soft_label_evidence(self) -> None:

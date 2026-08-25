@@ -241,6 +241,11 @@ def classify_request_with_model(
         argmax_prediction = model.predict(semantic_prompt, decision_policy="argmax")
         if heuristic.risk == "high" or request.priority == "quality":
             actual_policy = "tier_risk"
+        elif argmax_prediction.view_tier_disagreement:
+            # A task switch can be hidden by the dominant vocabulary in a longer
+            # conversation. Treat cross-view tier disagreement as uncertainty and
+            # apply the same calibrated posterior-risk guard used for low confidence.
+            actual_policy = "tier_risk"
         elif (
             request.priority == "balanced"
             and argmax_prediction.confidence < adaptive_confidence_threshold
@@ -288,6 +293,12 @@ def classify_request_with_model(
             f"learned complexity level {prediction.level} using {actual_policy}",
             f"learned classifier confidence {prediction.confidence:.2f}",
             f"normalized classifier entropy {prediction.entropy:.2f}",
+            (
+                "multi-view tier disagreement triggered posterior-risk escalation"
+                if decision_policy == "adaptive"
+                and argmax_prediction.view_tier_disagreement
+                else "full-conversation and final-turn tiers agree"
+            ),
             "posterior tier under-route probability "
             f"{prediction.tier_underroute_probability:.3f}",
         ),
@@ -296,5 +307,8 @@ def classify_request_with_model(
         classifier_confidence=prediction.confidence,
         classifier_entropy=prediction.entropy,
         tier_underroute_probability=prediction.tier_underroute_probability,
+        classifier_full_view_tier=prediction.full_view_tier,
+        classifier_final_view_tier=prediction.final_view_tier,
+        classifier_view_tier_disagreement=prediction.view_tier_disagreement,
         level_probabilities=prediction.probabilities,
     )

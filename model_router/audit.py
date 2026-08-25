@@ -59,6 +59,13 @@ class DecisionAuditLogger:
             "tier_underroute_probability": (
                 decision.features.tier_underroute_probability
             ),
+            "classifier_full_view_tier": (decision.features.classifier_full_view_tier),
+            "classifier_final_view_tier": (
+                decision.features.classifier_final_view_tier
+            ),
+            "classifier_view_tier_disagreement": (
+                decision.features.classifier_view_tier_disagreement
+            ),
             "complexity_level": decision.features.complexity_level,
             "use_case": decision.features.use_case,
             "risk": decision.features.risk,
