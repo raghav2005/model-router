@@ -41,9 +41,9 @@ class PricingTests(unittest.TestCase):
     def test_verifier_detects_source_mismatch(self) -> None:
         pages = {
             "gpt-5.6-sol": MODEL_PAGE.replace("terra", "sol")
-            .replace("| Input | $2 |", "| Input | $5 |")
-            .replace("| Cached input | $0.2 |", "| Cached input | $0.5 |")
-            .replace("| Output | $12 |", "| Output | $30 |"),
+            .replace("| Input | $2 |", "| Input | $4 |")
+            .replace("| Cached input | $0.2 |", "| Cached input | $0.4 |")
+            .replace("| Output | $12 |", "| Output | $20 |"),
             "gpt-5.6-terra": MODEL_PAGE,
             "gpt-5.6-luna": MODEL_PAGE.replace("terra", "luna")
             .replace("| Input | $2 |", "| Input | $0.2 |")

@@ -1,6 +1,6 @@
 # Model research and catalogue rationale
 
-**Research date:** 18 August 2026
+**Research date:** 25 August 2026
 
 **Scope:** Initial OpenAI deployment candidate behind NVIDIA NeMo Switchyard
 
@@ -12,7 +12,7 @@ The first controlled deployment uses one model family across three stable routin
 |---|---|---|---:|
 | `efficient` | `gpt-5.6-luna` | High-volume and straightforward work | $0.20 / $1.20 |
 | `balanced` | `gpt-5.6-terra` | Everyday professional work | $2 / $12 |
-| `capable` | `gpt-5.6-sol` | Complex reasoning, coding, and high-risk work | $5 / $30 |
+| `capable` | `gpt-5.6-sol` | Complex reasoning, coding, and high-risk work | $4 / $20 |
 
 Using one provider family simplifies the first evaluation: formats, tool behaviour, context limits, and billing semantics are comparable. A second provider should be added later for resilience, but only after its models have been run through the same response-level benchmark.
 

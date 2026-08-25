@@ -95,7 +95,7 @@ The versioned catalogue uses the current GPT-5.6 family as the first controlled 
 |---|---|---:|---:|---:|
 | `efficient` | `gpt-5.6-luna` | $0.20 / $1.20 | 1.05M | 128K |
 | `balanced` | `gpt-5.6-terra` | $2 / $12 | 1.05M | 128K |
-| `capable` | `gpt-5.6-sol` | $5 / $30 | 1.05M | 128K |
+| `capable` | `gpt-5.6-sol` | $4 / $20 | 1.05M | 128K |
 
 The cost engine includes cached-input rates, cache-write rates, and the published long-context multipliers above 272,000 input tokens. Every price records an official source URL and verification date. `model-router verify-pricing` independently downloads the official model Markdown, compares every billable field and limit, and writes a digest-bound verification report; enforcement rejects stale reports or reports created for another catalogue revision.
 
