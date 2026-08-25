@@ -126,6 +126,9 @@ class RequestFeatures:
     classifier_confidence: float | None = None
     classifier_entropy: float | None = None
     tier_underroute_probability: float | None = None
+    classifier_full_view_tier: int | None = None
+    classifier_final_view_tier: int | None = None
+    classifier_view_tier_disagreement: bool | None = None
     level_probabilities: tuple[float, ...] = ()
 
 
@@ -191,6 +194,13 @@ class RouteDecision:
                     round(self.features.tier_underroute_probability, 5)
                     if self.features.tier_underroute_probability is not None
                     else None
+                ),
+                "classifier_full_view_tier": (self.features.classifier_full_view_tier),
+                "classifier_final_view_tier": (
+                    self.features.classifier_final_view_tier
+                ),
+                "classifier_view_tier_disagreement": (
+                    self.features.classifier_view_tier_disagreement
                 ),
                 "level_probabilities": {
                     str(index + 1): round(probability, 5)

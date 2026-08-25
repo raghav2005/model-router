@@ -33,7 +33,7 @@ class RuntimeConfig:
     max_body_bytes: int = 1_048_576
     fallback_on_error: bool = False
     release_policy_path: str = "config/release_policy.json"
-    training_report_path: str = "reports/complexity_router_v2.json"
+    training_report_path: str = "reports/complexity_router_v3.json"
     live_summary_path: str = "reports/live_eval_summary.json"
     pricing_report_path: str = "reports/pricing_verification.json"
     metamorphic_report_path: str = "reports/metamorphic_routing_eval.json"
@@ -59,7 +59,7 @@ class RuntimeConfig:
                 "MODEL_ROUTER_RELEASE_POLICY", "config/release_policy.json"
             ),
             training_report_path=os.getenv(
-                "MODEL_ROUTER_TRAINING_REPORT", "reports/complexity_router_v2.json"
+                "MODEL_ROUTER_TRAINING_REPORT", "reports/complexity_router_v3.json"
             ),
             live_summary_path=os.getenv(
                 "MODEL_ROUTER_LIVE_SUMMARY", "reports/live_eval_summary.json"

@@ -153,11 +153,12 @@ def classify_request(request: RoutingRequest) -> RequestFeatures:
         signals.append("general question/answer pattern")
 
     input_tokens = request.input_tokens or estimate_tokens(raw_text)
+    semantic_tokens = estimate_tokens(text) if envelope is not None else input_tokens
     complexity = 0.12
-    if input_tokens > 250:
+    if semantic_tokens > 250:
         complexity += 0.12
         signals.append("long prompt")
-    if input_tokens > 1_000:
+    if semantic_tokens > 1_000:
         complexity += 0.13
         signals.append("very long prompt")
     if has_code:
@@ -240,6 +241,11 @@ def classify_request_with_model(
         argmax_prediction = model.predict(semantic_prompt, decision_policy="argmax")
         if heuristic.risk == "high" or request.priority == "quality":
             actual_policy = "tier_risk"
+        elif argmax_prediction.view_tier_disagreement:
+            # A task switch can be hidden by the dominant vocabulary in a longer
+            # conversation. Treat cross-view tier disagreement as uncertainty and
+            # apply the same calibrated posterior-risk guard used for low confidence.
+            actual_policy = "tier_risk"
         elif (
             request.priority == "balanced"
             and argmax_prediction.confidence < adaptive_confidence_threshold
@@ -274,7 +280,8 @@ def classify_request_with_model(
     minimum_tier = 1 if bounded_simple else prediction.minimum_tier
     complexity_level = 1 if bounded_simple else prediction.level
     dataset_hash = str(model.metadata.get("training_dataset_sha256", "unknown"))
-    model_version = f"{MODEL_SCHEMA_VERSION}:{dataset_hash[:12]}"
+    recipe_hash = str(model.metadata.get("training_recipe_sha256", "legacy"))
+    model_version = f"{MODEL_SCHEMA_VERSION}:{dataset_hash[:12]}:{recipe_hash[:12]}"
     return replace(
         heuristic,
         complexity=complexity,
@@ -286,6 +293,12 @@ def classify_request_with_model(
             f"learned complexity level {prediction.level} using {actual_policy}",
             f"learned classifier confidence {prediction.confidence:.2f}",
             f"normalized classifier entropy {prediction.entropy:.2f}",
+            (
+                "multi-view tier disagreement triggered posterior-risk escalation"
+                if decision_policy == "adaptive"
+                and argmax_prediction.view_tier_disagreement
+                else "full-conversation and final-turn tiers agree"
+            ),
             "posterior tier under-route probability "
             f"{prediction.tier_underroute_probability:.3f}",
         ),
@@ -294,5 +307,8 @@ def classify_request_with_model(
         classifier_confidence=prediction.confidence,
         classifier_entropy=prediction.entropy,
         tier_underroute_probability=prediction.tier_underroute_probability,
+        classifier_full_view_tier=prediction.full_view_tier,
+        classifier_final_view_tier=prediction.final_view_tier,
+        classifier_view_tier_disagreement=prediction.view_tier_disagreement,
         level_probabilities=prediction.probabilities,
     )

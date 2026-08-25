@@ -49,7 +49,7 @@ def evaluate_release_gates(
     *,
     policy_path: str | Path = "config/release_policy.json",
     catalog_path: str | Path | None = None,
-    training_report_path: str | Path = "reports/complexity_router_v2.json",
+    training_report_path: str | Path = "reports/complexity_router_v3.json",
     live_summary_path: str | Path = "reports/live_eval_summary.json",
     pricing_report_path: str | Path = "reports/pricing_verification.json",
     metamorphic_report_path: str | Path = "reports/metamorphic_routing_eval.json",

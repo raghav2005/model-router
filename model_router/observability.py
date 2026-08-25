@@ -29,6 +29,7 @@ class RoutingMetrics:
         self._classifier_confidence: Counter[float] = Counter()
         self._classifier_entropy: Counter[float] = Counter()
         self._tier_risk: Counter[float] = Counter()
+        self._view_disagreements: Counter[bool] = Counter()
         self._latencies: dict[str, deque[float]] = defaultdict(
             lambda: deque(maxlen=latency_sample_limit)
         )
@@ -54,6 +55,10 @@ class RoutingMetrics:
                 self._tier_risk,
                 decision.features.tier_underroute_probability,
             )
+            if decision.features.classifier_view_tier_disagreement is not None:
+                self._view_disagreements[
+                    decision.features.classifier_view_tier_disagreement
+                ] += 1
 
     @staticmethod
     def _record_classifier_value(counter: Counter[float], value: float | None) -> None:
@@ -145,6 +150,18 @@ class RoutingMetrics:
                     self._tier_risk,
                 )
             )
+            lines.extend(
+                [
+                    "# HELP model_router_classifier_view_tier_decisions_total "
+                    "Learned decisions grouped by whether conversation views disagree.",
+                    "# TYPE model_router_classifier_view_tier_decisions_total counter",
+                ]
+            )
+            for disagrees, count in sorted(self._view_disagreements.items()):
+                lines.append(
+                    "model_router_classifier_view_tier_decisions_total"
+                    f'{{disagrees="{str(disagrees).lower()}"}} {count}'
+                )
             lines.extend(self._latency_lines())
         return "\n".join(lines) + "\n"
 

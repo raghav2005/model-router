@@ -114,8 +114,13 @@ class OperationsTests(unittest.TestCase):
         self.assertEqual(len(event["prompt_hmac_sha256"]), 64)
 
     def test_metrics_export_is_prometheus_compatible_text(self) -> None:
-        decision = ModelRouter().route(
-            RoutingRequest("What is the capital of Japan?", expected_output_tokens=20)
+        decision = ModelRouter.from_artifact().route(
+            RoutingRequest(
+                "User: Explain an API.\n"
+                "Assistant: Here is the overview.\n"
+                "User: Compare two authentication options and recommend one.",
+                expected_output_tokens=20,
+            )
         )
         metrics = RoutingMetrics()
         metrics.record_decision(decision)
@@ -130,6 +135,10 @@ class OperationsTests(unittest.TestCase):
         self.assertIn("model_router_decisions_total", rendered)
         self.assertIn("model_router_execution_latency_ms_bucket", rendered)
         self.assertIn("model_router_classifier_entropy_bucket", rendered)
+        self.assertIn(
+            'model_router_classifier_view_tier_decisions_total{disagrees="true"} 1',
+            rendered,
+        )
 
     def test_request_provider_allowlist_is_a_hard_gate(self) -> None:
         with self.assertRaises(NoEligibleModel):

@@ -1,6 +1,6 @@
 {
   "schema_version": "model-router-catalog-v2",
-  "as_of": "2026-08-17",
+  "as_of": "2026-08-25",
   "notes": {
     "pricing": "Standard OpenAI API list prices verified from official model pages. Cached-input, cache-write, and long-context prices are represented explicitly.",
     "quality": "The skills fields remain conservative routing priors. Published benchmark results are useful context but are not a substitute for response-level evaluation on the intended workload.",
@@ -39,10 +39,10 @@
       "provider": "openai",
       "provider_model": "gpt-5.6-sol",
       "tier": 3,
-      "input_price_per_million": 5.0,
-      "cached_input_price_per_million": 0.5,
-      "cache_write_price_per_million": 6.25,
-      "output_price_per_million": 30.0,
+      "input_price_per_million": 4.0,
+      "cached_input_price_per_million": 0.4,
+      "cache_write_price_per_million": 5.0,
+      "output_price_per_million": 20.0,
       "long_context_threshold_tokens": 272000,
       "long_context_input_multiplier": 2.0,
       "long_context_output_multiplier": 1.5,
@@ -52,7 +52,7 @@
       "capabilities": ["text", "vision", "tools", "web", "structured_output"],
       "skills": {"general_qa": 0.95, "coding": 0.97, "reasoning": 0.98},
       "pricing_source": "https://developers.openai.com/api/docs/models/gpt-5.6-sol",
-      "pricing_as_of": "2026-08-17",
+      "pricing_as_of": "2026-08-25",
       "quality_evidence": "heuristic_prior_pending_workload_eval",
       "latency_evidence": "unmeasured_bootstrap_prior"
     },
@@ -75,7 +75,7 @@
       "capabilities": ["text", "vision", "tools", "web", "structured_output"],
       "skills": {"general_qa": 0.87, "coding": 0.89, "reasoning": 0.89},
       "pricing_source": "https://developers.openai.com/api/docs/models/gpt-5.6-terra",
-      "pricing_as_of": "2026-08-17",
+      "pricing_as_of": "2026-08-25",
       "quality_evidence": "heuristic_prior_pending_workload_eval",
       "latency_evidence": "unmeasured_bootstrap_prior"
     },
@@ -98,7 +98,7 @@
       "capabilities": ["text", "vision", "tools", "web", "structured_output"],
       "skills": {"general_qa": 0.76, "coding": 0.80, "reasoning": 0.73},
       "pricing_source": "https://developers.openai.com/api/docs/models/gpt-5.6-luna",
-      "pricing_as_of": "2026-08-17",
+      "pricing_as_of": "2026-08-25",
       "quality_evidence": "heuristic_prior_pending_workload_eval",
       "latency_evidence": "unmeasured_bootstrap_prior"
     }

@@ -14,7 +14,12 @@ from model_router.learned import (
     normalize_prompt,
 )
 from model_router.router import ModelRouter
-from model_router.training import split_for_prompt
+from model_router.training import (
+    DatasetRow,
+    TrainingConfig,
+    _label_weights,
+    split_for_prompt,
+)
 from model_router.types import RoutingRequest
 
 
@@ -27,6 +32,8 @@ class LearnedModelTests(unittest.TestCase):
         self.assertTrue(default_artifact_path().exists())
         self.assertEqual(self.model.feature_dimension, 32_768)
         self.assertIn("training_dataset_sha256", self.model.metadata)
+        self.assertIn("training_recipe_sha256", self.model.metadata)
+        self.assertIn("training_implementation_sha256", self.model.metadata)
         self.assertGreater(self.model.final_turn_weight, 0.0)
 
     def test_probabilities_are_normalized(self) -> None:
@@ -111,8 +118,57 @@ class LearnedRouterTests(unittest.TestCase):
         self.assertIsNotNone(decision.features.classifier_entropy)
         self.assertIsNotNone(decision.features.tier_underroute_probability)
 
+    def test_adaptive_policy_escalates_on_multi_view_tier_disagreement(self) -> None:
+        prompt = (
+            "User: Explain an API.\n"
+            "Assistant: Here is the overview.\n"
+            "User: Compare two authentication options and recommend one."
+        )
+        model = NaiveBayesComplexityModel.load()
+        prediction = model.predict(prompt)
+        self.assertTrue(prediction.view_tier_disagreement)
+        self.assertNotEqual(prediction.full_view_tier, prediction.final_view_tier)
+
+        argmax = ModelRouter.from_artifact(decision_policy="argmax").route(
+            RoutingRequest(prompt)
+        )
+        adaptive = ModelRouter.from_artifact(decision_policy="adaptive").route(
+            RoutingRequest(prompt)
+        )
+        self.assertGreater(
+            adaptive.features.minimum_model_tier,
+            argmax.features.minimum_model_tier,
+        )
+        self.assertEqual(adaptive.features.classifier_full_view_tier, 1)
+        self.assertEqual(adaptive.features.classifier_final_view_tier, 3)
+        self.assertTrue(adaptive.features.classifier_view_tier_disagreement)
+        self.assertTrue(
+            any(
+                "multi-view tier disagreement" in item
+                for item in adaptive.features.signals
+            )
+        )
+
 
 class EvaluationTests(unittest.TestCase):
+    def test_borderline_audit_suggestion_can_supply_soft_label_evidence(self) -> None:
+        row = DatasetRow(
+            prompt="Compare both options.",
+            level=2,
+            category="reasoning",
+            status="borderline",
+            confidence=1.0,
+            suggested_level=3,
+            row_id=1,
+        )
+        weights = _label_weights(
+            row,
+            TrainingConfig(borderline_suggested_weight=0.25),
+        )
+        self.assertAlmostEqual(weights[2], 0.4875)
+        self.assertAlmostEqual(weights[3], 0.1625)
+        self.assertAlmostEqual(sum(weights.values()), 0.65)
+
     def test_split_is_whitespace_and_case_stable(self) -> None:
         first = split_for_prompt("User: Explain recursion")
         second = split_for_prompt("  user:   explain RECURSION  ")

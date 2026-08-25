@@ -1,5 +1,5 @@
 {
-  "case_count": 1336,
+  "case_count": 1432,
   "limitations": [
     "Every case is a deterministic transformation of a synthetic design test.",
     "Invariance catches sensitivity to irrelevant presentation changes; it does not prove answer quality.",
@@ -7,1885 +7,2080 @@
   ],
   "policies": {
     "hybrid_adaptive_p15": {
-      "average_estimated_cost_usd": 0.0090038,
-      "comparable_to_baseline": 1336,
-      "count": 1336,
+      "average_estimated_cost_usd": 0.00659594,
+      "comparable_to_baseline": 1432,
+      "count": 1432,
       "failure_examples": [
         {
-          "baseline_tier": 1,
-          "classifier_confidence": 0.40785847636144934,
-          "expected_tier": 1,
-          "expected_use_case": "general_qa",
-          "id": "lexical-trap-00-0--quoted_task",
+          "baseline_tier": 3,
+          "classifier_confidence": 0.3877937281932526,
+          "expected_tier": 2,
+          "expected_use_case": "coding",
+          "id": "medium-00-0--polite_envelope",
           "selected_tier": 3,
           "selected_use_case": "coding",
           "signals": [
+            "normalized supported polite_envelope contract",
             "coding vocabulary or code block",
-            "advanced system-level task",
-            "learned complexity level 5 using tier_risk",
-            "learned classifier confidence 0.41",
-            "normalized classifier entropy 0.91",
-            "posterior tier under-route probability 0.000"
-          ],
-          "source_case_id": "lexical-trap-00-0",
-          "transformation": "quoted_task"
-        },
-        {
-          "baseline_tier": 1,
-          "classifier_confidence": 0.5192045026086085,
-          "expected_tier": 1,
-          "expected_use_case": "general_qa",
-          "id": "lexical-trap-00-0--whitespace_noise",
-          "selected_tier": 3,
-          "selected_use_case": "coding",
-          "signals": [
-            "coding vocabulary or code block",
-            "advanced system-level task",
-            "learned complexity level 5 using argmax",
-            "learned classifier confidence 0.52",
-            "normalized classifier entropy 0.81",
-            "posterior tier under-route probability 0.000"
-          ],
-          "source_case_id": "lexical-trap-00-0",
-          "transformation": "whitespace_noise"
-        },
-        {
-          "baseline_tier": 1,
-          "classifier_confidence": 0.9175134226172758,
-          "expected_tier": 1,
-          "expected_use_case": "general_qa",
-          "id": "lexical-trap-00-1--quoted_task",
-          "selected_tier": 1,
-          "selected_use_case": "coding",
-          "signals": [
-            "coding vocabulary or code block",
-            "advanced system-level task",
-            "learned complexity level 1 using argmax",
-            "learned classifier confidence 0.92",
-            "normalized classifier entropy 0.23",
-            "posterior tier under-route probability 0.037"
-          ],
-          "source_case_id": "lexical-trap-00-1",
-          "transformation": "quoted_task"
-        },
-        {
-          "baseline_tier": 1,
-          "classifier_confidence": 0.8247887106343873,
-          "expected_tier": 1,
-          "expected_use_case": "general_qa",
-          "id": "lexical-trap-00-1--whitespace_noise",
-          "selected_tier": 1,
-          "selected_use_case": "coding",
-          "signals": [
-            "coding vocabulary or code block",
-            "advanced system-level task",
-            "learned complexity level 1 using argmax",
-            "learned classifier confidence 0.82",
-            "normalized classifier entropy 0.43",
-            "posterior tier under-route probability 0.135"
-          ],
-          "source_case_id": "lexical-trap-00-1",
-          "transformation": "whitespace_noise"
-        },
-        {
-          "baseline_tier": 1,
-          "classifier_confidence": 0.8864036463250066,
-          "expected_tier": 1,
-          "expected_use_case": "general_qa",
-          "id": "lexical-trap-00-2--quoted_task",
-          "selected_tier": 1,
-          "selected_use_case": "coding",
-          "signals": [
-            "coding vocabulary or code block",
-            "advanced system-level task",
-            "learned complexity level 1 using argmax",
-            "learned classifier confidence 0.89",
-            "normalized classifier entropy 0.32",
-            "posterior tier under-route probability 0.097"
-          ],
-          "source_case_id": "lexical-trap-00-2",
-          "transformation": "quoted_task"
-        },
-        {
-          "baseline_tier": 1,
-          "classifier_confidence": 0.44524628409597844,
-          "expected_tier": 1,
-          "expected_use_case": "general_qa",
-          "id": "lexical-trap-00-2--whitespace_noise",
-          "selected_tier": 3,
-          "selected_use_case": "coding",
-          "signals": [
-            "coding vocabulary or code block",
-            "advanced system-level task",
-            "learned complexity level 5 using tier_risk",
-            "learned classifier confidence 0.45",
-            "normalized classifier entropy 0.73",
-            "posterior tier under-route probability 0.000"
-          ],
-          "source_case_id": "lexical-trap-00-2",
-          "transformation": "whitespace_noise"
-        },
-        {
-          "baseline_tier": 1,
-          "classifier_confidence": 0.33616514603709613,
-          "expected_tier": 1,
-          "expected_use_case": "general_qa",
-          "id": "lexical-trap-00-3--quoted_task",
-          "selected_tier": 3,
-          "selected_use_case": "coding",
-          "signals": [
-            "coding vocabulary or code block",
-            "advanced system-level task",
-            "learned complexity level 5 using tier_risk",
-            "learned classifier confidence 0.34",
-            "normalized classifier entropy 0.93",
-            "posterior tier under-route probability 0.000"
-          ],
-          "source_case_id": "lexical-trap-00-3",
-          "transformation": "quoted_task"
-        },
-        {
-          "baseline_tier": 1,
-          "classifier_confidence": 0.7040503199834853,
-          "expected_tier": 1,
-          "expected_use_case": "general_qa",
-          "id": "lexical-trap-00-3--whitespace_noise",
-          "selected_tier": 3,
-          "selected_use_case": "coding",
-          "signals": [
-            "coding vocabulary or code block",
-            "advanced system-level task",
-            "learned complexity level 5 using argmax",
-            "learned classifier confidence 0.70",
-            "normalized classifier entropy 0.60",
-            "posterior tier under-route probability 0.000"
-          ],
-          "source_case_id": "lexical-trap-00-3",
-          "transformation": "whitespace_noise"
-        },
-        {
-          "baseline_tier": 1,
-          "classifier_confidence": 0.378136249763745,
-          "expected_tier": 1,
-          "expected_use_case": "general_qa",
-          "id": "lexical-trap-01-0--quoted_task",
-          "selected_tier": 3,
-          "selected_use_case": "general_qa",
-          "signals": [
-            "general question/answer pattern",
-            "advanced system-level task",
-            "learned complexity level 5 using tier_risk",
-            "learned classifier confidence 0.38",
-            "normalized classifier entropy 0.87",
-            "posterior tier under-route probability 0.000"
-          ],
-          "source_case_id": "lexical-trap-01-0",
-          "transformation": "quoted_task"
-        },
-        {
-          "baseline_tier": 1,
-          "classifier_confidence": 0.34722957174539776,
-          "expected_tier": 1,
-          "expected_use_case": "general_qa",
-          "id": "lexical-trap-01-0--whitespace_noise",
-          "selected_tier": 3,
-          "selected_use_case": "general_qa",
-          "signals": [
-            "general question/answer pattern",
-            "advanced system-level task",
-            "learned complexity level 5 using tier_risk",
-            "learned classifier confidence 0.35",
-            "normalized classifier entropy 0.88",
-            "posterior tier under-route probability 0.000"
-          ],
-          "source_case_id": "lexical-trap-01-0",
-          "transformation": "whitespace_noise"
-        },
-        {
-          "baseline_tier": 1,
-          "classifier_confidence": 0.449415918987111,
-          "expected_tier": 1,
-          "expected_use_case": "general_qa",
-          "id": "lexical-trap-01-1--whitespace_noise",
-          "selected_tier": 2,
-          "selected_use_case": "general_qa",
-          "signals": [
-            "general question/answer pattern",
-            "advanced system-level task",
-            "learned complexity level 3 using tier_risk",
-            "learned classifier confidence 0.45",
-            "normalized classifier entropy 0.83",
-            "posterior tier under-route probability 0.102"
-          ],
-          "source_case_id": "lexical-trap-01-1",
-          "transformation": "whitespace_noise"
-        },
-        {
-          "baseline_tier": 1,
-          "classifier_confidence": 0.5192179615947946,
-          "expected_tier": 1,
-          "expected_use_case": "general_qa",
-          "id": "lexical-trap-01-2--whitespace_noise",
-          "selected_tier": 3,
-          "selected_use_case": "general_qa",
-          "signals": [
-            "general question/answer pattern",
-            "advanced system-level task",
-            "learned complexity level 5 using argmax",
-            "learned classifier confidence 0.52",
-            "normalized classifier entropy 0.75",
-            "posterior tier under-route probability 0.000"
-          ],
-          "source_case_id": "lexical-trap-01-2",
-          "transformation": "whitespace_noise"
-        },
-        {
-          "baseline_tier": 1,
-          "classifier_confidence": 0.570308435534607,
-          "expected_tier": 1,
-          "expected_use_case": "general_qa",
-          "id": "lexical-trap-01-3--quoted_task",
-          "selected_tier": 2,
-          "selected_use_case": "general_qa",
-          "signals": [
-            "general question/answer pattern",
-            "advanced system-level task",
-            "learned complexity level 2 using argmax",
-            "learned classifier confidence 0.57",
-            "normalized classifier entropy 0.74",
-            "posterior tier under-route probability 0.232"
-          ],
-          "source_case_id": "lexical-trap-01-3",
-          "transformation": "quoted_task"
-        },
-        {
-          "baseline_tier": 1,
-          "classifier_confidence": 0.4787814371232833,
-          "expected_tier": 1,
-          "expected_use_case": "general_qa",
-          "id": "lexical-trap-01-3--whitespace_noise",
-          "selected_tier": 3,
-          "selected_use_case": "general_qa",
-          "signals": [
-            "general question/answer pattern",
-            "advanced system-level task",
-            "learned complexity level 5 using argmax",
-            "learned classifier confidence 0.48",
-            "normalized classifier entropy 0.76",
-            "posterior tier under-route probability 0.000"
-          ],
-          "source_case_id": "lexical-trap-01-3",
-          "transformation": "whitespace_noise"
-        },
-        {
-          "baseline_tier": 1,
-          "classifier_confidence": 0.6998867081098777,
-          "expected_tier": 1,
-          "expected_use_case": "general_qa",
-          "id": "lexical-trap-02-0--quoted_task",
-          "selected_tier": 1,
-          "selected_use_case": "coding",
-          "signals": [
-            "coding vocabulary or code block",
-            "learned complexity level 1 using argmax",
-            "learned classifier confidence 0.70",
-            "normalized classifier entropy 0.60",
-            "posterior tier under-route probability 0.237"
-          ],
-          "source_case_id": "lexical-trap-02-0",
-          "transformation": "quoted_task"
-        },
-        {
-          "baseline_tier": 1,
-          "classifier_confidence": 0.5239229482450746,
-          "expected_tier": 1,
-          "expected_use_case": "general_qa",
-          "id": "lexical-trap-02-0--whitespace_noise",
-          "selected_tier": 1,
-          "selected_use_case": "coding",
-          "signals": [
-            "coding vocabulary or code block",
-            "learned complexity level 1 using argmax",
-            "learned classifier confidence 0.52",
-            "normalized classifier entropy 0.78",
-            "posterior tier under-route probability 0.433"
-          ],
-          "source_case_id": "lexical-trap-02-0",
-          "transformation": "whitespace_noise"
-        },
-        {
-          "baseline_tier": 1,
-          "classifier_confidence": 0.8799932235268517,
-          "expected_tier": 1,
-          "expected_use_case": "general_qa",
-          "id": "lexical-trap-02-1--quoted_task",
-          "selected_tier": 1,
-          "selected_use_case": "coding",
-          "signals": [
-            "coding vocabulary or code block",
-            "learned complexity level 1 using argmax",
-            "learned classifier confidence 0.88",
-            "normalized classifier entropy 0.28",
-            "posterior tier under-route probability 0.025"
-          ],
-          "source_case_id": "lexical-trap-02-1",
-          "transformation": "quoted_task"
-        },
-        {
-          "baseline_tier": 1,
-          "classifier_confidence": 0.8158992756088201,
-          "expected_tier": 1,
-          "expected_use_case": "general_qa",
-          "id": "lexical-trap-02-1--whitespace_noise",
-          "selected_tier": 1,
-          "selected_use_case": "coding",
-          "signals": [
-            "coding vocabulary or code block",
-            "learned complexity level 1 using argmax",
-            "learned classifier confidence 0.82",
-            "normalized classifier entropy 0.43",
-            "posterior tier under-route probability 0.096"
-          ],
-          "source_case_id": "lexical-trap-02-1",
-          "transformation": "whitespace_noise"
-        },
-        {
-          "baseline_tier": 1,
-          "classifier_confidence": 0.9665907842007228,
-          "expected_tier": 1,
-          "expected_use_case": "general_qa",
-          "id": "lexical-trap-02-2--quoted_task",
-          "selected_tier": 1,
-          "selected_use_case": "coding",
-          "signals": [
-            "coding vocabulary or code block",
-            "learned complexity level 1 using argmax",
-            "learned classifier confidence 0.97",
-            "normalized classifier entropy 0.12",
-            "posterior tier under-route probability 0.019"
-          ],
-          "source_case_id": "lexical-trap-02-2",
-          "transformation": "quoted_task"
-        },
-        {
-          "baseline_tier": 1,
-          "classifier_confidence": 0.7056722042480581,
-          "expected_tier": 1,
-          "expected_use_case": "general_qa",
-          "id": "lexical-trap-02-2--whitespace_noise",
-          "selected_tier": 1,
-          "selected_use_case": "coding",
-          "signals": [
-            "coding vocabulary or code block",
-            "learned complexity level 1 using argmax",
-            "learned classifier confidence 0.71",
-            "normalized classifier entropy 0.57",
-            "posterior tier under-route probability 0.269"
-          ],
-          "source_case_id": "lexical-trap-02-2",
-          "transformation": "whitespace_noise"
-        },
-        {
-          "baseline_tier": 1,
-          "classifier_confidence": 0.47380244624693646,
-          "expected_tier": 1,
-          "expected_use_case": "general_qa",
-          "id": "lexical-trap-02-3--quoted_task",
-          "selected_tier": 1,
-          "selected_use_case": "coding",
-          "signals": [
-            "coding vocabulary or code block",
-            "learned complexity level 2 using argmax",
-            "learned classifier confidence 0.47",
-            "normalized classifier entropy 0.64",
-            "posterior tier under-route probability 0.096"
-          ],
-          "source_case_id": "lexical-trap-02-3",
-          "transformation": "quoted_task"
-        },
-        {
-          "baseline_tier": 1,
-          "classifier_confidence": 0.41020981161746395,
-          "expected_tier": 1,
-          "expected_use_case": "general_qa",
-          "id": "lexical-trap-02-3--whitespace_noise",
-          "selected_tier": 3,
-          "selected_use_case": "coding",
-          "signals": [
-            "coding vocabulary or code block",
-            "learned complexity level 5 using tier_risk",
-            "learned classifier confidence 0.41",
-            "normalized classifier entropy 0.80",
-            "posterior tier under-route probability 0.000"
-          ],
-          "source_case_id": "lexical-trap-02-3",
-          "transformation": "whitespace_noise"
-        },
-        {
-          "baseline_tier": 1,
-          "classifier_confidence": 0.3767475918492846,
-          "expected_tier": 1,
-          "expected_use_case": "general_qa",
-          "id": "lexical-trap-03-0--quoted_task",
-          "selected_tier": 3,
-          "selected_use_case": "general_qa",
-          "signals": [
-            "general question/answer pattern",
-            "advanced system-level task",
-            "high-stakes domain",
-            "learned complexity level 5 using tier_risk",
-            "learned classifier confidence 0.38",
-            "normalized classifier entropy 0.87",
-            "posterior tier under-route probability 0.000"
-          ],
-          "source_case_id": "lexical-trap-03-0",
-          "transformation": "quoted_task"
-        },
-        {
-          "baseline_tier": 1,
-          "classifier_confidence": 0.404951170518894,
-          "expected_tier": 1,
-          "expected_use_case": "general_qa",
-          "id": "lexical-trap-03-0--whitespace_noise",
-          "selected_tier": 3,
-          "selected_use_case": "general_qa",
-          "signals": [
-            "general question/answer pattern",
-            "advanced system-level task",
-            "high-stakes domain",
-            "learned complexity level 5 using tier_risk",
-            "learned classifier confidence 0.40",
-            "normalized classifier entropy 0.89",
-            "posterior tier under-route probability 0.000"
-          ],
-          "source_case_id": "lexical-trap-03-0",
-          "transformation": "whitespace_noise"
-        },
-        {
-          "baseline_tier": 1,
-          "classifier_confidence": 0.7814977498946614,
-          "expected_tier": 1,
-          "expected_use_case": "general_qa",
-          "id": "lexical-trap-03-1--quoted_task",
-          "selected_tier": 2,
-          "selected_use_case": "general_qa",
-          "signals": [
-            "general question/answer pattern",
-            "advanced system-level task",
-            "high-stakes domain",
-            "learned complexity level 2 using tier_risk",
-            "learned classifier confidence 0.78",
-            "normalized classifier entropy 0.45",
-            "posterior tier under-route probability 0.075"
-          ],
-          "source_case_id": "lexical-trap-03-1",
-          "transformation": "quoted_task"
-        },
-        {
-          "baseline_tier": 1,
-          "classifier_confidence": 0.6438515835012487,
-          "expected_tier": 1,
-          "expected_use_case": "general_qa",
-          "id": "lexical-trap-03-1--whitespace_noise",
-          "selected_tier": 2,
-          "selected_use_case": "general_qa",
-          "signals": [
-            "general question/answer pattern",
-            "advanced system-level task",
-            "high-stakes domain",
-            "learned complexity level 3 using tier_risk",
-            "learned classifier confidence 0.64",
-            "normalized classifier entropy 0.67",
-            "posterior tier under-route probability 0.083"
-          ],
-          "source_case_id": "lexical-trap-03-1",
-          "transformation": "whitespace_noise"
-        },
-        {
-          "baseline_tier": 1,
-          "classifier_confidence": 0.8514836542518209,
-          "expected_tier": 1,
-          "expected_use_case": "general_qa",
-          "id": "lexical-trap-03-2--quoted_task",
-          "selected_tier": 2,
-          "selected_use_case": "general_qa",
-          "signals": [
-            "general question/answer pattern",
-            "advanced system-level task",
-            "high-stakes domain",
-            "learned complexity level 3 using tier_risk",
-            "learned classifier confidence 0.85",
-            "normalized classifier entropy 0.36",
-            "posterior tier under-route probability 0.049"
-          ],
-          "source_case_id": "lexical-trap-03-2",
-          "transformation": "quoted_task"
-        },
-        {
-          "baseline_tier": 1,
-          "classifier_confidence": 0.3515555684139476,
-          "expected_tier": 1,
-          "expected_use_case": "general_qa",
-          "id": "lexical-trap-03-2--whitespace_noise",
-          "selected_tier": 3,
-          "selected_use_case": "general_qa",
-          "signals": [
-            "general question/answer pattern",
-            "advanced system-level task",
-            "high-stakes domain",
-            "learned complexity level 5 using tier_risk",
-            "learned classifier confidence 0.35",
-            "normalized classifier entropy 0.81",
-            "posterior tier under-route probability 0.000"
-          ],
-          "source_case_id": "lexical-trap-03-2",
-          "transformation": "whitespace_noise"
-        },
-        {
-          "baseline_tier": 1,
-          "classifier_confidence": 0.3850336449962668,
-          "expected_tier": 1,
-          "expected_use_case": "general_qa",
-          "id": "lexical-trap-03-3--quoted_task",
-          "selected_tier": 3,
-          "selected_use_case": "general_qa",
-          "signals": [
-            "general question/answer pattern",
-            "advanced system-level task",
-            "high-stakes domain",
+            "non-trivial implementation or verification",
             "learned complexity level 5 using tier_risk",
             "learned classifier confidence 0.39",
-            "normalized classifier entropy 0.91",
+            "normalized classifier entropy 0.87",
+            "full-conversation and final-turn tiers agree",
             "posterior tier under-route probability 0.000"
           ],
-          "source_case_id": "lexical-trap-03-3",
+          "source_case_id": "medium-00-0",
+          "transformation": "polite_envelope"
+        },
+        {
+          "baseline_tier": 3,
+          "classifier_confidence": 0.3877937281932526,
+          "expected_tier": 2,
+          "expected_use_case": "coding",
+          "id": "medium-00-0--markdown_envelope",
+          "selected_tier": 3,
+          "selected_use_case": "coding",
+          "signals": [
+            "normalized supported markdown_envelope contract",
+            "coding vocabulary or code block",
+            "non-trivial implementation or verification",
+            "learned complexity level 5 using tier_risk",
+            "learned classifier confidence 0.39",
+            "normalized classifier entropy 0.87",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ],
+          "source_case_id": "medium-00-0",
+          "transformation": "markdown_envelope"
+        },
+        {
+          "baseline_tier": 3,
+          "classifier_confidence": 0.3877937281932526,
+          "expected_tier": 2,
+          "expected_use_case": "coding",
+          "id": "medium-00-0--xml_envelope",
+          "selected_tier": 3,
+          "selected_use_case": "coding",
+          "signals": [
+            "normalized supported xml_envelope contract",
+            "coding vocabulary or code block",
+            "non-trivial implementation or verification",
+            "learned complexity level 5 using tier_risk",
+            "learned classifier confidence 0.39",
+            "normalized classifier entropy 0.87",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ],
+          "source_case_id": "medium-00-0",
+          "transformation": "xml_envelope"
+        },
+        {
+          "baseline_tier": 3,
+          "classifier_confidence": 0.3877937281932526,
+          "expected_tier": 2,
+          "expected_use_case": "coding",
+          "id": "medium-00-0--json_envelope",
+          "selected_tier": 3,
+          "selected_use_case": "coding",
+          "signals": [
+            "normalized supported json_envelope contract",
+            "coding vocabulary or code block",
+            "non-trivial implementation or verification",
+            "learned complexity level 5 using tier_risk",
+            "learned classifier confidence 0.39",
+            "normalized classifier entropy 0.87",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ],
+          "source_case_id": "medium-00-0",
+          "transformation": "json_envelope"
+        },
+        {
+          "baseline_tier": 3,
+          "classifier_confidence": 0.3877937281932526,
+          "expected_tier": 2,
+          "expected_use_case": "coding",
+          "id": "medium-00-0--multi_turn_preamble",
+          "selected_tier": 3,
+          "selected_use_case": "coding",
+          "signals": [
+            "normalized supported multi_turn_preamble contract",
+            "coding vocabulary or code block",
+            "non-trivial implementation or verification",
+            "learned complexity level 5 using tier_risk",
+            "learned classifier confidence 0.39",
+            "normalized classifier entropy 0.87",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ],
+          "source_case_id": "medium-00-0",
+          "transformation": "multi_turn_preamble"
+        },
+        {
+          "baseline_tier": 3,
+          "classifier_confidence": 0.3877937281932526,
+          "expected_tier": 2,
+          "expected_use_case": "coding",
+          "id": "medium-00-0--untrusted_routing_hint",
+          "selected_tier": 3,
+          "selected_use_case": "coding",
+          "signals": [
+            "normalized supported untrusted_routing_hint contract",
+            "coding vocabulary or code block",
+            "non-trivial implementation or verification",
+            "learned complexity level 5 using tier_risk",
+            "learned classifier confidence 0.39",
+            "normalized classifier entropy 0.87",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ],
+          "source_case_id": "medium-00-0",
+          "transformation": "untrusted_routing_hint"
+        },
+        {
+          "baseline_tier": 3,
+          "classifier_confidence": 0.3877937281932526,
+          "expected_tier": 2,
+          "expected_use_case": "coding",
+          "id": "medium-00-0--quoted_task",
+          "selected_tier": 3,
+          "selected_use_case": "coding",
+          "signals": [
+            "normalized supported quoted_task contract",
+            "coding vocabulary or code block",
+            "non-trivial implementation or verification",
+            "learned complexity level 5 using tier_risk",
+            "learned classifier confidence 0.39",
+            "normalized classifier entropy 0.87",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ],
+          "source_case_id": "medium-00-0",
           "transformation": "quoted_task"
         },
         {
-          "baseline_tier": 1,
-          "classifier_confidence": 0.4334681831089716,
-          "expected_tier": 1,
-          "expected_use_case": "general_qa",
-          "id": "lexical-trap-03-3--whitespace_noise",
+          "baseline_tier": 3,
+          "classifier_confidence": 0.3877937281932526,
+          "expected_tier": 2,
+          "expected_use_case": "coding",
+          "id": "medium-00-0--whitespace_noise",
           "selected_tier": 3,
-          "selected_use_case": "general_qa",
+          "selected_use_case": "coding",
           "signals": [
-            "general question/answer pattern",
-            "advanced system-level task",
-            "high-stakes domain",
+            "normalized supported whitespace_noise contract",
+            "coding vocabulary or code block",
+            "non-trivial implementation or verification",
             "learned complexity level 5 using tier_risk",
-            "learned classifier confidence 0.43",
-            "normalized classifier entropy 0.89",
+            "learned classifier confidence 0.39",
+            "normalized classifier entropy 0.87",
+            "full-conversation and final-turn tiers agree",
             "posterior tier under-route probability 0.000"
           ],
-          "source_case_id": "lexical-trap-03-3",
+          "source_case_id": "medium-00-0",
           "transformation": "whitespace_noise"
+        },
+        {
+          "baseline_tier": 3,
+          "classifier_confidence": 0.3161409217038015,
+          "expected_tier": 2,
+          "expected_use_case": "coding",
+          "id": "medium-00-1--polite_envelope",
+          "selected_tier": 3,
+          "selected_use_case": "coding",
+          "signals": [
+            "normalized supported polite_envelope contract",
+            "coding vocabulary or code block",
+            "non-trivial implementation or verification",
+            "multiple constraints or subtasks",
+            "learned complexity level 5 using tier_risk",
+            "learned classifier confidence 0.32",
+            "normalized classifier entropy 0.88",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ],
+          "source_case_id": "medium-00-1",
+          "transformation": "polite_envelope"
+        },
+        {
+          "baseline_tier": 3,
+          "classifier_confidence": 0.3161409217038015,
+          "expected_tier": 2,
+          "expected_use_case": "coding",
+          "id": "medium-00-1--markdown_envelope",
+          "selected_tier": 3,
+          "selected_use_case": "coding",
+          "signals": [
+            "normalized supported markdown_envelope contract",
+            "coding vocabulary or code block",
+            "non-trivial implementation or verification",
+            "multiple constraints or subtasks",
+            "learned complexity level 5 using tier_risk",
+            "learned classifier confidence 0.32",
+            "normalized classifier entropy 0.88",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ],
+          "source_case_id": "medium-00-1",
+          "transformation": "markdown_envelope"
+        },
+        {
+          "baseline_tier": 3,
+          "classifier_confidence": 0.3161409217038015,
+          "expected_tier": 2,
+          "expected_use_case": "coding",
+          "id": "medium-00-1--xml_envelope",
+          "selected_tier": 3,
+          "selected_use_case": "coding",
+          "signals": [
+            "normalized supported xml_envelope contract",
+            "coding vocabulary or code block",
+            "non-trivial implementation or verification",
+            "multiple constraints or subtasks",
+            "learned complexity level 5 using tier_risk",
+            "learned classifier confidence 0.32",
+            "normalized classifier entropy 0.88",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ],
+          "source_case_id": "medium-00-1",
+          "transformation": "xml_envelope"
+        },
+        {
+          "baseline_tier": 3,
+          "classifier_confidence": 0.3161409217038015,
+          "expected_tier": 2,
+          "expected_use_case": "coding",
+          "id": "medium-00-1--json_envelope",
+          "selected_tier": 3,
+          "selected_use_case": "coding",
+          "signals": [
+            "normalized supported json_envelope contract",
+            "coding vocabulary or code block",
+            "non-trivial implementation or verification",
+            "multiple constraints or subtasks",
+            "learned complexity level 5 using tier_risk",
+            "learned classifier confidence 0.32",
+            "normalized classifier entropy 0.88",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ],
+          "source_case_id": "medium-00-1",
+          "transformation": "json_envelope"
+        },
+        {
+          "baseline_tier": 3,
+          "classifier_confidence": 0.3161409217038015,
+          "expected_tier": 2,
+          "expected_use_case": "coding",
+          "id": "medium-00-1--multi_turn_preamble",
+          "selected_tier": 3,
+          "selected_use_case": "coding",
+          "signals": [
+            "normalized supported multi_turn_preamble contract",
+            "coding vocabulary or code block",
+            "non-trivial implementation or verification",
+            "multiple constraints or subtasks",
+            "learned complexity level 5 using tier_risk",
+            "learned classifier confidence 0.32",
+            "normalized classifier entropy 0.88",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ],
+          "source_case_id": "medium-00-1",
+          "transformation": "multi_turn_preamble"
+        },
+        {
+          "baseline_tier": 3,
+          "classifier_confidence": 0.3161409217038015,
+          "expected_tier": 2,
+          "expected_use_case": "coding",
+          "id": "medium-00-1--untrusted_routing_hint",
+          "selected_tier": 3,
+          "selected_use_case": "coding",
+          "signals": [
+            "normalized supported untrusted_routing_hint contract",
+            "coding vocabulary or code block",
+            "non-trivial implementation or verification",
+            "multiple constraints or subtasks",
+            "learned complexity level 5 using tier_risk",
+            "learned classifier confidence 0.32",
+            "normalized classifier entropy 0.88",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ],
+          "source_case_id": "medium-00-1",
+          "transformation": "untrusted_routing_hint"
+        },
+        {
+          "baseline_tier": 3,
+          "classifier_confidence": 0.3161409217038015,
+          "expected_tier": 2,
+          "expected_use_case": "coding",
+          "id": "medium-00-1--quoted_task",
+          "selected_tier": 3,
+          "selected_use_case": "coding",
+          "signals": [
+            "normalized supported quoted_task contract",
+            "coding vocabulary or code block",
+            "non-trivial implementation or verification",
+            "multiple constraints or subtasks",
+            "learned complexity level 5 using tier_risk",
+            "learned classifier confidence 0.32",
+            "normalized classifier entropy 0.88",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ],
+          "source_case_id": "medium-00-1",
+          "transformation": "quoted_task"
+        },
+        {
+          "baseline_tier": 3,
+          "classifier_confidence": 0.3161409217038015,
+          "expected_tier": 2,
+          "expected_use_case": "coding",
+          "id": "medium-00-1--whitespace_noise",
+          "selected_tier": 3,
+          "selected_use_case": "coding",
+          "signals": [
+            "normalized supported whitespace_noise contract",
+            "coding vocabulary or code block",
+            "non-trivial implementation or verification",
+            "multiple constraints or subtasks",
+            "learned complexity level 5 using tier_risk",
+            "learned classifier confidence 0.32",
+            "normalized classifier entropy 0.88",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ],
+          "source_case_id": "medium-00-1",
+          "transformation": "whitespace_noise"
+        },
+        {
+          "baseline_tier": 3,
+          "classifier_confidence": 0.568511425563002,
+          "expected_tier": 2,
+          "expected_use_case": "coding",
+          "id": "medium-00-3--polite_envelope",
+          "selected_tier": 3,
+          "selected_use_case": "coding",
+          "signals": [
+            "normalized supported polite_envelope contract",
+            "coding vocabulary or code block",
+            "non-trivial implementation or verification",
+            "learned complexity level 5 using argmax",
+            "learned classifier confidence 0.57",
+            "normalized classifier entropy 0.76",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ],
+          "source_case_id": "medium-00-3",
+          "transformation": "polite_envelope"
+        },
+        {
+          "baseline_tier": 3,
+          "classifier_confidence": 0.568511425563002,
+          "expected_tier": 2,
+          "expected_use_case": "coding",
+          "id": "medium-00-3--markdown_envelope",
+          "selected_tier": 3,
+          "selected_use_case": "coding",
+          "signals": [
+            "normalized supported markdown_envelope contract",
+            "coding vocabulary or code block",
+            "non-trivial implementation or verification",
+            "learned complexity level 5 using argmax",
+            "learned classifier confidence 0.57",
+            "normalized classifier entropy 0.76",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ],
+          "source_case_id": "medium-00-3",
+          "transformation": "markdown_envelope"
+        },
+        {
+          "baseline_tier": 3,
+          "classifier_confidence": 0.568511425563002,
+          "expected_tier": 2,
+          "expected_use_case": "coding",
+          "id": "medium-00-3--xml_envelope",
+          "selected_tier": 3,
+          "selected_use_case": "coding",
+          "signals": [
+            "normalized supported xml_envelope contract",
+            "coding vocabulary or code block",
+            "non-trivial implementation or verification",
+            "learned complexity level 5 using argmax",
+            "learned classifier confidence 0.57",
+            "normalized classifier entropy 0.76",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ],
+          "source_case_id": "medium-00-3",
+          "transformation": "xml_envelope"
+        },
+        {
+          "baseline_tier": 3,
+          "classifier_confidence": 0.568511425563002,
+          "expected_tier": 2,
+          "expected_use_case": "coding",
+          "id": "medium-00-3--json_envelope",
+          "selected_tier": 3,
+          "selected_use_case": "coding",
+          "signals": [
+            "normalized supported json_envelope contract",
+            "coding vocabulary or code block",
+            "non-trivial implementation or verification",
+            "learned complexity level 5 using argmax",
+            "learned classifier confidence 0.57",
+            "normalized classifier entropy 0.76",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ],
+          "source_case_id": "medium-00-3",
+          "transformation": "json_envelope"
+        },
+        {
+          "baseline_tier": 3,
+          "classifier_confidence": 0.568511425563002,
+          "expected_tier": 2,
+          "expected_use_case": "coding",
+          "id": "medium-00-3--multi_turn_preamble",
+          "selected_tier": 3,
+          "selected_use_case": "coding",
+          "signals": [
+            "normalized supported multi_turn_preamble contract",
+            "coding vocabulary or code block",
+            "non-trivial implementation or verification",
+            "learned complexity level 5 using argmax",
+            "learned classifier confidence 0.57",
+            "normalized classifier entropy 0.76",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ],
+          "source_case_id": "medium-00-3",
+          "transformation": "multi_turn_preamble"
+        },
+        {
+          "baseline_tier": 3,
+          "classifier_confidence": 0.568511425563002,
+          "expected_tier": 2,
+          "expected_use_case": "coding",
+          "id": "medium-00-3--untrusted_routing_hint",
+          "selected_tier": 3,
+          "selected_use_case": "coding",
+          "signals": [
+            "normalized supported untrusted_routing_hint contract",
+            "coding vocabulary or code block",
+            "non-trivial implementation or verification",
+            "learned complexity level 5 using argmax",
+            "learned classifier confidence 0.57",
+            "normalized classifier entropy 0.76",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ],
+          "source_case_id": "medium-00-3",
+          "transformation": "untrusted_routing_hint"
+        },
+        {
+          "baseline_tier": 3,
+          "classifier_confidence": 0.568511425563002,
+          "expected_tier": 2,
+          "expected_use_case": "coding",
+          "id": "medium-00-3--quoted_task",
+          "selected_tier": 3,
+          "selected_use_case": "coding",
+          "signals": [
+            "normalized supported quoted_task contract",
+            "coding vocabulary or code block",
+            "non-trivial implementation or verification",
+            "learned complexity level 5 using argmax",
+            "learned classifier confidence 0.57",
+            "normalized classifier entropy 0.76",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ],
+          "source_case_id": "medium-00-3",
+          "transformation": "quoted_task"
+        },
+        {
+          "baseline_tier": 3,
+          "classifier_confidence": 0.568511425563002,
+          "expected_tier": 2,
+          "expected_use_case": "coding",
+          "id": "medium-00-3--whitespace_noise",
+          "selected_tier": 3,
+          "selected_use_case": "coding",
+          "signals": [
+            "normalized supported whitespace_noise contract",
+            "coding vocabulary or code block",
+            "non-trivial implementation or verification",
+            "learned complexity level 5 using argmax",
+            "learned classifier confidence 0.57",
+            "normalized classifier entropy 0.76",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ],
+          "source_case_id": "medium-00-3",
+          "transformation": "whitespace_noise"
+        },
+        {
+          "baseline_tier": 3,
+          "classifier_confidence": 0.3566226384562229,
+          "expected_tier": 2,
+          "expected_use_case": "coding",
+          "id": "medium-01-0--polite_envelope",
+          "selected_tier": 3,
+          "selected_use_case": "coding",
+          "signals": [
+            "normalized supported polite_envelope contract",
+            "coding vocabulary or code block",
+            "non-trivial implementation or verification",
+            "tool-assisted coding request",
+            "learned complexity level 5 using tier_risk",
+            "learned classifier confidence 0.36",
+            "normalized classifier entropy 0.92",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ],
+          "source_case_id": "medium-01-0",
+          "transformation": "polite_envelope"
+        },
+        {
+          "baseline_tier": 3,
+          "classifier_confidence": 0.3566226384562229,
+          "expected_tier": 2,
+          "expected_use_case": "coding",
+          "id": "medium-01-0--markdown_envelope",
+          "selected_tier": 3,
+          "selected_use_case": "coding",
+          "signals": [
+            "normalized supported markdown_envelope contract",
+            "coding vocabulary or code block",
+            "non-trivial implementation or verification",
+            "tool-assisted coding request",
+            "learned complexity level 5 using tier_risk",
+            "learned classifier confidence 0.36",
+            "normalized classifier entropy 0.92",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ],
+          "source_case_id": "medium-01-0",
+          "transformation": "markdown_envelope"
+        },
+        {
+          "baseline_tier": 3,
+          "classifier_confidence": 0.3566226384562229,
+          "expected_tier": 2,
+          "expected_use_case": "coding",
+          "id": "medium-01-0--xml_envelope",
+          "selected_tier": 3,
+          "selected_use_case": "coding",
+          "signals": [
+            "normalized supported xml_envelope contract",
+            "coding vocabulary or code block",
+            "non-trivial implementation or verification",
+            "tool-assisted coding request",
+            "learned complexity level 5 using tier_risk",
+            "learned classifier confidence 0.36",
+            "normalized classifier entropy 0.92",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ],
+          "source_case_id": "medium-01-0",
+          "transformation": "xml_envelope"
+        },
+        {
+          "baseline_tier": 3,
+          "classifier_confidence": 0.3566226384562229,
+          "expected_tier": 2,
+          "expected_use_case": "coding",
+          "id": "medium-01-0--json_envelope",
+          "selected_tier": 3,
+          "selected_use_case": "coding",
+          "signals": [
+            "normalized supported json_envelope contract",
+            "coding vocabulary or code block",
+            "non-trivial implementation or verification",
+            "tool-assisted coding request",
+            "learned complexity level 5 using tier_risk",
+            "learned classifier confidence 0.36",
+            "normalized classifier entropy 0.92",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ],
+          "source_case_id": "medium-01-0",
+          "transformation": "json_envelope"
+        },
+        {
+          "baseline_tier": 3,
+          "classifier_confidence": 0.3566226384562229,
+          "expected_tier": 2,
+          "expected_use_case": "coding",
+          "id": "medium-01-0--multi_turn_preamble",
+          "selected_tier": 3,
+          "selected_use_case": "coding",
+          "signals": [
+            "normalized supported multi_turn_preamble contract",
+            "coding vocabulary or code block",
+            "non-trivial implementation or verification",
+            "tool-assisted coding request",
+            "learned complexity level 5 using tier_risk",
+            "learned classifier confidence 0.36",
+            "normalized classifier entropy 0.92",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ],
+          "source_case_id": "medium-01-0",
+          "transformation": "multi_turn_preamble"
+        },
+        {
+          "baseline_tier": 3,
+          "classifier_confidence": 0.3566226384562229,
+          "expected_tier": 2,
+          "expected_use_case": "coding",
+          "id": "medium-01-0--untrusted_routing_hint",
+          "selected_tier": 3,
+          "selected_use_case": "coding",
+          "signals": [
+            "normalized supported untrusted_routing_hint contract",
+            "coding vocabulary or code block",
+            "non-trivial implementation or verification",
+            "tool-assisted coding request",
+            "learned complexity level 5 using tier_risk",
+            "learned classifier confidence 0.36",
+            "normalized classifier entropy 0.92",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ],
+          "source_case_id": "medium-01-0",
+          "transformation": "untrusted_routing_hint"
         }
       ],
-      "model_invariance_rate": 0.889222,
+      "model_invariance_rate": 1.0,
       "route_errors": 0,
-      "tier_accuracy": 0.733533,
-      "tier_invariance_rate": 0.889222,
-      "tier_overroute_rate": 0.21482,
-      "tier_underroute_rate": 0.051647,
+      "tier_accuracy": 0.75419,
+      "tier_invariance_rate": 1.0,
+      "tier_overroute_rate": 0.22905,
+      "tier_underroute_rate": 0.01676,
       "transformations": {
         "json_envelope": {
-          "exact": 129,
-          "over": 33,
-          "under": 5
+          "exact": 135,
+          "over": 41,
+          "under": 3
         },
         "markdown_envelope": {
-          "exact": 129,
-          "over": 33,
-          "under": 5
+          "exact": 135,
+          "over": 41,
+          "under": 3
         },
         "multi_turn_preamble": {
-          "exact": 129,
-          "over": 33,
-          "under": 5
+          "exact": 135,
+          "over": 41,
+          "under": 3
         },
         "polite_envelope": {
-          "exact": 129,
-          "over": 33,
-          "under": 5
+          "exact": 135,
+          "over": 41,
+          "under": 3
         },
         "quoted_task": {
-          "exact": 101,
-          "over": 47,
-          "under": 19
+          "exact": 135,
+          "over": 41,
+          "under": 3
         },
         "untrusted_routing_hint": {
-          "exact": 137,
-          "over": 17,
-          "under": 13
+          "exact": 135,
+          "over": 41,
+          "under": 3
         },
         "whitespace_noise": {
-          "exact": 97,
-          "over": 58,
-          "under": 12
+          "exact": 135,
+          "over": 41,
+          "under": 3
         },
         "xml_envelope": {
-          "exact": 129,
-          "over": 33,
-          "under": 5
+          "exact": 135,
+          "over": 41,
+          "under": 3
         }
       },
-      "use_case_accuracy": 0.706587
+      "use_case_accuracy": 0.73743
     },
     "hybrid_argmax": {
-      "average_estimated_cost_usd": 0.00810224,
-      "comparable_to_baseline": 1336,
-      "count": 1336,
+      "average_estimated_cost_usd": 0.00594706,
+      "comparable_to_baseline": 1432,
+      "count": 1432,
       "failure_examples": [
         {
-          "baseline_tier": 1,
-          "classifier_confidence": 0.40785847636144934,
-          "expected_tier": 1,
-          "expected_use_case": "general_qa",
-          "id": "lexical-trap-00-0--quoted_task",
-          "selected_tier": 2,
-          "selected_use_case": "coding",
-          "signals": [
-            "coding vocabulary or code block",
-            "advanced system-level task",
-            "learned complexity level 1 using argmax",
-            "learned classifier confidence 0.41",
-            "normalized classifier entropy 0.91",
-            "posterior tier under-route probability 0.500"
-          ],
-          "source_case_id": "lexical-trap-00-0",
-          "transformation": "quoted_task"
-        },
-        {
-          "baseline_tier": 1,
-          "classifier_confidence": 0.5192045026086085,
-          "expected_tier": 1,
-          "expected_use_case": "general_qa",
-          "id": "lexical-trap-00-0--whitespace_noise",
+          "baseline_tier": 3,
+          "classifier_confidence": 0.3877937281932526,
+          "expected_tier": 2,
+          "expected_use_case": "coding",
+          "id": "medium-00-0--polite_envelope",
           "selected_tier": 3,
           "selected_use_case": "coding",
           "signals": [
+            "normalized supported polite_envelope contract",
             "coding vocabulary or code block",
-            "advanced system-level task",
+            "non-trivial implementation or verification",
             "learned complexity level 5 using argmax",
-            "learned classifier confidence 0.52",
-            "normalized classifier entropy 0.81",
-            "posterior tier under-route probability 0.000"
-          ],
-          "source_case_id": "lexical-trap-00-0",
-          "transformation": "whitespace_noise"
-        },
-        {
-          "baseline_tier": 1,
-          "classifier_confidence": 0.9175134226172758,
-          "expected_tier": 1,
-          "expected_use_case": "general_qa",
-          "id": "lexical-trap-00-1--quoted_task",
-          "selected_tier": 1,
-          "selected_use_case": "coding",
-          "signals": [
-            "coding vocabulary or code block",
-            "advanced system-level task",
-            "learned complexity level 1 using argmax",
-            "learned classifier confidence 0.92",
-            "normalized classifier entropy 0.23",
-            "posterior tier under-route probability 0.037"
-          ],
-          "source_case_id": "lexical-trap-00-1",
-          "transformation": "quoted_task"
-        },
-        {
-          "baseline_tier": 1,
-          "classifier_confidence": 0.8247887106343873,
-          "expected_tier": 1,
-          "expected_use_case": "general_qa",
-          "id": "lexical-trap-00-1--whitespace_noise",
-          "selected_tier": 1,
-          "selected_use_case": "coding",
-          "signals": [
-            "coding vocabulary or code block",
-            "advanced system-level task",
-            "learned complexity level 1 using argmax",
-            "learned classifier confidence 0.82",
-            "normalized classifier entropy 0.43",
-            "posterior tier under-route probability 0.135"
-          ],
-          "source_case_id": "lexical-trap-00-1",
-          "transformation": "whitespace_noise"
-        },
-        {
-          "baseline_tier": 1,
-          "classifier_confidence": 0.8864036463250066,
-          "expected_tier": 1,
-          "expected_use_case": "general_qa",
-          "id": "lexical-trap-00-2--quoted_task",
-          "selected_tier": 1,
-          "selected_use_case": "coding",
-          "signals": [
-            "coding vocabulary or code block",
-            "advanced system-level task",
-            "learned complexity level 1 using argmax",
-            "learned classifier confidence 0.89",
-            "normalized classifier entropy 0.32",
-            "posterior tier under-route probability 0.097"
-          ],
-          "source_case_id": "lexical-trap-00-2",
-          "transformation": "quoted_task"
-        },
-        {
-          "baseline_tier": 1,
-          "classifier_confidence": 0.44524628409597844,
-          "expected_tier": 1,
-          "expected_use_case": "general_qa",
-          "id": "lexical-trap-00-2--whitespace_noise",
-          "selected_tier": 3,
-          "selected_use_case": "coding",
-          "signals": [
-            "coding vocabulary or code block",
-            "advanced system-level task",
-            "learned complexity level 5 using argmax",
-            "learned classifier confidence 0.45",
-            "normalized classifier entropy 0.73",
-            "posterior tier under-route probability 0.000"
-          ],
-          "source_case_id": "lexical-trap-00-2",
-          "transformation": "whitespace_noise"
-        },
-        {
-          "baseline_tier": 1,
-          "classifier_confidence": 0.33616514603709613,
-          "expected_tier": 1,
-          "expected_use_case": "general_qa",
-          "id": "lexical-trap-00-3--quoted_task",
-          "selected_tier": 2,
-          "selected_use_case": "coding",
-          "signals": [
-            "coding vocabulary or code block",
-            "advanced system-level task",
-            "learned complexity level 1 using argmax",
-            "learned classifier confidence 0.34",
-            "normalized classifier entropy 0.93",
-            "posterior tier under-route probability 0.473"
-          ],
-          "source_case_id": "lexical-trap-00-3",
-          "transformation": "quoted_task"
-        },
-        {
-          "baseline_tier": 1,
-          "classifier_confidence": 0.7040503199834853,
-          "expected_tier": 1,
-          "expected_use_case": "general_qa",
-          "id": "lexical-trap-00-3--whitespace_noise",
-          "selected_tier": 3,
-          "selected_use_case": "coding",
-          "signals": [
-            "coding vocabulary or code block",
-            "advanced system-level task",
-            "learned complexity level 5 using argmax",
-            "learned classifier confidence 0.70",
-            "normalized classifier entropy 0.60",
-            "posterior tier under-route probability 0.000"
-          ],
-          "source_case_id": "lexical-trap-00-3",
-          "transformation": "whitespace_noise"
-        },
-        {
-          "baseline_tier": 1,
-          "classifier_confidence": 0.378136249763745,
-          "expected_tier": 1,
-          "expected_use_case": "general_qa",
-          "id": "lexical-trap-01-0--quoted_task",
-          "selected_tier": 2,
-          "selected_use_case": "general_qa",
-          "signals": [
-            "general question/answer pattern",
-            "advanced system-level task",
-            "learned complexity level 1 using argmax",
-            "learned classifier confidence 0.38",
-            "normalized classifier entropy 0.87",
-            "posterior tier under-route probability 0.461"
-          ],
-          "source_case_id": "lexical-trap-01-0",
-          "transformation": "quoted_task"
-        },
-        {
-          "baseline_tier": 1,
-          "classifier_confidence": 0.34722957174539776,
-          "expected_tier": 1,
-          "expected_use_case": "general_qa",
-          "id": "lexical-trap-01-0--whitespace_noise",
-          "selected_tier": 2,
-          "selected_use_case": "general_qa",
-          "signals": [
-            "general question/answer pattern",
-            "advanced system-level task",
-            "learned complexity level 3 using argmax",
-            "learned classifier confidence 0.35",
-            "normalized classifier entropy 0.88",
-            "posterior tier under-route probability 0.413"
-          ],
-          "source_case_id": "lexical-trap-01-0",
-          "transformation": "whitespace_noise"
-        },
-        {
-          "baseline_tier": 1,
-          "classifier_confidence": 0.449415918987111,
-          "expected_tier": 1,
-          "expected_use_case": "general_qa",
-          "id": "lexical-trap-01-1--whitespace_noise",
-          "selected_tier": 2,
-          "selected_use_case": "general_qa",
-          "signals": [
-            "general question/answer pattern",
-            "advanced system-level task",
-            "learned complexity level 1 using argmax",
-            "learned classifier confidence 0.45",
-            "normalized classifier entropy 0.83",
-            "posterior tier under-route probability 0.338"
-          ],
-          "source_case_id": "lexical-trap-01-1",
-          "transformation": "whitespace_noise"
-        },
-        {
-          "baseline_tier": 1,
-          "classifier_confidence": 0.5192179615947946,
-          "expected_tier": 1,
-          "expected_use_case": "general_qa",
-          "id": "lexical-trap-01-2--whitespace_noise",
-          "selected_tier": 3,
-          "selected_use_case": "general_qa",
-          "signals": [
-            "general question/answer pattern",
-            "advanced system-level task",
-            "learned complexity level 5 using argmax",
-            "learned classifier confidence 0.52",
-            "normalized classifier entropy 0.75",
-            "posterior tier under-route probability 0.000"
-          ],
-          "source_case_id": "lexical-trap-01-2",
-          "transformation": "whitespace_noise"
-        },
-        {
-          "baseline_tier": 1,
-          "classifier_confidence": 0.570308435534607,
-          "expected_tier": 1,
-          "expected_use_case": "general_qa",
-          "id": "lexical-trap-01-3--quoted_task",
-          "selected_tier": 2,
-          "selected_use_case": "general_qa",
-          "signals": [
-            "general question/answer pattern",
-            "advanced system-level task",
-            "learned complexity level 2 using argmax",
-            "learned classifier confidence 0.57",
-            "normalized classifier entropy 0.74",
-            "posterior tier under-route probability 0.232"
-          ],
-          "source_case_id": "lexical-trap-01-3",
-          "transformation": "quoted_task"
-        },
-        {
-          "baseline_tier": 1,
-          "classifier_confidence": 0.4787814371232833,
-          "expected_tier": 1,
-          "expected_use_case": "general_qa",
-          "id": "lexical-trap-01-3--whitespace_noise",
-          "selected_tier": 3,
-          "selected_use_case": "general_qa",
-          "signals": [
-            "general question/answer pattern",
-            "advanced system-level task",
-            "learned complexity level 5 using argmax",
-            "learned classifier confidence 0.48",
-            "normalized classifier entropy 0.76",
-            "posterior tier under-route probability 0.000"
-          ],
-          "source_case_id": "lexical-trap-01-3",
-          "transformation": "whitespace_noise"
-        },
-        {
-          "baseline_tier": 1,
-          "classifier_confidence": 0.6998867081098777,
-          "expected_tier": 1,
-          "expected_use_case": "general_qa",
-          "id": "lexical-trap-02-0--quoted_task",
-          "selected_tier": 1,
-          "selected_use_case": "coding",
-          "signals": [
-            "coding vocabulary or code block",
-            "learned complexity level 1 using argmax",
-            "learned classifier confidence 0.70",
-            "normalized classifier entropy 0.60",
-            "posterior tier under-route probability 0.237"
-          ],
-          "source_case_id": "lexical-trap-02-0",
-          "transformation": "quoted_task"
-        },
-        {
-          "baseline_tier": 1,
-          "classifier_confidence": 0.5239229482450746,
-          "expected_tier": 1,
-          "expected_use_case": "general_qa",
-          "id": "lexical-trap-02-0--whitespace_noise",
-          "selected_tier": 1,
-          "selected_use_case": "coding",
-          "signals": [
-            "coding vocabulary or code block",
-            "learned complexity level 1 using argmax",
-            "learned classifier confidence 0.52",
-            "normalized classifier entropy 0.78",
-            "posterior tier under-route probability 0.433"
-          ],
-          "source_case_id": "lexical-trap-02-0",
-          "transformation": "whitespace_noise"
-        },
-        {
-          "baseline_tier": 1,
-          "classifier_confidence": 0.8799932235268517,
-          "expected_tier": 1,
-          "expected_use_case": "general_qa",
-          "id": "lexical-trap-02-1--quoted_task",
-          "selected_tier": 1,
-          "selected_use_case": "coding",
-          "signals": [
-            "coding vocabulary or code block",
-            "learned complexity level 1 using argmax",
-            "learned classifier confidence 0.88",
-            "normalized classifier entropy 0.28",
-            "posterior tier under-route probability 0.025"
-          ],
-          "source_case_id": "lexical-trap-02-1",
-          "transformation": "quoted_task"
-        },
-        {
-          "baseline_tier": 1,
-          "classifier_confidence": 0.8158992756088201,
-          "expected_tier": 1,
-          "expected_use_case": "general_qa",
-          "id": "lexical-trap-02-1--whitespace_noise",
-          "selected_tier": 1,
-          "selected_use_case": "coding",
-          "signals": [
-            "coding vocabulary or code block",
-            "learned complexity level 1 using argmax",
-            "learned classifier confidence 0.82",
-            "normalized classifier entropy 0.43",
-            "posterior tier under-route probability 0.096"
-          ],
-          "source_case_id": "lexical-trap-02-1",
-          "transformation": "whitespace_noise"
-        },
-        {
-          "baseline_tier": 1,
-          "classifier_confidence": 0.9665907842007228,
-          "expected_tier": 1,
-          "expected_use_case": "general_qa",
-          "id": "lexical-trap-02-2--quoted_task",
-          "selected_tier": 1,
-          "selected_use_case": "coding",
-          "signals": [
-            "coding vocabulary or code block",
-            "learned complexity level 1 using argmax",
-            "learned classifier confidence 0.97",
-            "normalized classifier entropy 0.12",
-            "posterior tier under-route probability 0.019"
-          ],
-          "source_case_id": "lexical-trap-02-2",
-          "transformation": "quoted_task"
-        },
-        {
-          "baseline_tier": 1,
-          "classifier_confidence": 0.7056722042480581,
-          "expected_tier": 1,
-          "expected_use_case": "general_qa",
-          "id": "lexical-trap-02-2--whitespace_noise",
-          "selected_tier": 1,
-          "selected_use_case": "coding",
-          "signals": [
-            "coding vocabulary or code block",
-            "learned complexity level 1 using argmax",
-            "learned classifier confidence 0.71",
-            "normalized classifier entropy 0.57",
-            "posterior tier under-route probability 0.269"
-          ],
-          "source_case_id": "lexical-trap-02-2",
-          "transformation": "whitespace_noise"
-        },
-        {
-          "baseline_tier": 1,
-          "classifier_confidence": 0.47380244624693646,
-          "expected_tier": 1,
-          "expected_use_case": "general_qa",
-          "id": "lexical-trap-02-3--quoted_task",
-          "selected_tier": 1,
-          "selected_use_case": "coding",
-          "signals": [
-            "coding vocabulary or code block",
-            "learned complexity level 2 using argmax",
-            "learned classifier confidence 0.47",
-            "normalized classifier entropy 0.64",
-            "posterior tier under-route probability 0.096"
-          ],
-          "source_case_id": "lexical-trap-02-3",
-          "transformation": "quoted_task"
-        },
-        {
-          "baseline_tier": 1,
-          "classifier_confidence": 0.41020981161746395,
-          "expected_tier": 1,
-          "expected_use_case": "general_qa",
-          "id": "lexical-trap-02-3--whitespace_noise",
-          "selected_tier": 1,
-          "selected_use_case": "coding",
-          "signals": [
-            "coding vocabulary or code block",
-            "learned complexity level 2 using argmax",
-            "learned classifier confidence 0.41",
-            "normalized classifier entropy 0.80",
-            "posterior tier under-route probability 0.225"
-          ],
-          "source_case_id": "lexical-trap-02-3",
-          "transformation": "whitespace_noise"
-        },
-        {
-          "baseline_tier": 1,
-          "classifier_confidence": 0.3767475918492846,
-          "expected_tier": 1,
-          "expected_use_case": "general_qa",
-          "id": "lexical-trap-03-0--quoted_task",
-          "selected_tier": 2,
-          "selected_use_case": "general_qa",
-          "signals": [
-            "general question/answer pattern",
-            "advanced system-level task",
-            "high-stakes domain",
-            "learned complexity level 3 using argmax",
-            "learned classifier confidence 0.38",
-            "normalized classifier entropy 0.87",
-            "posterior tier under-route probability 0.172"
-          ],
-          "source_case_id": "lexical-trap-03-0",
-          "transformation": "quoted_task"
-        },
-        {
-          "baseline_tier": 1,
-          "classifier_confidence": 0.404951170518894,
-          "expected_tier": 1,
-          "expected_use_case": "general_qa",
-          "id": "lexical-trap-03-0--whitespace_noise",
-          "selected_tier": 2,
-          "selected_use_case": "general_qa",
-          "signals": [
-            "general question/answer pattern",
-            "advanced system-level task",
-            "high-stakes domain",
-            "learned complexity level 3 using argmax",
-            "learned classifier confidence 0.40",
-            "normalized classifier entropy 0.89",
-            "posterior tier under-route probability 0.403"
-          ],
-          "source_case_id": "lexical-trap-03-0",
-          "transformation": "whitespace_noise"
-        },
-        {
-          "baseline_tier": 1,
-          "classifier_confidence": 0.7814977498946614,
-          "expected_tier": 1,
-          "expected_use_case": "general_qa",
-          "id": "lexical-trap-03-1--quoted_task",
-          "selected_tier": 2,
-          "selected_use_case": "general_qa",
-          "signals": [
-            "general question/answer pattern",
-            "advanced system-level task",
-            "high-stakes domain",
-            "learned complexity level 1 using argmax",
-            "learned classifier confidence 0.78",
-            "normalized classifier entropy 0.45",
-            "posterior tier under-route probability 0.075"
-          ],
-          "source_case_id": "lexical-trap-03-1",
-          "transformation": "quoted_task"
-        },
-        {
-          "baseline_tier": 1,
-          "classifier_confidence": 0.6438515835012487,
-          "expected_tier": 1,
-          "expected_use_case": "general_qa",
-          "id": "lexical-trap-03-1--whitespace_noise",
-          "selected_tier": 2,
-          "selected_use_case": "general_qa",
-          "signals": [
-            "general question/answer pattern",
-            "advanced system-level task",
-            "high-stakes domain",
-            "learned complexity level 1 using argmax",
-            "learned classifier confidence 0.64",
-            "normalized classifier entropy 0.67",
-            "posterior tier under-route probability 0.238"
-          ],
-          "source_case_id": "lexical-trap-03-1",
-          "transformation": "whitespace_noise"
-        },
-        {
-          "baseline_tier": 1,
-          "classifier_confidence": 0.8514836542518209,
-          "expected_tier": 1,
-          "expected_use_case": "general_qa",
-          "id": "lexical-trap-03-2--quoted_task",
-          "selected_tier": 2,
-          "selected_use_case": "general_qa",
-          "signals": [
-            "general question/answer pattern",
-            "advanced system-level task",
-            "high-stakes domain",
-            "learned complexity level 1 using argmax",
-            "learned classifier confidence 0.85",
-            "normalized classifier entropy 0.36",
-            "posterior tier under-route probability 0.135"
-          ],
-          "source_case_id": "lexical-trap-03-2",
-          "transformation": "quoted_task"
-        },
-        {
-          "baseline_tier": 1,
-          "classifier_confidence": 0.3515555684139476,
-          "expected_tier": 1,
-          "expected_use_case": "general_qa",
-          "id": "lexical-trap-03-2--whitespace_noise",
-          "selected_tier": 3,
-          "selected_use_case": "general_qa",
-          "signals": [
-            "general question/answer pattern",
-            "advanced system-level task",
-            "high-stakes domain",
-            "learned complexity level 4 using argmax",
-            "learned classifier confidence 0.35",
-            "normalized classifier entropy 0.81",
-            "posterior tier under-route probability 0.000"
-          ],
-          "source_case_id": "lexical-trap-03-2",
-          "transformation": "whitespace_noise"
-        },
-        {
-          "baseline_tier": 1,
-          "classifier_confidence": 0.3850336449962668,
-          "expected_tier": 1,
-          "expected_use_case": "general_qa",
-          "id": "lexical-trap-03-3--quoted_task",
-          "selected_tier": 2,
-          "selected_use_case": "general_qa",
-          "signals": [
-            "general question/answer pattern",
-            "advanced system-level task",
-            "high-stakes domain",
-            "learned complexity level 1 using argmax",
             "learned classifier confidence 0.39",
-            "normalized classifier entropy 0.91",
-            "posterior tier under-route probability 0.375"
+            "normalized classifier entropy 0.87",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
           ],
-          "source_case_id": "lexical-trap-03-3",
+          "source_case_id": "medium-00-0",
+          "transformation": "polite_envelope"
+        },
+        {
+          "baseline_tier": 3,
+          "classifier_confidence": 0.3877937281932526,
+          "expected_tier": 2,
+          "expected_use_case": "coding",
+          "id": "medium-00-0--markdown_envelope",
+          "selected_tier": 3,
+          "selected_use_case": "coding",
+          "signals": [
+            "normalized supported markdown_envelope contract",
+            "coding vocabulary or code block",
+            "non-trivial implementation or verification",
+            "learned complexity level 5 using argmax",
+            "learned classifier confidence 0.39",
+            "normalized classifier entropy 0.87",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ],
+          "source_case_id": "medium-00-0",
+          "transformation": "markdown_envelope"
+        },
+        {
+          "baseline_tier": 3,
+          "classifier_confidence": 0.3877937281932526,
+          "expected_tier": 2,
+          "expected_use_case": "coding",
+          "id": "medium-00-0--xml_envelope",
+          "selected_tier": 3,
+          "selected_use_case": "coding",
+          "signals": [
+            "normalized supported xml_envelope contract",
+            "coding vocabulary or code block",
+            "non-trivial implementation or verification",
+            "learned complexity level 5 using argmax",
+            "learned classifier confidence 0.39",
+            "normalized classifier entropy 0.87",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ],
+          "source_case_id": "medium-00-0",
+          "transformation": "xml_envelope"
+        },
+        {
+          "baseline_tier": 3,
+          "classifier_confidence": 0.3877937281932526,
+          "expected_tier": 2,
+          "expected_use_case": "coding",
+          "id": "medium-00-0--json_envelope",
+          "selected_tier": 3,
+          "selected_use_case": "coding",
+          "signals": [
+            "normalized supported json_envelope contract",
+            "coding vocabulary or code block",
+            "non-trivial implementation or verification",
+            "learned complexity level 5 using argmax",
+            "learned classifier confidence 0.39",
+            "normalized classifier entropy 0.87",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ],
+          "source_case_id": "medium-00-0",
+          "transformation": "json_envelope"
+        },
+        {
+          "baseline_tier": 3,
+          "classifier_confidence": 0.3877937281932526,
+          "expected_tier": 2,
+          "expected_use_case": "coding",
+          "id": "medium-00-0--multi_turn_preamble",
+          "selected_tier": 3,
+          "selected_use_case": "coding",
+          "signals": [
+            "normalized supported multi_turn_preamble contract",
+            "coding vocabulary or code block",
+            "non-trivial implementation or verification",
+            "learned complexity level 5 using argmax",
+            "learned classifier confidence 0.39",
+            "normalized classifier entropy 0.87",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ],
+          "source_case_id": "medium-00-0",
+          "transformation": "multi_turn_preamble"
+        },
+        {
+          "baseline_tier": 3,
+          "classifier_confidence": 0.3877937281932526,
+          "expected_tier": 2,
+          "expected_use_case": "coding",
+          "id": "medium-00-0--untrusted_routing_hint",
+          "selected_tier": 3,
+          "selected_use_case": "coding",
+          "signals": [
+            "normalized supported untrusted_routing_hint contract",
+            "coding vocabulary or code block",
+            "non-trivial implementation or verification",
+            "learned complexity level 5 using argmax",
+            "learned classifier confidence 0.39",
+            "normalized classifier entropy 0.87",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ],
+          "source_case_id": "medium-00-0",
+          "transformation": "untrusted_routing_hint"
+        },
+        {
+          "baseline_tier": 3,
+          "classifier_confidence": 0.3877937281932526,
+          "expected_tier": 2,
+          "expected_use_case": "coding",
+          "id": "medium-00-0--quoted_task",
+          "selected_tier": 3,
+          "selected_use_case": "coding",
+          "signals": [
+            "normalized supported quoted_task contract",
+            "coding vocabulary or code block",
+            "non-trivial implementation or verification",
+            "learned complexity level 5 using argmax",
+            "learned classifier confidence 0.39",
+            "normalized classifier entropy 0.87",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ],
+          "source_case_id": "medium-00-0",
           "transformation": "quoted_task"
         },
         {
-          "baseline_tier": 1,
-          "classifier_confidence": 0.4334681831089716,
-          "expected_tier": 1,
-          "expected_use_case": "general_qa",
-          "id": "lexical-trap-03-3--whitespace_noise",
+          "baseline_tier": 3,
+          "classifier_confidence": 0.3877937281932526,
+          "expected_tier": 2,
+          "expected_use_case": "coding",
+          "id": "medium-00-0--whitespace_noise",
           "selected_tier": 3,
-          "selected_use_case": "general_qa",
+          "selected_use_case": "coding",
           "signals": [
-            "general question/answer pattern",
-            "advanced system-level task",
-            "high-stakes domain",
+            "normalized supported whitespace_noise contract",
+            "coding vocabulary or code block",
+            "non-trivial implementation or verification",
             "learned complexity level 5 using argmax",
-            "learned classifier confidence 0.43",
-            "normalized classifier entropy 0.89",
+            "learned classifier confidence 0.39",
+            "normalized classifier entropy 0.87",
+            "full-conversation and final-turn tiers agree",
             "posterior tier under-route probability 0.000"
           ],
-          "source_case_id": "lexical-trap-03-3",
+          "source_case_id": "medium-00-0",
           "transformation": "whitespace_noise"
+        },
+        {
+          "baseline_tier": 3,
+          "classifier_confidence": 0.568511425563002,
+          "expected_tier": 2,
+          "expected_use_case": "coding",
+          "id": "medium-00-3--polite_envelope",
+          "selected_tier": 3,
+          "selected_use_case": "coding",
+          "signals": [
+            "normalized supported polite_envelope contract",
+            "coding vocabulary or code block",
+            "non-trivial implementation or verification",
+            "learned complexity level 5 using argmax",
+            "learned classifier confidence 0.57",
+            "normalized classifier entropy 0.76",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ],
+          "source_case_id": "medium-00-3",
+          "transformation": "polite_envelope"
+        },
+        {
+          "baseline_tier": 3,
+          "classifier_confidence": 0.568511425563002,
+          "expected_tier": 2,
+          "expected_use_case": "coding",
+          "id": "medium-00-3--markdown_envelope",
+          "selected_tier": 3,
+          "selected_use_case": "coding",
+          "signals": [
+            "normalized supported markdown_envelope contract",
+            "coding vocabulary or code block",
+            "non-trivial implementation or verification",
+            "learned complexity level 5 using argmax",
+            "learned classifier confidence 0.57",
+            "normalized classifier entropy 0.76",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ],
+          "source_case_id": "medium-00-3",
+          "transformation": "markdown_envelope"
+        },
+        {
+          "baseline_tier": 3,
+          "classifier_confidence": 0.568511425563002,
+          "expected_tier": 2,
+          "expected_use_case": "coding",
+          "id": "medium-00-3--xml_envelope",
+          "selected_tier": 3,
+          "selected_use_case": "coding",
+          "signals": [
+            "normalized supported xml_envelope contract",
+            "coding vocabulary or code block",
+            "non-trivial implementation or verification",
+            "learned complexity level 5 using argmax",
+            "learned classifier confidence 0.57",
+            "normalized classifier entropy 0.76",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ],
+          "source_case_id": "medium-00-3",
+          "transformation": "xml_envelope"
+        },
+        {
+          "baseline_tier": 3,
+          "classifier_confidence": 0.568511425563002,
+          "expected_tier": 2,
+          "expected_use_case": "coding",
+          "id": "medium-00-3--json_envelope",
+          "selected_tier": 3,
+          "selected_use_case": "coding",
+          "signals": [
+            "normalized supported json_envelope contract",
+            "coding vocabulary or code block",
+            "non-trivial implementation or verification",
+            "learned complexity level 5 using argmax",
+            "learned classifier confidence 0.57",
+            "normalized classifier entropy 0.76",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ],
+          "source_case_id": "medium-00-3",
+          "transformation": "json_envelope"
+        },
+        {
+          "baseline_tier": 3,
+          "classifier_confidence": 0.568511425563002,
+          "expected_tier": 2,
+          "expected_use_case": "coding",
+          "id": "medium-00-3--multi_turn_preamble",
+          "selected_tier": 3,
+          "selected_use_case": "coding",
+          "signals": [
+            "normalized supported multi_turn_preamble contract",
+            "coding vocabulary or code block",
+            "non-trivial implementation or verification",
+            "learned complexity level 5 using argmax",
+            "learned classifier confidence 0.57",
+            "normalized classifier entropy 0.76",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ],
+          "source_case_id": "medium-00-3",
+          "transformation": "multi_turn_preamble"
+        },
+        {
+          "baseline_tier": 3,
+          "classifier_confidence": 0.568511425563002,
+          "expected_tier": 2,
+          "expected_use_case": "coding",
+          "id": "medium-00-3--untrusted_routing_hint",
+          "selected_tier": 3,
+          "selected_use_case": "coding",
+          "signals": [
+            "normalized supported untrusted_routing_hint contract",
+            "coding vocabulary or code block",
+            "non-trivial implementation or verification",
+            "learned complexity level 5 using argmax",
+            "learned classifier confidence 0.57",
+            "normalized classifier entropy 0.76",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ],
+          "source_case_id": "medium-00-3",
+          "transformation": "untrusted_routing_hint"
+        },
+        {
+          "baseline_tier": 3,
+          "classifier_confidence": 0.568511425563002,
+          "expected_tier": 2,
+          "expected_use_case": "coding",
+          "id": "medium-00-3--quoted_task",
+          "selected_tier": 3,
+          "selected_use_case": "coding",
+          "signals": [
+            "normalized supported quoted_task contract",
+            "coding vocabulary or code block",
+            "non-trivial implementation or verification",
+            "learned complexity level 5 using argmax",
+            "learned classifier confidence 0.57",
+            "normalized classifier entropy 0.76",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ],
+          "source_case_id": "medium-00-3",
+          "transformation": "quoted_task"
+        },
+        {
+          "baseline_tier": 3,
+          "classifier_confidence": 0.568511425563002,
+          "expected_tier": 2,
+          "expected_use_case": "coding",
+          "id": "medium-00-3--whitespace_noise",
+          "selected_tier": 3,
+          "selected_use_case": "coding",
+          "signals": [
+            "normalized supported whitespace_noise contract",
+            "coding vocabulary or code block",
+            "non-trivial implementation or verification",
+            "learned complexity level 5 using argmax",
+            "learned classifier confidence 0.57",
+            "normalized classifier entropy 0.76",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ],
+          "source_case_id": "medium-00-3",
+          "transformation": "whitespace_noise"
+        },
+        {
+          "baseline_tier": 3,
+          "classifier_confidence": 0.4181104448202601,
+          "expected_tier": 2,
+          "expected_use_case": "reasoning",
+          "id": "medium-02-3--polite_envelope",
+          "selected_tier": 3,
+          "selected_use_case": "reasoning",
+          "signals": [
+            "normalized supported polite_envelope contract",
+            "multi-step reasoning vocabulary",
+            "learned complexity level 4 using argmax",
+            "learned classifier confidence 0.42",
+            "normalized classifier entropy 0.69",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ],
+          "source_case_id": "medium-02-3",
+          "transformation": "polite_envelope"
+        },
+        {
+          "baseline_tier": 3,
+          "classifier_confidence": 0.4181104448202601,
+          "expected_tier": 2,
+          "expected_use_case": "reasoning",
+          "id": "medium-02-3--markdown_envelope",
+          "selected_tier": 3,
+          "selected_use_case": "reasoning",
+          "signals": [
+            "normalized supported markdown_envelope contract",
+            "multi-step reasoning vocabulary",
+            "learned complexity level 4 using argmax",
+            "learned classifier confidence 0.42",
+            "normalized classifier entropy 0.69",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ],
+          "source_case_id": "medium-02-3",
+          "transformation": "markdown_envelope"
+        },
+        {
+          "baseline_tier": 3,
+          "classifier_confidence": 0.4181104448202601,
+          "expected_tier": 2,
+          "expected_use_case": "reasoning",
+          "id": "medium-02-3--xml_envelope",
+          "selected_tier": 3,
+          "selected_use_case": "reasoning",
+          "signals": [
+            "normalized supported xml_envelope contract",
+            "multi-step reasoning vocabulary",
+            "learned complexity level 4 using argmax",
+            "learned classifier confidence 0.42",
+            "normalized classifier entropy 0.69",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ],
+          "source_case_id": "medium-02-3",
+          "transformation": "xml_envelope"
+        },
+        {
+          "baseline_tier": 3,
+          "classifier_confidence": 0.4181104448202601,
+          "expected_tier": 2,
+          "expected_use_case": "reasoning",
+          "id": "medium-02-3--json_envelope",
+          "selected_tier": 3,
+          "selected_use_case": "reasoning",
+          "signals": [
+            "normalized supported json_envelope contract",
+            "multi-step reasoning vocabulary",
+            "learned complexity level 4 using argmax",
+            "learned classifier confidence 0.42",
+            "normalized classifier entropy 0.69",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ],
+          "source_case_id": "medium-02-3",
+          "transformation": "json_envelope"
+        },
+        {
+          "baseline_tier": 3,
+          "classifier_confidence": 0.4181104448202601,
+          "expected_tier": 2,
+          "expected_use_case": "reasoning",
+          "id": "medium-02-3--multi_turn_preamble",
+          "selected_tier": 3,
+          "selected_use_case": "reasoning",
+          "signals": [
+            "normalized supported multi_turn_preamble contract",
+            "multi-step reasoning vocabulary",
+            "learned complexity level 4 using argmax",
+            "learned classifier confidence 0.42",
+            "normalized classifier entropy 0.69",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ],
+          "source_case_id": "medium-02-3",
+          "transformation": "multi_turn_preamble"
+        },
+        {
+          "baseline_tier": 3,
+          "classifier_confidence": 0.4181104448202601,
+          "expected_tier": 2,
+          "expected_use_case": "reasoning",
+          "id": "medium-02-3--untrusted_routing_hint",
+          "selected_tier": 3,
+          "selected_use_case": "reasoning",
+          "signals": [
+            "normalized supported untrusted_routing_hint contract",
+            "multi-step reasoning vocabulary",
+            "learned complexity level 4 using argmax",
+            "learned classifier confidence 0.42",
+            "normalized classifier entropy 0.69",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ],
+          "source_case_id": "medium-02-3",
+          "transformation": "untrusted_routing_hint"
+        },
+        {
+          "baseline_tier": 3,
+          "classifier_confidence": 0.4181104448202601,
+          "expected_tier": 2,
+          "expected_use_case": "reasoning",
+          "id": "medium-02-3--quoted_task",
+          "selected_tier": 3,
+          "selected_use_case": "reasoning",
+          "signals": [
+            "normalized supported quoted_task contract",
+            "multi-step reasoning vocabulary",
+            "learned complexity level 4 using argmax",
+            "learned classifier confidence 0.42",
+            "normalized classifier entropy 0.69",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ],
+          "source_case_id": "medium-02-3",
+          "transformation": "quoted_task"
+        },
+        {
+          "baseline_tier": 3,
+          "classifier_confidence": 0.4181104448202601,
+          "expected_tier": 2,
+          "expected_use_case": "reasoning",
+          "id": "medium-02-3--whitespace_noise",
+          "selected_tier": 3,
+          "selected_use_case": "reasoning",
+          "signals": [
+            "normalized supported whitespace_noise contract",
+            "multi-step reasoning vocabulary",
+            "learned complexity level 4 using argmax",
+            "learned classifier confidence 0.42",
+            "normalized classifier entropy 0.69",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ],
+          "source_case_id": "medium-02-3",
+          "transformation": "whitespace_noise"
+        },
+        {
+          "baseline_tier": 3,
+          "classifier_confidence": 0.47118565428848086,
+          "expected_tier": 2,
+          "expected_use_case": "reasoning",
+          "id": "medium-03-3--polite_envelope",
+          "selected_tier": 3,
+          "selected_use_case": "reasoning",
+          "signals": [
+            "normalized supported polite_envelope contract",
+            "multi-step reasoning vocabulary",
+            "learned complexity level 4 using argmax",
+            "learned classifier confidence 0.47",
+            "normalized classifier entropy 0.80",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ],
+          "source_case_id": "medium-03-3",
+          "transformation": "polite_envelope"
+        },
+        {
+          "baseline_tier": 3,
+          "classifier_confidence": 0.47118565428848086,
+          "expected_tier": 2,
+          "expected_use_case": "reasoning",
+          "id": "medium-03-3--markdown_envelope",
+          "selected_tier": 3,
+          "selected_use_case": "reasoning",
+          "signals": [
+            "normalized supported markdown_envelope contract",
+            "multi-step reasoning vocabulary",
+            "learned complexity level 4 using argmax",
+            "learned classifier confidence 0.47",
+            "normalized classifier entropy 0.80",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ],
+          "source_case_id": "medium-03-3",
+          "transformation": "markdown_envelope"
+        },
+        {
+          "baseline_tier": 3,
+          "classifier_confidence": 0.47118565428848086,
+          "expected_tier": 2,
+          "expected_use_case": "reasoning",
+          "id": "medium-03-3--xml_envelope",
+          "selected_tier": 3,
+          "selected_use_case": "reasoning",
+          "signals": [
+            "normalized supported xml_envelope contract",
+            "multi-step reasoning vocabulary",
+            "learned complexity level 4 using argmax",
+            "learned classifier confidence 0.47",
+            "normalized classifier entropy 0.80",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ],
+          "source_case_id": "medium-03-3",
+          "transformation": "xml_envelope"
+        },
+        {
+          "baseline_tier": 3,
+          "classifier_confidence": 0.47118565428848086,
+          "expected_tier": 2,
+          "expected_use_case": "reasoning",
+          "id": "medium-03-3--json_envelope",
+          "selected_tier": 3,
+          "selected_use_case": "reasoning",
+          "signals": [
+            "normalized supported json_envelope contract",
+            "multi-step reasoning vocabulary",
+            "learned complexity level 4 using argmax",
+            "learned classifier confidence 0.47",
+            "normalized classifier entropy 0.80",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ],
+          "source_case_id": "medium-03-3",
+          "transformation": "json_envelope"
+        },
+        {
+          "baseline_tier": 3,
+          "classifier_confidence": 0.47118565428848086,
+          "expected_tier": 2,
+          "expected_use_case": "reasoning",
+          "id": "medium-03-3--multi_turn_preamble",
+          "selected_tier": 3,
+          "selected_use_case": "reasoning",
+          "signals": [
+            "normalized supported multi_turn_preamble contract",
+            "multi-step reasoning vocabulary",
+            "learned complexity level 4 using argmax",
+            "learned classifier confidence 0.47",
+            "normalized classifier entropy 0.80",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ],
+          "source_case_id": "medium-03-3",
+          "transformation": "multi_turn_preamble"
+        },
+        {
+          "baseline_tier": 3,
+          "classifier_confidence": 0.47118565428848086,
+          "expected_tier": 2,
+          "expected_use_case": "reasoning",
+          "id": "medium-03-3--untrusted_routing_hint",
+          "selected_tier": 3,
+          "selected_use_case": "reasoning",
+          "signals": [
+            "normalized supported untrusted_routing_hint contract",
+            "multi-step reasoning vocabulary",
+            "learned complexity level 4 using argmax",
+            "learned classifier confidence 0.47",
+            "normalized classifier entropy 0.80",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ],
+          "source_case_id": "medium-03-3",
+          "transformation": "untrusted_routing_hint"
         }
       ],
-      "model_invariance_rate": 0.897455,
+      "model_invariance_rate": 1.0,
       "route_errors": 0,
-      "tier_accuracy": 0.782934,
-      "tier_invariance_rate": 0.897455,
-      "tier_overroute_rate": 0.149701,
-      "tier_underroute_rate": 0.067365,
+      "tier_accuracy": 0.837989,
+      "tier_invariance_rate": 1.0,
+      "tier_overroute_rate": 0.117318,
+      "tier_underroute_rate": 0.044693,
       "transformations": {
         "json_envelope": {
-          "exact": 140,
-          "over": 20,
-          "under": 7
+          "exact": 150,
+          "over": 21,
+          "under": 8
         },
         "markdown_envelope": {
-          "exact": 140,
-          "over": 20,
-          "under": 7
+          "exact": 150,
+          "over": 21,
+          "under": 8
         },
         "multi_turn_preamble": {
-          "exact": 140,
-          "over": 20,
-          "under": 7
+          "exact": 150,
+          "over": 21,
+          "under": 8
         },
         "polite_envelope": {
-          "exact": 140,
-          "over": 20,
-          "under": 7
+          "exact": 150,
+          "over": 21,
+          "under": 8
         },
         "quoted_task": {
-          "exact": 102,
-          "over": 40,
-          "under": 25
+          "exact": 150,
+          "over": 21,
+          "under": 8
         },
         "untrusted_routing_hint": {
-          "exact": 139,
-          "over": 11,
-          "under": 17
+          "exact": 150,
+          "over": 21,
+          "under": 8
         },
         "whitespace_noise": {
-          "exact": 105,
-          "over": 49,
-          "under": 13
+          "exact": 150,
+          "over": 21,
+          "under": 8
         },
         "xml_envelope": {
-          "exact": 140,
-          "over": 20,
-          "under": 7
+          "exact": 150,
+          "over": 21,
+          "under": 8
         }
       },
-      "use_case_accuracy": 0.706587
+      "use_case_accuracy": 0.73743
     },
     "hybrid_tier_risk_p15": {
-      "average_estimated_cost_usd": 0.00991008,
-      "comparable_to_baseline": 1336,
-      "count": 1336,
+      "average_estimated_cost_usd": 0.0068856,
+      "comparable_to_baseline": 1432,
+      "count": 1432,
       "failure_examples": [
         {
-          "baseline_tier": 1,
-          "classifier_confidence": 0.40785847636144934,
-          "expected_tier": 1,
-          "expected_use_case": "general_qa",
-          "id": "lexical-trap-00-0--quoted_task",
+          "baseline_tier": 3,
+          "classifier_confidence": 0.3877937281932526,
+          "expected_tier": 2,
+          "expected_use_case": "coding",
+          "id": "medium-00-0--polite_envelope",
           "selected_tier": 3,
           "selected_use_case": "coding",
           "signals": [
+            "normalized supported polite_envelope contract",
             "coding vocabulary or code block",
-            "advanced system-level task",
-            "learned complexity level 5 using tier_risk",
-            "learned classifier confidence 0.41",
-            "normalized classifier entropy 0.91",
-            "posterior tier under-route probability 0.000"
-          ],
-          "source_case_id": "lexical-trap-00-0",
-          "transformation": "quoted_task"
-        },
-        {
-          "baseline_tier": 1,
-          "classifier_confidence": 0.5192045026086085,
-          "expected_tier": 1,
-          "expected_use_case": "general_qa",
-          "id": "lexical-trap-00-0--whitespace_noise",
-          "selected_tier": 3,
-          "selected_use_case": "coding",
-          "signals": [
-            "coding vocabulary or code block",
-            "advanced system-level task",
-            "learned complexity level 5 using tier_risk",
-            "learned classifier confidence 0.52",
-            "normalized classifier entropy 0.81",
-            "posterior tier under-route probability 0.000"
-          ],
-          "source_case_id": "lexical-trap-00-0",
-          "transformation": "whitespace_noise"
-        },
-        {
-          "baseline_tier": 1,
-          "classifier_confidence": 0.9175134226172758,
-          "expected_tier": 1,
-          "expected_use_case": "general_qa",
-          "id": "lexical-trap-00-1--quoted_task",
-          "selected_tier": 1,
-          "selected_use_case": "coding",
-          "signals": [
-            "coding vocabulary or code block",
-            "advanced system-level task",
-            "learned complexity level 2 using tier_risk",
-            "learned classifier confidence 0.92",
-            "normalized classifier entropy 0.23",
-            "posterior tier under-route probability 0.037"
-          ],
-          "source_case_id": "lexical-trap-00-1",
-          "transformation": "quoted_task"
-        },
-        {
-          "baseline_tier": 1,
-          "classifier_confidence": 0.8247887106343873,
-          "expected_tier": 1,
-          "expected_use_case": "general_qa",
-          "id": "lexical-trap-00-1--whitespace_noise",
-          "selected_tier": 1,
-          "selected_use_case": "coding",
-          "signals": [
-            "coding vocabulary or code block",
-            "advanced system-level task",
-            "learned complexity level 2 using tier_risk",
-            "learned classifier confidence 0.82",
-            "normalized classifier entropy 0.43",
-            "posterior tier under-route probability 0.135"
-          ],
-          "source_case_id": "lexical-trap-00-1",
-          "transformation": "whitespace_noise"
-        },
-        {
-          "baseline_tier": 1,
-          "classifier_confidence": 0.8864036463250066,
-          "expected_tier": 1,
-          "expected_use_case": "general_qa",
-          "id": "lexical-trap-00-2--quoted_task",
-          "selected_tier": 1,
-          "selected_use_case": "coding",
-          "signals": [
-            "coding vocabulary or code block",
-            "advanced system-level task",
-            "learned complexity level 2 using tier_risk",
-            "learned classifier confidence 0.89",
-            "normalized classifier entropy 0.32",
-            "posterior tier under-route probability 0.097"
-          ],
-          "source_case_id": "lexical-trap-00-2",
-          "transformation": "quoted_task"
-        },
-        {
-          "baseline_tier": 1,
-          "classifier_confidence": 0.44524628409597844,
-          "expected_tier": 1,
-          "expected_use_case": "general_qa",
-          "id": "lexical-trap-00-2--whitespace_noise",
-          "selected_tier": 3,
-          "selected_use_case": "coding",
-          "signals": [
-            "coding vocabulary or code block",
-            "advanced system-level task",
-            "learned complexity level 5 using tier_risk",
-            "learned classifier confidence 0.45",
-            "normalized classifier entropy 0.73",
-            "posterior tier under-route probability 0.000"
-          ],
-          "source_case_id": "lexical-trap-00-2",
-          "transformation": "whitespace_noise"
-        },
-        {
-          "baseline_tier": 1,
-          "classifier_confidence": 0.33616514603709613,
-          "expected_tier": 1,
-          "expected_use_case": "general_qa",
-          "id": "lexical-trap-00-3--quoted_task",
-          "selected_tier": 3,
-          "selected_use_case": "coding",
-          "signals": [
-            "coding vocabulary or code block",
-            "advanced system-level task",
-            "learned complexity level 5 using tier_risk",
-            "learned classifier confidence 0.34",
-            "normalized classifier entropy 0.93",
-            "posterior tier under-route probability 0.000"
-          ],
-          "source_case_id": "lexical-trap-00-3",
-          "transformation": "quoted_task"
-        },
-        {
-          "baseline_tier": 1,
-          "classifier_confidence": 0.7040503199834853,
-          "expected_tier": 1,
-          "expected_use_case": "general_qa",
-          "id": "lexical-trap-00-3--whitespace_noise",
-          "selected_tier": 3,
-          "selected_use_case": "coding",
-          "signals": [
-            "coding vocabulary or code block",
-            "advanced system-level task",
-            "learned complexity level 5 using tier_risk",
-            "learned classifier confidence 0.70",
-            "normalized classifier entropy 0.60",
-            "posterior tier under-route probability 0.000"
-          ],
-          "source_case_id": "lexical-trap-00-3",
-          "transformation": "whitespace_noise"
-        },
-        {
-          "baseline_tier": 1,
-          "classifier_confidence": 0.378136249763745,
-          "expected_tier": 1,
-          "expected_use_case": "general_qa",
-          "id": "lexical-trap-01-0--quoted_task",
-          "selected_tier": 3,
-          "selected_use_case": "general_qa",
-          "signals": [
-            "general question/answer pattern",
-            "advanced system-level task",
-            "learned complexity level 5 using tier_risk",
-            "learned classifier confidence 0.38",
-            "normalized classifier entropy 0.87",
-            "posterior tier under-route probability 0.000"
-          ],
-          "source_case_id": "lexical-trap-01-0",
-          "transformation": "quoted_task"
-        },
-        {
-          "baseline_tier": 1,
-          "classifier_confidence": 0.34722957174539776,
-          "expected_tier": 1,
-          "expected_use_case": "general_qa",
-          "id": "lexical-trap-01-0--whitespace_noise",
-          "selected_tier": 3,
-          "selected_use_case": "general_qa",
-          "signals": [
-            "general question/answer pattern",
-            "advanced system-level task",
-            "learned complexity level 5 using tier_risk",
-            "learned classifier confidence 0.35",
-            "normalized classifier entropy 0.88",
-            "posterior tier under-route probability 0.000"
-          ],
-          "source_case_id": "lexical-trap-01-0",
-          "transformation": "whitespace_noise"
-        },
-        {
-          "baseline_tier": 1,
-          "classifier_confidence": 0.449415918987111,
-          "expected_tier": 1,
-          "expected_use_case": "general_qa",
-          "id": "lexical-trap-01-1--whitespace_noise",
-          "selected_tier": 2,
-          "selected_use_case": "general_qa",
-          "signals": [
-            "general question/answer pattern",
-            "advanced system-level task",
-            "learned complexity level 3 using tier_risk",
-            "learned classifier confidence 0.45",
-            "normalized classifier entropy 0.83",
-            "posterior tier under-route probability 0.102"
-          ],
-          "source_case_id": "lexical-trap-01-1",
-          "transformation": "whitespace_noise"
-        },
-        {
-          "baseline_tier": 1,
-          "classifier_confidence": 0.8170016208882013,
-          "expected_tier": 1,
-          "expected_use_case": "general_qa",
-          "id": "lexical-trap-01-2--quoted_task",
-          "selected_tier": 2,
-          "selected_use_case": "general_qa",
-          "signals": [
-            "general question/answer pattern",
-            "advanced system-level task",
-            "learned complexity level 3 using tier_risk",
-            "learned classifier confidence 0.82",
-            "normalized classifier entropy 0.43",
-            "posterior tier under-route probability 0.060"
-          ],
-          "source_case_id": "lexical-trap-01-2",
-          "transformation": "quoted_task"
-        },
-        {
-          "baseline_tier": 1,
-          "classifier_confidence": 0.5192179615947946,
-          "expected_tier": 1,
-          "expected_use_case": "general_qa",
-          "id": "lexical-trap-01-2--whitespace_noise",
-          "selected_tier": 3,
-          "selected_use_case": "general_qa",
-          "signals": [
-            "general question/answer pattern",
-            "advanced system-level task",
-            "learned complexity level 5 using tier_risk",
-            "learned classifier confidence 0.52",
-            "normalized classifier entropy 0.75",
-            "posterior tier under-route probability 0.000"
-          ],
-          "source_case_id": "lexical-trap-01-2",
-          "transformation": "whitespace_noise"
-        },
-        {
-          "baseline_tier": 1,
-          "classifier_confidence": 0.570308435534607,
-          "expected_tier": 1,
-          "expected_use_case": "general_qa",
-          "id": "lexical-trap-01-3--quoted_task",
-          "selected_tier": 2,
-          "selected_use_case": "general_qa",
-          "signals": [
-            "general question/answer pattern",
-            "advanced system-level task",
-            "learned complexity level 3 using tier_risk",
-            "learned classifier confidence 0.57",
-            "normalized classifier entropy 0.74",
-            "posterior tier under-route probability 0.112"
-          ],
-          "source_case_id": "lexical-trap-01-3",
-          "transformation": "quoted_task"
-        },
-        {
-          "baseline_tier": 1,
-          "classifier_confidence": 0.4787814371232833,
-          "expected_tier": 1,
-          "expected_use_case": "general_qa",
-          "id": "lexical-trap-01-3--whitespace_noise",
-          "selected_tier": 3,
-          "selected_use_case": "general_qa",
-          "signals": [
-            "general question/answer pattern",
-            "advanced system-level task",
-            "learned complexity level 5 using tier_risk",
-            "learned classifier confidence 0.48",
-            "normalized classifier entropy 0.76",
-            "posterior tier under-route probability 0.000"
-          ],
-          "source_case_id": "lexical-trap-01-3",
-          "transformation": "whitespace_noise"
-        },
-        {
-          "baseline_tier": 1,
-          "classifier_confidence": 0.6998867081098777,
-          "expected_tier": 1,
-          "expected_use_case": "general_qa",
-          "id": "lexical-trap-02-0--quoted_task",
-          "selected_tier": 2,
-          "selected_use_case": "coding",
-          "signals": [
-            "coding vocabulary or code block",
-            "learned complexity level 3 using tier_risk",
-            "learned classifier confidence 0.70",
-            "normalized classifier entropy 0.60",
-            "posterior tier under-route probability 0.078"
-          ],
-          "source_case_id": "lexical-trap-02-0",
-          "transformation": "quoted_task"
-        },
-        {
-          "baseline_tier": 1,
-          "classifier_confidence": 0.5239229482450746,
-          "expected_tier": 1,
-          "expected_use_case": "general_qa",
-          "id": "lexical-trap-02-0--whitespace_noise",
-          "selected_tier": 3,
-          "selected_use_case": "coding",
-          "signals": [
-            "coding vocabulary or code block",
-            "learned complexity level 5 using tier_risk",
-            "learned classifier confidence 0.52",
-            "normalized classifier entropy 0.78",
-            "posterior tier under-route probability 0.000"
-          ],
-          "source_case_id": "lexical-trap-02-0",
-          "transformation": "whitespace_noise"
-        },
-        {
-          "baseline_tier": 1,
-          "classifier_confidence": 0.8799932235268517,
-          "expected_tier": 1,
-          "expected_use_case": "general_qa",
-          "id": "lexical-trap-02-1--quoted_task",
-          "selected_tier": 1,
-          "selected_use_case": "coding",
-          "signals": [
-            "coding vocabulary or code block",
-            "learned complexity level 2 using tier_risk",
-            "learned classifier confidence 0.88",
-            "normalized classifier entropy 0.28",
-            "posterior tier under-route probability 0.025"
-          ],
-          "source_case_id": "lexical-trap-02-1",
-          "transformation": "quoted_task"
-        },
-        {
-          "baseline_tier": 1,
-          "classifier_confidence": 0.8158992756088201,
-          "expected_tier": 1,
-          "expected_use_case": "general_qa",
-          "id": "lexical-trap-02-1--whitespace_noise",
-          "selected_tier": 1,
-          "selected_use_case": "coding",
-          "signals": [
-            "coding vocabulary or code block",
-            "learned complexity level 2 using tier_risk",
-            "learned classifier confidence 0.82",
-            "normalized classifier entropy 0.43",
-            "posterior tier under-route probability 0.096"
-          ],
-          "source_case_id": "lexical-trap-02-1",
-          "transformation": "whitespace_noise"
-        },
-        {
-          "baseline_tier": 1,
-          "classifier_confidence": 0.9665907842007228,
-          "expected_tier": 1,
-          "expected_use_case": "general_qa",
-          "id": "lexical-trap-02-2--quoted_task",
-          "selected_tier": 1,
-          "selected_use_case": "coding",
-          "signals": [
-            "coding vocabulary or code block",
-            "learned complexity level 2 using tier_risk",
-            "learned classifier confidence 0.97",
-            "normalized classifier entropy 0.12",
-            "posterior tier under-route probability 0.019"
-          ],
-          "source_case_id": "lexical-trap-02-2",
-          "transformation": "quoted_task"
-        },
-        {
-          "baseline_tier": 1,
-          "classifier_confidence": 0.7056722042480581,
-          "expected_tier": 1,
-          "expected_use_case": "general_qa",
-          "id": "lexical-trap-02-2--whitespace_noise",
-          "selected_tier": 3,
-          "selected_use_case": "coding",
-          "signals": [
-            "coding vocabulary or code block",
-            "learned complexity level 5 using tier_risk",
-            "learned classifier confidence 0.71",
-            "normalized classifier entropy 0.57",
-            "posterior tier under-route probability 0.000"
-          ],
-          "source_case_id": "lexical-trap-02-2",
-          "transformation": "whitespace_noise"
-        },
-        {
-          "baseline_tier": 1,
-          "classifier_confidence": 0.47380244624693646,
-          "expected_tier": 1,
-          "expected_use_case": "general_qa",
-          "id": "lexical-trap-02-3--quoted_task",
-          "selected_tier": 1,
-          "selected_use_case": "coding",
-          "signals": [
-            "coding vocabulary or code block",
-            "learned complexity level 2 using tier_risk",
-            "learned classifier confidence 0.47",
-            "normalized classifier entropy 0.64",
-            "posterior tier under-route probability 0.096"
-          ],
-          "source_case_id": "lexical-trap-02-3",
-          "transformation": "quoted_task"
-        },
-        {
-          "baseline_tier": 1,
-          "classifier_confidence": 0.41020981161746395,
-          "expected_tier": 1,
-          "expected_use_case": "general_qa",
-          "id": "lexical-trap-02-3--whitespace_noise",
-          "selected_tier": 3,
-          "selected_use_case": "coding",
-          "signals": [
-            "coding vocabulary or code block",
-            "learned complexity level 5 using tier_risk",
-            "learned classifier confidence 0.41",
-            "normalized classifier entropy 0.80",
-            "posterior tier under-route probability 0.000"
-          ],
-          "source_case_id": "lexical-trap-02-3",
-          "transformation": "whitespace_noise"
-        },
-        {
-          "baseline_tier": 1,
-          "classifier_confidence": 0.3767475918492846,
-          "expected_tier": 1,
-          "expected_use_case": "general_qa",
-          "id": "lexical-trap-03-0--quoted_task",
-          "selected_tier": 3,
-          "selected_use_case": "general_qa",
-          "signals": [
-            "general question/answer pattern",
-            "advanced system-level task",
-            "high-stakes domain",
-            "learned complexity level 5 using tier_risk",
-            "learned classifier confidence 0.38",
-            "normalized classifier entropy 0.87",
-            "posterior tier under-route probability 0.000"
-          ],
-          "source_case_id": "lexical-trap-03-0",
-          "transformation": "quoted_task"
-        },
-        {
-          "baseline_tier": 1,
-          "classifier_confidence": 0.404951170518894,
-          "expected_tier": 1,
-          "expected_use_case": "general_qa",
-          "id": "lexical-trap-03-0--whitespace_noise",
-          "selected_tier": 3,
-          "selected_use_case": "general_qa",
-          "signals": [
-            "general question/answer pattern",
-            "advanced system-level task",
-            "high-stakes domain",
-            "learned complexity level 5 using tier_risk",
-            "learned classifier confidence 0.40",
-            "normalized classifier entropy 0.89",
-            "posterior tier under-route probability 0.000"
-          ],
-          "source_case_id": "lexical-trap-03-0",
-          "transformation": "whitespace_noise"
-        },
-        {
-          "baseline_tier": 1,
-          "classifier_confidence": 0.7814977498946614,
-          "expected_tier": 1,
-          "expected_use_case": "general_qa",
-          "id": "lexical-trap-03-1--quoted_task",
-          "selected_tier": 2,
-          "selected_use_case": "general_qa",
-          "signals": [
-            "general question/answer pattern",
-            "advanced system-level task",
-            "high-stakes domain",
-            "learned complexity level 2 using tier_risk",
-            "learned classifier confidence 0.78",
-            "normalized classifier entropy 0.45",
-            "posterior tier under-route probability 0.075"
-          ],
-          "source_case_id": "lexical-trap-03-1",
-          "transformation": "quoted_task"
-        },
-        {
-          "baseline_tier": 1,
-          "classifier_confidence": 0.6438515835012487,
-          "expected_tier": 1,
-          "expected_use_case": "general_qa",
-          "id": "lexical-trap-03-1--whitespace_noise",
-          "selected_tier": 2,
-          "selected_use_case": "general_qa",
-          "signals": [
-            "general question/answer pattern",
-            "advanced system-level task",
-            "high-stakes domain",
-            "learned complexity level 3 using tier_risk",
-            "learned classifier confidence 0.64",
-            "normalized classifier entropy 0.67",
-            "posterior tier under-route probability 0.083"
-          ],
-          "source_case_id": "lexical-trap-03-1",
-          "transformation": "whitespace_noise"
-        },
-        {
-          "baseline_tier": 1,
-          "classifier_confidence": 0.8514836542518209,
-          "expected_tier": 1,
-          "expected_use_case": "general_qa",
-          "id": "lexical-trap-03-2--quoted_task",
-          "selected_tier": 2,
-          "selected_use_case": "general_qa",
-          "signals": [
-            "general question/answer pattern",
-            "advanced system-level task",
-            "high-stakes domain",
-            "learned complexity level 3 using tier_risk",
-            "learned classifier confidence 0.85",
-            "normalized classifier entropy 0.36",
-            "posterior tier under-route probability 0.049"
-          ],
-          "source_case_id": "lexical-trap-03-2",
-          "transformation": "quoted_task"
-        },
-        {
-          "baseline_tier": 1,
-          "classifier_confidence": 0.3515555684139476,
-          "expected_tier": 1,
-          "expected_use_case": "general_qa",
-          "id": "lexical-trap-03-2--whitespace_noise",
-          "selected_tier": 3,
-          "selected_use_case": "general_qa",
-          "signals": [
-            "general question/answer pattern",
-            "advanced system-level task",
-            "high-stakes domain",
-            "learned complexity level 5 using tier_risk",
-            "learned classifier confidence 0.35",
-            "normalized classifier entropy 0.81",
-            "posterior tier under-route probability 0.000"
-          ],
-          "source_case_id": "lexical-trap-03-2",
-          "transformation": "whitespace_noise"
-        },
-        {
-          "baseline_tier": 1,
-          "classifier_confidence": 0.3850336449962668,
-          "expected_tier": 1,
-          "expected_use_case": "general_qa",
-          "id": "lexical-trap-03-3--quoted_task",
-          "selected_tier": 3,
-          "selected_use_case": "general_qa",
-          "signals": [
-            "general question/answer pattern",
-            "advanced system-level task",
-            "high-stakes domain",
+            "non-trivial implementation or verification",
             "learned complexity level 5 using tier_risk",
             "learned classifier confidence 0.39",
-            "normalized classifier entropy 0.91",
+            "normalized classifier entropy 0.87",
+            "full-conversation and final-turn tiers agree",
             "posterior tier under-route probability 0.000"
           ],
-          "source_case_id": "lexical-trap-03-3",
+          "source_case_id": "medium-00-0",
+          "transformation": "polite_envelope"
+        },
+        {
+          "baseline_tier": 3,
+          "classifier_confidence": 0.3877937281932526,
+          "expected_tier": 2,
+          "expected_use_case": "coding",
+          "id": "medium-00-0--markdown_envelope",
+          "selected_tier": 3,
+          "selected_use_case": "coding",
+          "signals": [
+            "normalized supported markdown_envelope contract",
+            "coding vocabulary or code block",
+            "non-trivial implementation or verification",
+            "learned complexity level 5 using tier_risk",
+            "learned classifier confidence 0.39",
+            "normalized classifier entropy 0.87",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ],
+          "source_case_id": "medium-00-0",
+          "transformation": "markdown_envelope"
+        },
+        {
+          "baseline_tier": 3,
+          "classifier_confidence": 0.3877937281932526,
+          "expected_tier": 2,
+          "expected_use_case": "coding",
+          "id": "medium-00-0--xml_envelope",
+          "selected_tier": 3,
+          "selected_use_case": "coding",
+          "signals": [
+            "normalized supported xml_envelope contract",
+            "coding vocabulary or code block",
+            "non-trivial implementation or verification",
+            "learned complexity level 5 using tier_risk",
+            "learned classifier confidence 0.39",
+            "normalized classifier entropy 0.87",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ],
+          "source_case_id": "medium-00-0",
+          "transformation": "xml_envelope"
+        },
+        {
+          "baseline_tier": 3,
+          "classifier_confidence": 0.3877937281932526,
+          "expected_tier": 2,
+          "expected_use_case": "coding",
+          "id": "medium-00-0--json_envelope",
+          "selected_tier": 3,
+          "selected_use_case": "coding",
+          "signals": [
+            "normalized supported json_envelope contract",
+            "coding vocabulary or code block",
+            "non-trivial implementation or verification",
+            "learned complexity level 5 using tier_risk",
+            "learned classifier confidence 0.39",
+            "normalized classifier entropy 0.87",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ],
+          "source_case_id": "medium-00-0",
+          "transformation": "json_envelope"
+        },
+        {
+          "baseline_tier": 3,
+          "classifier_confidence": 0.3877937281932526,
+          "expected_tier": 2,
+          "expected_use_case": "coding",
+          "id": "medium-00-0--multi_turn_preamble",
+          "selected_tier": 3,
+          "selected_use_case": "coding",
+          "signals": [
+            "normalized supported multi_turn_preamble contract",
+            "coding vocabulary or code block",
+            "non-trivial implementation or verification",
+            "learned complexity level 5 using tier_risk",
+            "learned classifier confidence 0.39",
+            "normalized classifier entropy 0.87",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ],
+          "source_case_id": "medium-00-0",
+          "transformation": "multi_turn_preamble"
+        },
+        {
+          "baseline_tier": 3,
+          "classifier_confidence": 0.3877937281932526,
+          "expected_tier": 2,
+          "expected_use_case": "coding",
+          "id": "medium-00-0--untrusted_routing_hint",
+          "selected_tier": 3,
+          "selected_use_case": "coding",
+          "signals": [
+            "normalized supported untrusted_routing_hint contract",
+            "coding vocabulary or code block",
+            "non-trivial implementation or verification",
+            "learned complexity level 5 using tier_risk",
+            "learned classifier confidence 0.39",
+            "normalized classifier entropy 0.87",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ],
+          "source_case_id": "medium-00-0",
+          "transformation": "untrusted_routing_hint"
+        },
+        {
+          "baseline_tier": 3,
+          "classifier_confidence": 0.3877937281932526,
+          "expected_tier": 2,
+          "expected_use_case": "coding",
+          "id": "medium-00-0--quoted_task",
+          "selected_tier": 3,
+          "selected_use_case": "coding",
+          "signals": [
+            "normalized supported quoted_task contract",
+            "coding vocabulary or code block",
+            "non-trivial implementation or verification",
+            "learned complexity level 5 using tier_risk",
+            "learned classifier confidence 0.39",
+            "normalized classifier entropy 0.87",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ],
+          "source_case_id": "medium-00-0",
           "transformation": "quoted_task"
+        },
+        {
+          "baseline_tier": 3,
+          "classifier_confidence": 0.3877937281932526,
+          "expected_tier": 2,
+          "expected_use_case": "coding",
+          "id": "medium-00-0--whitespace_noise",
+          "selected_tier": 3,
+          "selected_use_case": "coding",
+          "signals": [
+            "normalized supported whitespace_noise contract",
+            "coding vocabulary or code block",
+            "non-trivial implementation or verification",
+            "learned complexity level 5 using tier_risk",
+            "learned classifier confidence 0.39",
+            "normalized classifier entropy 0.87",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ],
+          "source_case_id": "medium-00-0",
+          "transformation": "whitespace_noise"
+        },
+        {
+          "baseline_tier": 3,
+          "classifier_confidence": 0.3161409217038015,
+          "expected_tier": 2,
+          "expected_use_case": "coding",
+          "id": "medium-00-1--polite_envelope",
+          "selected_tier": 3,
+          "selected_use_case": "coding",
+          "signals": [
+            "normalized supported polite_envelope contract",
+            "coding vocabulary or code block",
+            "non-trivial implementation or verification",
+            "multiple constraints or subtasks",
+            "learned complexity level 5 using tier_risk",
+            "learned classifier confidence 0.32",
+            "normalized classifier entropy 0.88",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ],
+          "source_case_id": "medium-00-1",
+          "transformation": "polite_envelope"
+        },
+        {
+          "baseline_tier": 3,
+          "classifier_confidence": 0.3161409217038015,
+          "expected_tier": 2,
+          "expected_use_case": "coding",
+          "id": "medium-00-1--markdown_envelope",
+          "selected_tier": 3,
+          "selected_use_case": "coding",
+          "signals": [
+            "normalized supported markdown_envelope contract",
+            "coding vocabulary or code block",
+            "non-trivial implementation or verification",
+            "multiple constraints or subtasks",
+            "learned complexity level 5 using tier_risk",
+            "learned classifier confidence 0.32",
+            "normalized classifier entropy 0.88",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ],
+          "source_case_id": "medium-00-1",
+          "transformation": "markdown_envelope"
+        },
+        {
+          "baseline_tier": 3,
+          "classifier_confidence": 0.3161409217038015,
+          "expected_tier": 2,
+          "expected_use_case": "coding",
+          "id": "medium-00-1--xml_envelope",
+          "selected_tier": 3,
+          "selected_use_case": "coding",
+          "signals": [
+            "normalized supported xml_envelope contract",
+            "coding vocabulary or code block",
+            "non-trivial implementation or verification",
+            "multiple constraints or subtasks",
+            "learned complexity level 5 using tier_risk",
+            "learned classifier confidence 0.32",
+            "normalized classifier entropy 0.88",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ],
+          "source_case_id": "medium-00-1",
+          "transformation": "xml_envelope"
+        },
+        {
+          "baseline_tier": 3,
+          "classifier_confidence": 0.3161409217038015,
+          "expected_tier": 2,
+          "expected_use_case": "coding",
+          "id": "medium-00-1--json_envelope",
+          "selected_tier": 3,
+          "selected_use_case": "coding",
+          "signals": [
+            "normalized supported json_envelope contract",
+            "coding vocabulary or code block",
+            "non-trivial implementation or verification",
+            "multiple constraints or subtasks",
+            "learned complexity level 5 using tier_risk",
+            "learned classifier confidence 0.32",
+            "normalized classifier entropy 0.88",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ],
+          "source_case_id": "medium-00-1",
+          "transformation": "json_envelope"
+        },
+        {
+          "baseline_tier": 3,
+          "classifier_confidence": 0.3161409217038015,
+          "expected_tier": 2,
+          "expected_use_case": "coding",
+          "id": "medium-00-1--multi_turn_preamble",
+          "selected_tier": 3,
+          "selected_use_case": "coding",
+          "signals": [
+            "normalized supported multi_turn_preamble contract",
+            "coding vocabulary or code block",
+            "non-trivial implementation or verification",
+            "multiple constraints or subtasks",
+            "learned complexity level 5 using tier_risk",
+            "learned classifier confidence 0.32",
+            "normalized classifier entropy 0.88",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ],
+          "source_case_id": "medium-00-1",
+          "transformation": "multi_turn_preamble"
+        },
+        {
+          "baseline_tier": 3,
+          "classifier_confidence": 0.3161409217038015,
+          "expected_tier": 2,
+          "expected_use_case": "coding",
+          "id": "medium-00-1--untrusted_routing_hint",
+          "selected_tier": 3,
+          "selected_use_case": "coding",
+          "signals": [
+            "normalized supported untrusted_routing_hint contract",
+            "coding vocabulary or code block",
+            "non-trivial implementation or verification",
+            "multiple constraints or subtasks",
+            "learned complexity level 5 using tier_risk",
+            "learned classifier confidence 0.32",
+            "normalized classifier entropy 0.88",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ],
+          "source_case_id": "medium-00-1",
+          "transformation": "untrusted_routing_hint"
+        },
+        {
+          "baseline_tier": 3,
+          "classifier_confidence": 0.3161409217038015,
+          "expected_tier": 2,
+          "expected_use_case": "coding",
+          "id": "medium-00-1--quoted_task",
+          "selected_tier": 3,
+          "selected_use_case": "coding",
+          "signals": [
+            "normalized supported quoted_task contract",
+            "coding vocabulary or code block",
+            "non-trivial implementation or verification",
+            "multiple constraints or subtasks",
+            "learned complexity level 5 using tier_risk",
+            "learned classifier confidence 0.32",
+            "normalized classifier entropy 0.88",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ],
+          "source_case_id": "medium-00-1",
+          "transformation": "quoted_task"
+        },
+        {
+          "baseline_tier": 3,
+          "classifier_confidence": 0.3161409217038015,
+          "expected_tier": 2,
+          "expected_use_case": "coding",
+          "id": "medium-00-1--whitespace_noise",
+          "selected_tier": 3,
+          "selected_use_case": "coding",
+          "signals": [
+            "normalized supported whitespace_noise contract",
+            "coding vocabulary or code block",
+            "non-trivial implementation or verification",
+            "multiple constraints or subtasks",
+            "learned complexity level 5 using tier_risk",
+            "learned classifier confidence 0.32",
+            "normalized classifier entropy 0.88",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ],
+          "source_case_id": "medium-00-1",
+          "transformation": "whitespace_noise"
+        },
+        {
+          "baseline_tier": 3,
+          "classifier_confidence": 0.568511425563002,
+          "expected_tier": 2,
+          "expected_use_case": "coding",
+          "id": "medium-00-3--polite_envelope",
+          "selected_tier": 3,
+          "selected_use_case": "coding",
+          "signals": [
+            "normalized supported polite_envelope contract",
+            "coding vocabulary or code block",
+            "non-trivial implementation or verification",
+            "learned complexity level 5 using tier_risk",
+            "learned classifier confidence 0.57",
+            "normalized classifier entropy 0.76",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ],
+          "source_case_id": "medium-00-3",
+          "transformation": "polite_envelope"
+        },
+        {
+          "baseline_tier": 3,
+          "classifier_confidence": 0.568511425563002,
+          "expected_tier": 2,
+          "expected_use_case": "coding",
+          "id": "medium-00-3--markdown_envelope",
+          "selected_tier": 3,
+          "selected_use_case": "coding",
+          "signals": [
+            "normalized supported markdown_envelope contract",
+            "coding vocabulary or code block",
+            "non-trivial implementation or verification",
+            "learned complexity level 5 using tier_risk",
+            "learned classifier confidence 0.57",
+            "normalized classifier entropy 0.76",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ],
+          "source_case_id": "medium-00-3",
+          "transformation": "markdown_envelope"
+        },
+        {
+          "baseline_tier": 3,
+          "classifier_confidence": 0.568511425563002,
+          "expected_tier": 2,
+          "expected_use_case": "coding",
+          "id": "medium-00-3--xml_envelope",
+          "selected_tier": 3,
+          "selected_use_case": "coding",
+          "signals": [
+            "normalized supported xml_envelope contract",
+            "coding vocabulary or code block",
+            "non-trivial implementation or verification",
+            "learned complexity level 5 using tier_risk",
+            "learned classifier confidence 0.57",
+            "normalized classifier entropy 0.76",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ],
+          "source_case_id": "medium-00-3",
+          "transformation": "xml_envelope"
+        },
+        {
+          "baseline_tier": 3,
+          "classifier_confidence": 0.568511425563002,
+          "expected_tier": 2,
+          "expected_use_case": "coding",
+          "id": "medium-00-3--json_envelope",
+          "selected_tier": 3,
+          "selected_use_case": "coding",
+          "signals": [
+            "normalized supported json_envelope contract",
+            "coding vocabulary or code block",
+            "non-trivial implementation or verification",
+            "learned complexity level 5 using tier_risk",
+            "learned classifier confidence 0.57",
+            "normalized classifier entropy 0.76",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ],
+          "source_case_id": "medium-00-3",
+          "transformation": "json_envelope"
+        },
+        {
+          "baseline_tier": 3,
+          "classifier_confidence": 0.568511425563002,
+          "expected_tier": 2,
+          "expected_use_case": "coding",
+          "id": "medium-00-3--multi_turn_preamble",
+          "selected_tier": 3,
+          "selected_use_case": "coding",
+          "signals": [
+            "normalized supported multi_turn_preamble contract",
+            "coding vocabulary or code block",
+            "non-trivial implementation or verification",
+            "learned complexity level 5 using tier_risk",
+            "learned classifier confidence 0.57",
+            "normalized classifier entropy 0.76",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ],
+          "source_case_id": "medium-00-3",
+          "transformation": "multi_turn_preamble"
+        },
+        {
+          "baseline_tier": 3,
+          "classifier_confidence": 0.568511425563002,
+          "expected_tier": 2,
+          "expected_use_case": "coding",
+          "id": "medium-00-3--untrusted_routing_hint",
+          "selected_tier": 3,
+          "selected_use_case": "coding",
+          "signals": [
+            "normalized supported untrusted_routing_hint contract",
+            "coding vocabulary or code block",
+            "non-trivial implementation or verification",
+            "learned complexity level 5 using tier_risk",
+            "learned classifier confidence 0.57",
+            "normalized classifier entropy 0.76",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ],
+          "source_case_id": "medium-00-3",
+          "transformation": "untrusted_routing_hint"
+        },
+        {
+          "baseline_tier": 3,
+          "classifier_confidence": 0.568511425563002,
+          "expected_tier": 2,
+          "expected_use_case": "coding",
+          "id": "medium-00-3--quoted_task",
+          "selected_tier": 3,
+          "selected_use_case": "coding",
+          "signals": [
+            "normalized supported quoted_task contract",
+            "coding vocabulary or code block",
+            "non-trivial implementation or verification",
+            "learned complexity level 5 using tier_risk",
+            "learned classifier confidence 0.57",
+            "normalized classifier entropy 0.76",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ],
+          "source_case_id": "medium-00-3",
+          "transformation": "quoted_task"
+        },
+        {
+          "baseline_tier": 3,
+          "classifier_confidence": 0.568511425563002,
+          "expected_tier": 2,
+          "expected_use_case": "coding",
+          "id": "medium-00-3--whitespace_noise",
+          "selected_tier": 3,
+          "selected_use_case": "coding",
+          "signals": [
+            "normalized supported whitespace_noise contract",
+            "coding vocabulary or code block",
+            "non-trivial implementation or verification",
+            "learned complexity level 5 using tier_risk",
+            "learned classifier confidence 0.57",
+            "normalized classifier entropy 0.76",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ],
+          "source_case_id": "medium-00-3",
+          "transformation": "whitespace_noise"
+        },
+        {
+          "baseline_tier": 3,
+          "classifier_confidence": 0.3566226384562229,
+          "expected_tier": 2,
+          "expected_use_case": "coding",
+          "id": "medium-01-0--polite_envelope",
+          "selected_tier": 3,
+          "selected_use_case": "coding",
+          "signals": [
+            "normalized supported polite_envelope contract",
+            "coding vocabulary or code block",
+            "non-trivial implementation or verification",
+            "tool-assisted coding request",
+            "learned complexity level 5 using tier_risk",
+            "learned classifier confidence 0.36",
+            "normalized classifier entropy 0.92",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ],
+          "source_case_id": "medium-01-0",
+          "transformation": "polite_envelope"
+        },
+        {
+          "baseline_tier": 3,
+          "classifier_confidence": 0.3566226384562229,
+          "expected_tier": 2,
+          "expected_use_case": "coding",
+          "id": "medium-01-0--markdown_envelope",
+          "selected_tier": 3,
+          "selected_use_case": "coding",
+          "signals": [
+            "normalized supported markdown_envelope contract",
+            "coding vocabulary or code block",
+            "non-trivial implementation or verification",
+            "tool-assisted coding request",
+            "learned complexity level 5 using tier_risk",
+            "learned classifier confidence 0.36",
+            "normalized classifier entropy 0.92",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ],
+          "source_case_id": "medium-01-0",
+          "transformation": "markdown_envelope"
+        },
+        {
+          "baseline_tier": 3,
+          "classifier_confidence": 0.3566226384562229,
+          "expected_tier": 2,
+          "expected_use_case": "coding",
+          "id": "medium-01-0--xml_envelope",
+          "selected_tier": 3,
+          "selected_use_case": "coding",
+          "signals": [
+            "normalized supported xml_envelope contract",
+            "coding vocabulary or code block",
+            "non-trivial implementation or verification",
+            "tool-assisted coding request",
+            "learned complexity level 5 using tier_risk",
+            "learned classifier confidence 0.36",
+            "normalized classifier entropy 0.92",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ],
+          "source_case_id": "medium-01-0",
+          "transformation": "xml_envelope"
+        },
+        {
+          "baseline_tier": 3,
+          "classifier_confidence": 0.3566226384562229,
+          "expected_tier": 2,
+          "expected_use_case": "coding",
+          "id": "medium-01-0--json_envelope",
+          "selected_tier": 3,
+          "selected_use_case": "coding",
+          "signals": [
+            "normalized supported json_envelope contract",
+            "coding vocabulary or code block",
+            "non-trivial implementation or verification",
+            "tool-assisted coding request",
+            "learned complexity level 5 using tier_risk",
+            "learned classifier confidence 0.36",
+            "normalized classifier entropy 0.92",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ],
+          "source_case_id": "medium-01-0",
+          "transformation": "json_envelope"
+        },
+        {
+          "baseline_tier": 3,
+          "classifier_confidence": 0.3566226384562229,
+          "expected_tier": 2,
+          "expected_use_case": "coding",
+          "id": "medium-01-0--multi_turn_preamble",
+          "selected_tier": 3,
+          "selected_use_case": "coding",
+          "signals": [
+            "normalized supported multi_turn_preamble contract",
+            "coding vocabulary or code block",
+            "non-trivial implementation or verification",
+            "tool-assisted coding request",
+            "learned complexity level 5 using tier_risk",
+            "learned classifier confidence 0.36",
+            "normalized classifier entropy 0.92",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ],
+          "source_case_id": "medium-01-0",
+          "transformation": "multi_turn_preamble"
+        },
+        {
+          "baseline_tier": 3,
+          "classifier_confidence": 0.3566226384562229,
+          "expected_tier": 2,
+          "expected_use_case": "coding",
+          "id": "medium-01-0--untrusted_routing_hint",
+          "selected_tier": 3,
+          "selected_use_case": "coding",
+          "signals": [
+            "normalized supported untrusted_routing_hint contract",
+            "coding vocabulary or code block",
+            "non-trivial implementation or verification",
+            "tool-assisted coding request",
+            "learned complexity level 5 using tier_risk",
+            "learned classifier confidence 0.36",
+            "normalized classifier entropy 0.92",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ],
+          "source_case_id": "medium-01-0",
+          "transformation": "untrusted_routing_hint"
         }
       ],
-      "model_invariance_rate": 0.889222,
+      "model_invariance_rate": 1.0,
       "route_errors": 0,
-      "tier_accuracy": 0.682635,
-      "tier_invariance_rate": 0.889222,
-      "tier_overroute_rate": 0.291168,
-      "tier_underroute_rate": 0.026198,
+      "tier_accuracy": 0.692737,
+      "tier_invariance_rate": 1.0,
+      "tier_overroute_rate": 0.290503,
+      "tier_underroute_rate": 0.01676,
       "transformations": {
         "json_envelope": {
-          "exact": 118,
-          "over": 46,
+          "exact": 124,
+          "over": 52,
           "under": 3
         },
         "markdown_envelope": {
-          "exact": 118,
-          "over": 46,
+          "exact": 124,
+          "over": 52,
           "under": 3
         },
         "multi_turn_preamble": {
-          "exact": 118,
-          "over": 46,
+          "exact": 124,
+          "over": 52,
           "under": 3
         },
         "polite_envelope": {
-          "exact": 118,
-          "over": 46,
+          "exact": 124,
+          "over": 52,
           "under": 3
         },
         "quoted_task": {
-          "exact": 98,
-          "over": 59,
-          "under": 10
+          "exact": 124,
+          "over": 52,
+          "under": 3
         },
         "untrusted_routing_hint": {
-          "exact": 139,
-          "over": 23,
-          "under": 5
+          "exact": 124,
+          "over": 52,
+          "under": 3
         },
         "whitespace_noise": {
-          "exact": 85,
-          "over": 77,
-          "under": 5
+          "exact": 124,
+          "over": 52,
+          "under": 3
         },
         "xml_envelope": {
-          "exact": 118,
-          "over": 46,
+          "exact": 124,
+          "over": 52,
           "under": 3
         }
       },
-      "use_case_accuracy": 0.706587
+      "use_case_accuracy": 0.73743
     }
   },
   "schema_version": "model-router-metamorphic-eval-v1",
-  "source_case_count": 167,
+  "source_case_count": 179,
   "transformations": [
     "polite_envelope",
     "markdown_envelope",

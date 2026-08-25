@@ -6,7 +6,7 @@ import json
 import statistics
 import time
 from collections import Counter, defaultdict
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Iterator
@@ -41,6 +41,7 @@ class DatasetRow:
     category: str
     status: str
     confidence: float
+    suggested_level: int | None
     row_id: int | None
 
 
@@ -49,11 +50,12 @@ class TrainingConfig:
     feature_dimension: int = DEFAULT_FEATURE_DIMENSION
     smoothing: float = 1.0
     borderline_weight: float = 0.65
+    borderline_suggested_weight: float = 0.0
     appropriate_weight: float = 1.0
     train_percentage: int = 80
     validation_percentage: int = 10
     class_prior: str = "uniform"
-    augmentation_copies_per_train_row: int = 1
+    augmentation_copies_per_train_row: int = 2
     augmentation_weight: float = 0.5
 
     def validate(self) -> None:
@@ -63,6 +65,8 @@ class TrainingConfig:
             raise ValueError("smoothing must be greater than zero")
         if not 0 < self.borderline_weight <= 1:
             raise ValueError("borderline_weight must be in (0, 1]")
+        if not 0 <= self.borderline_suggested_weight <= 1:
+            raise ValueError("borderline_suggested_weight must be in [0, 1]")
         if not 0 < self.appropriate_weight <= 1:
             raise ValueError("appropriate_weight must be in (0, 1]")
         if self.train_percentage + self.validation_percentage >= 100:
@@ -80,6 +84,19 @@ def sha256_file(path: Path) -> str:
     with path.open("rb") as handle:
         for chunk in iter(lambda: handle.read(1024 * 1024), b""):
             digest.update(chunk)
+    return digest.hexdigest()
+
+
+def training_implementation_sha256() -> str:
+    """Fingerprint the local code that defines training and probability outputs."""
+
+    package_root = Path(__file__).resolve().parent
+    digest = hashlib.sha256()
+    for name in ("evaluation.py", "learned.py", "normalization.py", "training.py"):
+        digest.update(name.encode("utf-8"))
+        digest.update(b"\0")
+        digest.update((package_root / name).read_bytes())
+        digest.update(b"\0")
     return digest.hexdigest()
 
 
@@ -129,6 +146,11 @@ def read_dataset(path: str | Path) -> Iterator[DatasetRow]:
                 category=str(raw.get("category", "unknown")),
                 status=str(raw.get("complexity_audit_status", "unreviewed")),
                 confidence=float(raw.get("complexity_audit_confidence", 1.0)),
+                suggested_level=(
+                    int(raw["complexity_audit_suggested_level"])
+                    if "complexity_audit_suggested_level" in raw
+                    else None
+                ),
                 row_id=int(raw["row_id"]) if "row_id" in raw else None,
             )
 
@@ -153,6 +175,27 @@ def _row_weight(row: DatasetRow, config: TrainingConfig) -> float:
         else config.appropriate_weight
     )
     return max(0.05, min(1.0, row.confidence)) * status_weight
+
+
+def _label_weights(row: DatasetRow, config: TrainingConfig) -> dict[int, float]:
+    """Allocate one row's evidence across its assigned and audit-suggested labels."""
+
+    weight = _row_weight(row, config)
+    suggested = row.suggested_level
+    suggested_fraction = config.borderline_suggested_weight
+    if (
+        row.status != "borderline"
+        or suggested is None
+        or suggested == row.level
+        or suggested_fraction == 0
+    ):
+        return {row.level: weight}
+    if suggested not in range(1, 6):
+        raise ValueError(f"invalid audit-suggested level: {suggested}")
+    return {
+        row.level: weight * (1.0 - suggested_fraction),
+        suggested: weight * suggested_fraction,
+    }
 
 
 def _augmented_prompts(prompt: str, copies: int) -> list[str]:
@@ -796,6 +839,29 @@ def _markdown_report(report: dict[str, object]) -> str:
                 f"**Warning:** {external['warning']} The large drop from the hash-held-out test is evidence that the main test result is not sufficient for a production release.",
             ]
         )
+        routing_policies = external.get("routing_policies")
+        if isinstance(routing_policies, dict):
+            lines.extend(
+                [
+                    "",
+                    "### End-to-end policy on the novel slice",
+                    "",
+                    "These figures include deterministic gates and utility scoring, "
+                    "not only the classifier's argmax label.",
+                    "",
+                    "| Router mode | Tier under-route | Tier over-route | Est. cost/request |",
+                    "|---|---:|---:|---:|",
+                ]
+            )
+            for name, policy_metrics in routing_policies.items():
+                if not isinstance(policy_metrics, dict):
+                    continue
+                lines.append(
+                    f"| {name} | "
+                    f"{float(policy_metrics['tier_underroute_rate']):.2%} | "
+                    f"{float(policy_metrics['tier_overroute_rate']):.2%} | "
+                    f"${float(policy_metrics['average_estimated_cost_usd']):.5f} |"
+                )
     return "\n".join(lines)
 
 
@@ -839,22 +905,28 @@ def train_and_evaluate(
     class_weights = np.full(5, training_config.smoothing, dtype=np.float64)
     for row in split_rows["train"]:
         indices, values = vectorizer.transform_one(row.prompt)
-        weight = _row_weight(row, training_config)
-        np.add.at(feature_counts[row.level - 1], indices, values * weight)
-        class_weights[row.level - 1] += weight
+        label_weights = _label_weights(row, training_config)
+        for level, label_weight in label_weights.items():
+            np.add.at(
+                feature_counts[level - 1],
+                indices,
+                values * label_weight,
+            )
+            class_weights[level - 1] += label_weight
         for augmented_prompt in _augmented_prompts(
             row.prompt, training_config.augmentation_copies_per_train_row
         ):
             augmented_indices, augmented_values = vectorizer.transform_one(
                 augmented_prompt
             )
-            augmented_weight = weight * training_config.augmentation_weight
-            np.add.at(
-                feature_counts[row.level - 1],
-                augmented_indices,
-                augmented_values * augmented_weight,
-            )
-            class_weights[row.level - 1] += augmented_weight
+            for level, label_weight in label_weights.items():
+                augmented_weight = label_weight * training_config.augmentation_weight
+                np.add.at(
+                    feature_counts[level - 1],
+                    augmented_indices,
+                    augmented_values * augmented_weight,
+                )
+                class_weights[level - 1] += augmented_weight
 
     log_feature_probability = np.log(
         feature_counts / feature_counts.sum(axis=1, keepdims=True)
@@ -884,6 +956,21 @@ def train_and_evaluate(
     )
 
     generated_at = datetime.now(UTC).isoformat()
+    implementation_sha256 = training_implementation_sha256()
+    training_recipe = {
+        **asdict(training_config),
+        "algorithm": "weighted multinomial naive Bayes",
+        "implementation_sha256": implementation_sha256,
+        "model_schema_version": MODEL_SCHEMA_VERSION,
+        "vectorizer": "stable hashed word unigrams, bigrams, and structural features",
+    }
+    training_recipe_sha256 = hashlib.sha256(
+        json.dumps(
+            training_recipe,
+            sort_keys=True,
+            separators=(",", ":"),
+        ).encode("utf-8")
+    ).hexdigest()
     metadata: dict[str, object] = {
         "generated_at": generated_at,
         "training_dataset": source_path.name,
@@ -895,6 +982,9 @@ def train_and_evaluate(
         "final_turn_weight": final_turn_weight,
         "class_prior": training_config.class_prior,
         "borderline_weight": training_config.borderline_weight,
+        "borderline_suggested_weight": (training_config.borderline_suggested_weight),
+        "training_recipe_sha256": training_recipe_sha256,
+        "training_implementation_sha256": implementation_sha256,
         "augmentation_copies_per_train_row": (
             training_config.augmentation_copies_per_train_row
         ),
@@ -971,8 +1061,13 @@ def train_and_evaluate(
             "feature_dimension": training_config.feature_dimension,
             "smoothing": training_config.smoothing,
             "borderline_weight": training_config.borderline_weight,
+            "borderline_suggested_weight": (
+                training_config.borderline_suggested_weight
+            ),
             "appropriate_weight": training_config.appropriate_weight,
             "class_prior": training_config.class_prior,
+            "training_recipe_sha256": training_recipe_sha256,
+            "training_implementation_sha256": implementation_sha256,
             "augmentation": {
                 "method": "deterministic meaning-preserving prompt envelopes",
                 "copies_per_train_row": (
@@ -1133,17 +1228,18 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("dataset", help="Audited JSONL dataset")
     parser.add_argument(
-        "--artifact", default="model_router/artifacts/complexity_router_v2.npz"
+        "--artifact", default="model_router/artifacts/complexity_router_v3.npz"
     )
-    parser.add_argument("--report-json", default="reports/complexity_router_v2.json")
-    parser.add_argument("--report-markdown", default="reports/complexity_router_v2.md")
+    parser.add_argument("--report-json", default="reports/complexity_router_v3.json")
+    parser.add_argument("--report-markdown", default="reports/complexity_router_v3.md")
     parser.add_argument("--external-context-dataset")
     parser.add_argument("--feature-dimension", type=int, default=32_768)
     parser.add_argument("--borderline-weight", type=float, default=0.65)
+    parser.add_argument("--borderline-suggested-weight", type=float, default=0.0)
     parser.add_argument(
         "--class-prior", choices=["uniform", "empirical"], default="uniform"
     )
-    parser.add_argument("--augmentation-copies", type=int, default=1)
+    parser.add_argument("--augmentation-copies", type=int, default=2)
     parser.add_argument("--augmentation-weight", type=float, default=0.5)
     return parser
 
@@ -1159,6 +1255,7 @@ def main() -> None:
         config=TrainingConfig(
             feature_dimension=args.feature_dimension,
             borderline_weight=args.borderline_weight,
+            borderline_suggested_weight=args.borderline_suggested_weight,
             class_prior=args.class_prior,
             augmentation_copies_per_train_row=args.augmentation_copies,
             augmentation_weight=args.augmentation_weight,

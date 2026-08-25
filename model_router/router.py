@@ -19,7 +19,7 @@ WEIGHTS = {
     "quality": (0.90, 0.05, 0.05),
     "latency": (0.35, 0.10, 0.55),
 }
-POLICY_VERSION = "hybrid-utility-policy-v4"
+POLICY_VERSION = "hybrid-utility-policy-v5"
 
 
 class NoEligibleModel(RuntimeError):

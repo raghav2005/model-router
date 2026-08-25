@@ -31,23 +31,26 @@ The selected classifier was trained on 86,967 audited examples using a determini
 
 | Evaluation | Exact accuracy | Tier under-route |
 |---|---:|---:|
-| Internal hash-held-out test | 91.57% | 3.13% |
-| Genuinely non-overlapping multi-turn slice | 57.80% | 18.02% |
+| Internal hash-held-out test | 91.95% | 2.79% |
+| Genuinely non-overlapping multi-turn slice | 59.12% | 17.36% |
 
 The multi-turn result is a release blocker. The internal result shows that the model learned the supplied synthetic rubric; it does not demonstrate production generalisation.
 
 The selected model combines complete-conversation and final-turn predictions with
 a validation-selected 0.05 final-turn weight and temperature 4.362. Training-only
 prompt-envelope augmentation improves robustness without changing validation, test,
-or external prompts. The default adaptive end-to-end policy has 2.23% internal tier
-under-routing and an estimated cost 41.73% below the always-capable reference. These
-are offline proxies, not measured production savings.
+or external prompts. The adaptive policy now treats disagreement between the full
+conversation and final-user-turn tiers as uncertainty and applies posterior-risk
+escalation. End-to-end tier under-routing is 1.26% internally and 10.99% on the
+455-prompt multi-turn diagnostic, compared with 2.03% and 14.95% before the guard.
+Its estimated internal cost is 34.45% below the newly repriced always-capable
+reference. These are offline proxies, not measured production savings.
 
-Classifier-only latency on this development machine was 169 µs median, 241 µs p95,
-and 274 µs p99 over 1,000 prompts. This is recorded for regression purposes and
+Classifier-only latency on this development machine was 116 µs median, 166 µs p95,
+and 191 µs p99 over 1,000 prompts. This is recorded for regression purposes and
 does not include Switchyard, network, or model-generation time.
 
-The current test suite contains 79 credential-free tests. Linting, formatting,
+The current test suite contains 83 credential-free tests. Linting, formatting,
 source compilation, CLI operation, wheel packaging, catalogue validation, API
 behaviour, resilience, audit privacy, drift detection, streaming parsing,
 evaluation resumability, adversarial regression, and release gates are covered.
@@ -95,7 +98,7 @@ The versioned catalogue uses the current GPT-5.6 family as the first controlled 
 |---|---|---:|---:|---:|
 | `efficient` | `gpt-5.6-luna` | $0.20 / $1.20 | 1.05M | 128K |
 | `balanced` | `gpt-5.6-terra` | $2 / $12 | 1.05M | 128K |
-| `capable` | `gpt-5.6-sol` | $5 / $30 | 1.05M | 128K |
+| `capable` | `gpt-5.6-sol` | $4 / $20 | 1.05M | 128K |
 
 The cost engine includes cached-input rates, cache-write rates, and the published long-context multipliers above 272,000 input tokens. Every price records an official source URL and verification date. `model-router verify-pricing` independently downloads the official model Markdown, compares every billable field and limit, and writes a digest-bound verification report; enforcement rejects stale reports or reports created for another catalogue revision.
 
@@ -155,14 +158,15 @@ model-router metamorphic-eval
 | `case-set-hash` | Compute the immutable live case-set digest | No |
 | `release-gates` | Evaluate production-enforcement evidence | No |
 | `verify-pricing` | Verify catalogue economics against official model pages | Provider docs only |
-| `adversarial-eval` | Run 167 deterministic routing regression cases | No |
-| `metamorphic-eval` | Run 1,336 meaning-preserving routing invariance cases | No |
+| `adversarial-eval` | Run 179 deterministic routing regression cases | No |
+| `metamorphic-eval` | Run 1,432 meaning-preserving routing invariance cases | No |
 | `drift-baseline` | Create an approved baseline from prompt-free audit events | No |
 | `drift-report` | Compare recent audit events with the approved baseline | No |
 
 The CLI defaults to hybrid classification with the adaptive policy. Adaptive mode
 uses ordinary argmax routing for confident, normal-risk work and posterior tier-risk
-routing for high-risk, quality-first, or sufficiently uncertain work. Use
+routing for high-risk, quality-first, low-confidence, or cross-view-disagreement
+work. Use
 `--classifier-mode heuristic` for the deterministic baseline or
 `--complexity-policy tier_risk` for a stronger under-routing bound at higher cost.
 The adaptive confidence threshold is configurable. Training evaluates 28 threshold
@@ -253,7 +257,7 @@ receive reduced weight. Validation data, rather than the test split, selects the
 full-conversation/final-turn ensemble weight and probability temperature. The same
 validation split selects a candidate adaptive escalation policy under a predeclared
 tier-risk cap; external confirmation is required before adoption. Each train-split
-prompt receives one deterministic, half-weight prompt-envelope augmentation. No
+prompt receives two deterministic, half-weight prompt-envelope augmentations. No
 validation, test, or external prompt is augmented, preventing split leakage.
 
 Reproduce the selected artifact:
@@ -266,14 +270,20 @@ model-router train \
 
 The command writes:
 
-- `model_router/artifacts/complexity_router_v2.npz`;
-- `reports/complexity_router_v2.json`; and
-- `reports/complexity_router_v2.md`.
+- `model_router/artifacts/complexity_router_v3.npz`;
+- `reports/complexity_router_v3.json`; and
+- `reports/complexity_router_v3.md`.
 
-The previous model and equal-level dataset remain challengers. The version-two
-champion improves internal accuracy, macro F1, negative log likelihood, expected
-calibration error, and external negative log likelihood; see
-`reports/experiments/champion_selection_v2.md`.
+The previous models and equal-level dataset remain challengers. The datagen
+re-audit, rejected soft-label experiment, augmentation grid, and v3 promotion are
+documented in `reports/experiments/datagen_reaudit_v3.md`.
+
+Generate a privacy-safe structural audit of the private datagen folder without
+emitting prompt text:
+
+```bash
+model-router dataset-audit /path/to/model-routing-datagen
+```
 
 ## Evaluation
 
@@ -288,17 +298,18 @@ model-router benchmark --iterations 300
 ```
 
 The separate adversarial suite is deterministic and never enters training or the
-independent release gate. It exposed a keyword-driven over-routing pattern; after
-the guarded fix, default-policy exact tier accuracy improved from 47.31% to 77.84%,
-over-routing fell from 45.51% to 14.97%, and all concise-hard/high-stakes cases
-remained on the capable tier. See
-`reports/experiments/adversarial_regression_v1.md`.
+independent release gate. It exposed keyword-driven over-routing and multi-turn
+task-switch failures. The expanded v3 default has 1.68% under-routing across 179
+cases, and all concise-hard/high-stakes cases remain on the capable tier. See
+`reports/experiments/adversarial_regression_v1.md` and
+`reports/experiments/multi_view_disagreement_v1.md`.
 
 The metamorphic suite applies eight meaning-preserving presentation changes to all
-167 adversarial cases. Five exact application-envelope contracts are normalized;
-three transformations remain unseen robustness checks. On the promoted default
-policy, tier invariance is 88.92%, tier under-routing is 5.16%, and exact tier
-accuracy is 73.35%. These synthetic metrics are a regression gate, never a
+179 adversarial cases. All eight exact, versioned application-envelope contracts
+are normalized before semantic classification while raw tokens remain available
+for cost estimation. On the promoted default policy, tier and model invariance are
+100%, tier under-routing is 1.68%, and exact tier accuracy is 75.42%. These
+synthetic metrics are a regression gate, never a
 substitute for real workload outcomes.
 
 ### Response-level benchmark
@@ -362,10 +373,11 @@ independent judge rubric, blinded human review, or a combination.
 The Switchyard client includes timeouts, safe GET retries with exponential backoff and jitter, `Retry-After` handling, a circuit breaker, request IDs, and optional explicit fallback. Generation retries are off by default because a failed generation may still be billable.
 
 Prometheus output covers decisions, estimated spend, execution outcomes, tokens,
-latency histograms, classifier confidence, normalized entropy, and posterior tier
-risk. Audit events include prompt HMAC, model/catalog/policy/classifier versions,
-decision, estimate, latency, usage, and error type without prompt or response
-content.
+latency histograms, classifier confidence, normalized entropy, posterior tier
+risk, and full-conversation/final-turn tier disagreement. Audit events include the
+same structured disagreement evidence plus prompt HMAC, model/catalog/policy/
+classifier versions, decision, estimate, latency, usage, and error type without
+prompt or response content.
 
 After an approved shadow window, create and retain an immutable drift baseline,
 then compare each subsequent observation window:

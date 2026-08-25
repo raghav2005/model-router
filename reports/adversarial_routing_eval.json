@@ -4,11 +4,11 @@
     "high_stakes": 6,
     "lexical_trap_simple": 48,
     "medium_composition": 48,
-    "multi_turn_shift": 6,
+    "multi_turn_shift": 18,
     "multilingual_simple": 8,
     "routing_injection": 3
   },
-  "case_count": 167,
+  "case_count": 179,
   "limitations": [
     "Cases and tier expectations are deterministic synthetic design tests.",
     "They are useful for regression and failure discovery, not production quality evidence.",
@@ -16,7 +16,7 @@
   ],
   "policies": {
     "hybrid_adaptive_p15": {
-      "average_estimated_cost_usd": 0.00883307,
+      "average_estimated_cost_usd": 0.00655397,
       "categories": {
         "concise_hard": {
           "exact": 48
@@ -28,764 +28,13 @@
           "exact": 48
         },
         "medium_composition": {
-          "exact": 16,
-          "over": 30,
+          "exact": 13,
+          "over": 33,
           "under": 2
         },
         "multi_turn_shift": {
-          "exact": 2,
-          "over": 1,
-          "under": 3
-        },
-        "multilingual_simple": {
-          "exact": 8
-        },
-        "routing_injection": {
-          "exact": 1,
-          "over": 2
-        }
-      },
-      "count": 167,
-      "failure_examples": [
-        {
-          "category": "medium_composition",
-          "classifier_confidence": 0.3375354042192718,
-          "expected_tier": 2,
-          "expected_use_case": "coding",
-          "id": "medium-00-0",
-          "selected_tier": 3,
-          "selected_use_case": "coding",
-          "signals": [
-            "coding vocabulary or code block",
-            "non-trivial implementation or verification",
-            "learned complexity level 5 using tier_risk",
-            "learned classifier confidence 0.34",
-            "normalized classifier entropy 0.88",
-            "posterior tier under-route probability 0.000"
-          ]
-        },
-        {
-          "category": "medium_composition",
-          "classifier_confidence": 0.34304376115101687,
-          "expected_tier": 2,
-          "expected_use_case": "coding",
-          "id": "medium-00-1",
-          "selected_tier": 3,
-          "selected_use_case": "coding",
-          "signals": [
-            "coding vocabulary or code block",
-            "non-trivial implementation or verification",
-            "multiple constraints or subtasks",
-            "learned complexity level 5 using tier_risk",
-            "learned classifier confidence 0.34",
-            "normalized classifier entropy 0.88",
-            "posterior tier under-route probability 0.000"
-          ]
-        },
-        {
-          "category": "medium_composition",
-          "classifier_confidence": 0.48239682508573695,
-          "expected_tier": 2,
-          "expected_use_case": "coding",
-          "id": "medium-00-3",
-          "selected_tier": 3,
-          "selected_use_case": "coding",
-          "signals": [
-            "coding vocabulary or code block",
-            "non-trivial implementation or verification",
-            "learned complexity level 5 using argmax",
-            "learned classifier confidence 0.48",
-            "normalized classifier entropy 0.83",
-            "posterior tier under-route probability 0.000"
-          ]
-        },
-        {
-          "category": "medium_composition",
-          "classifier_confidence": 0.3940809495965197,
-          "expected_tier": 2,
-          "expected_use_case": "coding",
-          "id": "medium-01-0",
-          "selected_tier": 3,
-          "selected_use_case": "coding",
-          "signals": [
-            "coding vocabulary or code block",
-            "non-trivial implementation or verification",
-            "tool-assisted coding request",
-            "learned complexity level 5 using tier_risk",
-            "learned classifier confidence 0.39",
-            "normalized classifier entropy 0.89",
-            "posterior tier under-route probability 0.000"
-          ]
-        },
-        {
-          "category": "medium_composition",
-          "classifier_confidence": 0.3938337858419835,
-          "expected_tier": 2,
-          "expected_use_case": "coding",
-          "id": "medium-01-3",
-          "selected_tier": 3,
-          "selected_use_case": "coding",
-          "signals": [
-            "coding vocabulary or code block",
-            "non-trivial implementation or verification",
-            "tool-assisted coding request",
-            "learned complexity level 5 using tier_risk",
-            "learned classifier confidence 0.39",
-            "normalized classifier entropy 0.88",
-            "posterior tier under-route probability 0.000"
-          ]
-        },
-        {
-          "category": "medium_composition",
-          "classifier_confidence": 0.39108156731041965,
-          "expected_tier": 2,
-          "expected_use_case": "reasoning",
-          "id": "medium-02-2",
-          "selected_tier": 3,
-          "selected_use_case": "reasoning",
-          "signals": [
-            "multi-step reasoning vocabulary",
-            "learned complexity level 5 using tier_risk",
-            "learned classifier confidence 0.39",
-            "normalized classifier entropy 0.93",
-            "posterior tier under-route probability 0.000"
-          ]
-        },
-        {
-          "category": "medium_composition",
-          "classifier_confidence": 0.4277612204989172,
-          "expected_tier": 2,
-          "expected_use_case": "reasoning",
-          "id": "medium-02-3",
-          "selected_tier": 3,
-          "selected_use_case": "reasoning",
-          "signals": [
-            "multi-step reasoning vocabulary",
-            "learned complexity level 5 using tier_risk",
-            "learned classifier confidence 0.43",
-            "normalized classifier entropy 0.71",
-            "posterior tier under-route probability 0.000"
-          ]
-        },
-        {
-          "category": "medium_composition",
-          "classifier_confidence": 0.2866875339575977,
-          "expected_tier": 2,
-          "expected_use_case": "reasoning",
-          "id": "medium-03-0",
-          "selected_tier": 3,
-          "selected_use_case": "reasoning",
-          "signals": [
-            "multi-step reasoning vocabulary",
-            "learned complexity level 5 using tier_risk",
-            "learned classifier confidence 0.29",
-            "normalized classifier entropy 0.92",
-            "posterior tier under-route probability 0.000"
-          ]
-        },
-        {
-          "category": "medium_composition",
-          "classifier_confidence": 0.28979222810744476,
-          "expected_tier": 2,
-          "expected_use_case": "reasoning",
-          "id": "medium-03-1",
-          "selected_tier": 3,
-          "selected_use_case": "reasoning",
-          "signals": [
-            "multi-step reasoning vocabulary",
-            "multiple constraints or subtasks",
-            "learned complexity level 5 using tier_risk",
-            "learned classifier confidence 0.29",
-            "normalized classifier entropy 0.93",
-            "posterior tier under-route probability 0.000"
-          ]
-        },
-        {
-          "category": "medium_composition",
-          "classifier_confidence": 0.44819201542032644,
-          "expected_tier": 2,
-          "expected_use_case": "reasoning",
-          "id": "medium-03-3",
-          "selected_tier": 3,
-          "selected_use_case": "reasoning",
-          "signals": [
-            "multi-step reasoning vocabulary",
-            "learned complexity level 5 using tier_risk",
-            "learned classifier confidence 0.45",
-            "normalized classifier entropy 0.82",
-            "posterior tier under-route probability 0.000"
-          ]
-        },
-        {
-          "category": "medium_composition",
-          "classifier_confidence": 0.43752833558712656,
-          "expected_tier": 2,
-          "expected_use_case": "general_qa",
-          "id": "medium-04-0",
-          "selected_tier": 3,
-          "selected_use_case": "general_qa",
-          "signals": [
-            "general question/answer pattern",
-            "learned complexity level 5 using tier_risk",
-            "learned classifier confidence 0.44",
-            "normalized classifier entropy 0.83",
-            "posterior tier under-route probability 0.000"
-          ]
-        },
-        {
-          "category": "medium_composition",
-          "classifier_confidence": 0.42207042890749585,
-          "expected_tier": 2,
-          "expected_use_case": "general_qa",
-          "id": "medium-04-1",
-          "selected_tier": 3,
-          "selected_use_case": "reasoning",
-          "signals": [
-            "multi-step reasoning vocabulary",
-            "multiple constraints or subtasks",
-            "learned complexity level 5 using tier_risk",
-            "learned classifier confidence 0.42",
-            "normalized classifier entropy 0.79",
-            "posterior tier under-route probability 0.000"
-          ]
-        },
-        {
-          "category": "medium_composition",
-          "classifier_confidence": 0.3686085430873904,
-          "expected_tier": 2,
-          "expected_use_case": "general_qa",
-          "id": "medium-04-2",
-          "selected_tier": 3,
-          "selected_use_case": "general_qa",
-          "signals": [
-            "general question/answer pattern",
-            "learned complexity level 5 using tier_risk",
-            "learned classifier confidence 0.37",
-            "normalized classifier entropy 0.86",
-            "posterior tier under-route probability 0.000"
-          ]
-        },
-        {
-          "category": "medium_composition",
-          "classifier_confidence": 0.4206905369225169,
-          "expected_tier": 2,
-          "expected_use_case": "general_qa",
-          "id": "medium-04-3",
-          "selected_tier": 3,
-          "selected_use_case": "general_qa",
-          "signals": [
-            "general question/answer pattern",
-            "learned complexity level 5 using tier_risk",
-            "learned classifier confidence 0.42",
-            "normalized classifier entropy 0.79",
-            "posterior tier under-route probability 0.000"
-          ]
-        },
-        {
-          "category": "medium_composition",
-          "classifier_confidence": 0.43925980828161104,
-          "expected_tier": 2,
-          "expected_use_case": "general_qa",
-          "id": "medium-05-0",
-          "selected_tier": 3,
-          "selected_use_case": "general_qa",
-          "signals": [
-            "general question/answer pattern",
-            "learned complexity level 5 using tier_risk",
-            "learned classifier confidence 0.44",
-            "normalized classifier entropy 0.90",
-            "posterior tier under-route probability 0.000"
-          ]
-        },
-        {
-          "category": "medium_composition",
-          "classifier_confidence": 0.5005686198682711,
-          "expected_tier": 2,
-          "expected_use_case": "general_qa",
-          "id": "medium-05-1",
-          "selected_tier": 2,
-          "selected_use_case": "reasoning",
-          "signals": [
-            "multi-step reasoning vocabulary",
-            "multiple constraints or subtasks",
-            "learned complexity level 1 using argmax",
-            "learned classifier confidence 0.50",
-            "normalized classifier entropy 0.83",
-            "posterior tier under-route probability 0.443"
-          ]
-        },
-        {
-          "category": "medium_composition",
-          "classifier_confidence": 0.4638600024426211,
-          "expected_tier": 2,
-          "expected_use_case": "coding",
-          "id": "medium-06-0",
-          "selected_tier": 2,
-          "selected_use_case": "general_qa",
-          "signals": [
-            "general question/answer pattern",
-            "non-trivial implementation or verification",
-            "learned complexity level 3 using argmax",
-            "learned classifier confidence 0.46",
-            "normalized classifier entropy 0.86",
-            "posterior tier under-route probability 0.368"
-          ]
-        },
-        {
-          "category": "medium_composition",
-          "classifier_confidence": 0.6658574788698964,
-          "expected_tier": 2,
-          "expected_use_case": "coding",
-          "id": "medium-06-1",
-          "selected_tier": 2,
-          "selected_use_case": "reasoning",
-          "signals": [
-            "multi-step reasoning vocabulary",
-            "non-trivial implementation or verification",
-            "multiple constraints or subtasks",
-            "learned complexity level 3 using argmax",
-            "learned classifier confidence 0.67",
-            "normalized classifier entropy 0.66",
-            "posterior tier under-route probability 0.235"
-          ]
-        },
-        {
-          "category": "medium_composition",
-          "classifier_confidence": 0.6274301233816578,
-          "expected_tier": 2,
-          "expected_use_case": "coding",
-          "id": "medium-06-2",
-          "selected_tier": 2,
-          "selected_use_case": "general_qa",
-          "signals": [
-            "general question/answer pattern",
-            "non-trivial implementation or verification",
-            "learned complexity level 3 using argmax",
-            "learned classifier confidence 0.63",
-            "normalized classifier entropy 0.68",
-            "posterior tier under-route probability 0.109"
-          ]
-        },
-        {
-          "category": "medium_composition",
-          "classifier_confidence": 0.4455745988324753,
-          "expected_tier": 2,
-          "expected_use_case": "coding",
-          "id": "medium-06-3",
-          "selected_tier": 3,
-          "selected_use_case": "general_qa",
-          "signals": [
-            "general question/answer pattern",
-            "non-trivial implementation or verification",
-            "learned complexity level 5 using tier_risk",
-            "learned classifier confidence 0.45",
-            "normalized classifier entropy 0.73",
-            "posterior tier under-route probability 0.000"
-          ]
-        }
-      ],
-      "route_errors": 0,
-      "tier_accuracy": 0.772455,
-      "tier_overroute_rate": 0.197605,
-      "tier_underroute_rate": 0.02994,
-      "use_case_accuracy": 0.736527
-    },
-    "hybrid_argmax": {
-      "average_estimated_cost_usd": 0.00806066,
-      "categories": {
-        "concise_hard": {
-          "exact": 48
-        },
-        "high_stakes": {
-          "exact": 6
-        },
-        "lexical_trap_simple": {
-          "exact": 48
-        },
-        "medium_composition": {
-          "exact": 26,
-          "over": 18,
-          "under": 4
-        },
-        "multi_turn_shift": {
-          "exact": 2,
-          "over": 1,
-          "under": 3
-        },
-        "multilingual_simple": {
-          "exact": 8
-        },
-        "routing_injection": {
-          "exact": 2,
-          "over": 1
-        }
-      },
-      "count": 167,
-      "failure_examples": [
-        {
-          "category": "medium_composition",
-          "classifier_confidence": 0.3375354042192718,
-          "expected_tier": 2,
-          "expected_use_case": "coding",
-          "id": "medium-00-0",
-          "selected_tier": 3,
-          "selected_use_case": "coding",
-          "signals": [
-            "coding vocabulary or code block",
-            "non-trivial implementation or verification",
-            "learned complexity level 5 using argmax",
-            "learned classifier confidence 0.34",
-            "normalized classifier entropy 0.88",
-            "posterior tier under-route probability 0.000"
-          ]
-        },
-        {
-          "category": "medium_composition",
-          "classifier_confidence": 0.48239682508573695,
-          "expected_tier": 2,
-          "expected_use_case": "coding",
-          "id": "medium-00-3",
-          "selected_tier": 3,
-          "selected_use_case": "coding",
-          "signals": [
-            "coding vocabulary or code block",
-            "non-trivial implementation or verification",
-            "learned complexity level 5 using argmax",
-            "learned classifier confidence 0.48",
-            "normalized classifier entropy 0.83",
-            "posterior tier under-route probability 0.000"
-          ]
-        },
-        {
-          "category": "medium_composition",
-          "classifier_confidence": 0.3940809495965197,
-          "expected_tier": 2,
-          "expected_use_case": "coding",
-          "id": "medium-01-0",
-          "selected_tier": 1,
-          "selected_use_case": "coding",
-          "signals": [
-            "coding vocabulary or code block",
-            "non-trivial implementation or verification",
-            "tool-assisted coding request",
-            "learned complexity level 1 using argmax",
-            "learned classifier confidence 0.39",
-            "normalized classifier entropy 0.89",
-            "posterior tier under-route probability 0.329"
-          ]
-        },
-        {
-          "category": "medium_composition",
-          "classifier_confidence": 0.4277612204989172,
-          "expected_tier": 2,
-          "expected_use_case": "reasoning",
-          "id": "medium-02-3",
-          "selected_tier": 3,
-          "selected_use_case": "reasoning",
-          "signals": [
-            "multi-step reasoning vocabulary",
-            "learned complexity level 4 using argmax",
-            "learned classifier confidence 0.43",
-            "normalized classifier entropy 0.71",
-            "posterior tier under-route probability 0.000"
-          ]
-        },
-        {
-          "category": "medium_composition",
-          "classifier_confidence": 0.44819201542032644,
-          "expected_tier": 2,
-          "expected_use_case": "reasoning",
-          "id": "medium-03-3",
-          "selected_tier": 3,
-          "selected_use_case": "reasoning",
-          "signals": [
-            "multi-step reasoning vocabulary",
-            "learned complexity level 4 using argmax",
-            "learned classifier confidence 0.45",
-            "normalized classifier entropy 0.82",
-            "posterior tier under-route probability 0.000"
-          ]
-        },
-        {
-          "category": "medium_composition",
-          "classifier_confidence": 0.43752833558712656,
-          "expected_tier": 2,
-          "expected_use_case": "general_qa",
-          "id": "medium-04-0",
-          "selected_tier": 3,
-          "selected_use_case": "general_qa",
-          "signals": [
-            "general question/answer pattern",
-            "learned complexity level 5 using argmax",
-            "learned classifier confidence 0.44",
-            "normalized classifier entropy 0.83",
-            "posterior tier under-route probability 0.000"
-          ]
-        },
-        {
-          "category": "medium_composition",
-          "classifier_confidence": 0.42207042890749585,
-          "expected_tier": 2,
-          "expected_use_case": "general_qa",
-          "id": "medium-04-1",
-          "selected_tier": 2,
-          "selected_use_case": "reasoning",
-          "signals": [
-            "multi-step reasoning vocabulary",
-            "multiple constraints or subtasks",
-            "learned complexity level 1 using argmax",
-            "learned classifier confidence 0.42",
-            "normalized classifier entropy 0.79",
-            "posterior tier under-route probability 0.561"
-          ]
-        },
-        {
-          "category": "medium_composition",
-          "classifier_confidence": 0.4206905369225169,
-          "expected_tier": 2,
-          "expected_use_case": "general_qa",
-          "id": "medium-04-3",
-          "selected_tier": 3,
-          "selected_use_case": "general_qa",
-          "signals": [
-            "general question/answer pattern",
-            "learned complexity level 5 using argmax",
-            "learned classifier confidence 0.42",
-            "normalized classifier entropy 0.79",
-            "posterior tier under-route probability 0.000"
-          ]
-        },
-        {
-          "category": "medium_composition",
-          "classifier_confidence": 0.5005686198682711,
-          "expected_tier": 2,
-          "expected_use_case": "general_qa",
-          "id": "medium-05-1",
-          "selected_tier": 2,
-          "selected_use_case": "reasoning",
-          "signals": [
-            "multi-step reasoning vocabulary",
-            "multiple constraints or subtasks",
-            "learned complexity level 1 using argmax",
-            "learned classifier confidence 0.50",
-            "normalized classifier entropy 0.83",
-            "posterior tier under-route probability 0.443"
-          ]
-        },
-        {
-          "category": "medium_composition",
-          "classifier_confidence": 0.3609084164005405,
-          "expected_tier": 2,
-          "expected_use_case": "general_qa",
-          "id": "medium-05-2",
-          "selected_tier": 1,
-          "selected_use_case": "general_qa",
-          "signals": [
-            "general question/answer pattern",
-            "learned complexity level 1 using argmax",
-            "learned classifier confidence 0.36",
-            "normalized classifier entropy 0.84",
-            "posterior tier under-route probability 0.307"
-          ]
-        },
-        {
-          "category": "medium_composition",
-          "classifier_confidence": 0.4638600024426211,
-          "expected_tier": 2,
-          "expected_use_case": "coding",
-          "id": "medium-06-0",
-          "selected_tier": 2,
-          "selected_use_case": "general_qa",
-          "signals": [
-            "general question/answer pattern",
-            "non-trivial implementation or verification",
-            "learned complexity level 3 using argmax",
-            "learned classifier confidence 0.46",
-            "normalized classifier entropy 0.86",
-            "posterior tier under-route probability 0.368"
-          ]
-        },
-        {
-          "category": "medium_composition",
-          "classifier_confidence": 0.6658574788698964,
-          "expected_tier": 2,
-          "expected_use_case": "coding",
-          "id": "medium-06-1",
-          "selected_tier": 2,
-          "selected_use_case": "reasoning",
-          "signals": [
-            "multi-step reasoning vocabulary",
-            "non-trivial implementation or verification",
-            "multiple constraints or subtasks",
-            "learned complexity level 3 using argmax",
-            "learned classifier confidence 0.67",
-            "normalized classifier entropy 0.66",
-            "posterior tier under-route probability 0.235"
-          ]
-        },
-        {
-          "category": "medium_composition",
-          "classifier_confidence": 0.6274301233816578,
-          "expected_tier": 2,
-          "expected_use_case": "coding",
-          "id": "medium-06-2",
-          "selected_tier": 2,
-          "selected_use_case": "general_qa",
-          "signals": [
-            "general question/answer pattern",
-            "non-trivial implementation or verification",
-            "learned complexity level 3 using argmax",
-            "learned classifier confidence 0.63",
-            "normalized classifier entropy 0.68",
-            "posterior tier under-route probability 0.109"
-          ]
-        },
-        {
-          "category": "medium_composition",
-          "classifier_confidence": 0.4455745988324753,
-          "expected_tier": 2,
-          "expected_use_case": "coding",
-          "id": "medium-06-3",
-          "selected_tier": 3,
-          "selected_use_case": "general_qa",
-          "signals": [
-            "general question/answer pattern",
-            "non-trivial implementation or verification",
-            "learned complexity level 4 using argmax",
-            "learned classifier confidence 0.45",
-            "normalized classifier entropy 0.73",
-            "posterior tier under-route probability 0.000"
-          ]
-        },
-        {
-          "category": "medium_composition",
-          "classifier_confidence": 0.6488946465983929,
-          "expected_tier": 2,
-          "expected_use_case": "reasoning",
-          "id": "medium-07-0",
-          "selected_tier": 3,
-          "selected_use_case": "reasoning",
-          "signals": [
-            "multi-step reasoning vocabulary",
-            "fresh information requested",
-            "learned complexity level 5 using argmax",
-            "learned classifier confidence 0.65",
-            "normalized classifier entropy 0.67",
-            "posterior tier under-route probability 0.000"
-          ]
-        },
-        {
-          "category": "medium_composition",
-          "classifier_confidence": 0.6437048260630234,
-          "expected_tier": 2,
-          "expected_use_case": "reasoning",
-          "id": "medium-07-1",
-          "selected_tier": 3,
-          "selected_use_case": "reasoning",
-          "signals": [
-            "multi-step reasoning vocabulary",
-            "multiple constraints or subtasks",
-            "fresh information requested",
-            "learned complexity level 5 using argmax",
-            "learned classifier confidence 0.64",
-            "normalized classifier entropy 0.67",
-            "posterior tier under-route probability 0.000"
-          ]
-        },
-        {
-          "category": "medium_composition",
-          "classifier_confidence": 0.5034001164186225,
-          "expected_tier": 2,
-          "expected_use_case": "reasoning",
-          "id": "medium-07-2",
-          "selected_tier": 3,
-          "selected_use_case": "reasoning",
-          "signals": [
-            "multi-step reasoning vocabulary",
-            "fresh information requested",
-            "learned complexity level 5 using argmax",
-            "learned classifier confidence 0.50",
-            "normalized classifier entropy 0.79",
-            "posterior tier under-route probability 0.000"
-          ]
-        },
-        {
-          "category": "medium_composition",
-          "classifier_confidence": 0.6592852790617065,
-          "expected_tier": 2,
-          "expected_use_case": "reasoning",
-          "id": "medium-07-3",
-          "selected_tier": 3,
-          "selected_use_case": "reasoning",
-          "signals": [
-            "multi-step reasoning vocabulary",
-            "fresh information requested",
-            "learned complexity level 5 using argmax",
-            "learned classifier confidence 0.66",
-            "normalized classifier entropy 0.58",
-            "posterior tier under-route probability 0.000"
-          ]
-        },
-        {
-          "category": "medium_composition",
-          "classifier_confidence": 0.6818011042587252,
-          "expected_tier": 2,
-          "expected_use_case": "general_qa",
-          "id": "medium-08-0",
-          "selected_tier": 1,
-          "selected_use_case": "general_qa",
-          "signals": [
-            "general question/answer pattern",
-            "learned complexity level 2 using argmax",
-            "learned classifier confidence 0.68",
-            "normalized classifier entropy 0.56",
-            "posterior tier under-route probability 0.125"
-          ]
-        },
-        {
-          "category": "medium_composition",
-          "classifier_confidence": 0.43800697559577617,
-          "expected_tier": 2,
-          "expected_use_case": "general_qa",
-          "id": "medium-08-1",
-          "selected_tier": 2,
-          "selected_use_case": "reasoning",
-          "signals": [
-            "multi-step reasoning vocabulary",
-            "multiple constraints or subtasks",
-            "learned complexity level 1 using argmax",
-            "learned classifier confidence 0.44",
-            "normalized classifier entropy 0.73",
-            "posterior tier under-route probability 0.193"
-          ]
-        }
-      ],
-      "route_errors": 0,
-      "tier_accuracy": 0.838323,
-      "tier_overroute_rate": 0.11976,
-      "tier_underroute_rate": 0.041916,
-      "use_case_accuracy": 0.736527
-    },
-    "hybrid_tier_risk_p15": {
-      "average_estimated_cost_usd": 0.00967063,
-      "categories": {
-        "concise_hard": {
-          "exact": 48
-        },
-        "high_stakes": {
-          "exact": 6
-        },
-        "lexical_trap_simple": {
-          "exact": 48
-        },
-        "medium_composition": {
-          "exact": 5,
-          "over": 41,
-          "under": 2
-        },
-        "multi_turn_shift": {
-          "exact": 2,
-          "over": 3,
+          "exact": 11,
+          "over": 6,
           "under": 1
         },
         "multilingual_simple": {
@@ -796,11 +45,11 @@
           "over": 2
         }
       },
-      "count": 167,
+      "count": 179,
       "failure_examples": [
         {
           "category": "medium_composition",
-          "classifier_confidence": 0.3375354042192718,
+          "classifier_confidence": 0.3877937281932526,
           "expected_tier": 2,
           "expected_use_case": "coding",
           "id": "medium-00-0",
@@ -810,14 +59,15 @@
             "coding vocabulary or code block",
             "non-trivial implementation or verification",
             "learned complexity level 5 using tier_risk",
-            "learned classifier confidence 0.34",
-            "normalized classifier entropy 0.88",
+            "learned classifier confidence 0.39",
+            "normalized classifier entropy 0.87",
+            "full-conversation and final-turn tiers agree",
             "posterior tier under-route probability 0.000"
           ]
         },
         {
           "category": "medium_composition",
-          "classifier_confidence": 0.34304376115101687,
+          "classifier_confidence": 0.3161409217038015,
           "expected_tier": 2,
           "expected_use_case": "coding",
           "id": "medium-00-1",
@@ -828,14 +78,15 @@
             "non-trivial implementation or verification",
             "multiple constraints or subtasks",
             "learned complexity level 5 using tier_risk",
-            "learned classifier confidence 0.34",
+            "learned classifier confidence 0.32",
             "normalized classifier entropy 0.88",
+            "full-conversation and final-turn tiers agree",
             "posterior tier under-route probability 0.000"
           ]
         },
         {
           "category": "medium_composition",
-          "classifier_confidence": 0.48239682508573695,
+          "classifier_confidence": 0.568511425563002,
           "expected_tier": 2,
           "expected_use_case": "coding",
           "id": "medium-00-3",
@@ -844,15 +95,16 @@
           "signals": [
             "coding vocabulary or code block",
             "non-trivial implementation or verification",
-            "learned complexity level 5 using tier_risk",
-            "learned classifier confidence 0.48",
-            "normalized classifier entropy 0.83",
+            "learned complexity level 5 using argmax",
+            "learned classifier confidence 0.57",
+            "normalized classifier entropy 0.76",
+            "full-conversation and final-turn tiers agree",
             "posterior tier under-route probability 0.000"
           ]
         },
         {
           "category": "medium_composition",
-          "classifier_confidence": 0.3940809495965197,
+          "classifier_confidence": 0.3566226384562229,
           "expected_tier": 2,
           "expected_use_case": "coding",
           "id": "medium-01-0",
@@ -863,14 +115,804 @@
             "non-trivial implementation or verification",
             "tool-assisted coding request",
             "learned complexity level 5 using tier_risk",
-            "learned classifier confidence 0.39",
-            "normalized classifier entropy 0.89",
+            "learned classifier confidence 0.36",
+            "normalized classifier entropy 0.92",
+            "full-conversation and final-turn tiers agree",
             "posterior tier under-route probability 0.000"
           ]
         },
         {
           "category": "medium_composition",
-          "classifier_confidence": 0.5483795998584257,
+          "classifier_confidence": 0.42391970360228215,
+          "expected_tier": 2,
+          "expected_use_case": "coding",
+          "id": "medium-01-2",
+          "selected_tier": 3,
+          "selected_use_case": "coding",
+          "signals": [
+            "coding vocabulary or code block",
+            "non-trivial implementation or verification",
+            "tool-assisted coding request",
+            "learned complexity level 5 using tier_risk",
+            "learned classifier confidence 0.42",
+            "normalized classifier entropy 0.85",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ]
+        },
+        {
+          "category": "medium_composition",
+          "classifier_confidence": 0.3411002262105377,
+          "expected_tier": 2,
+          "expected_use_case": "coding",
+          "id": "medium-01-3",
+          "selected_tier": 3,
+          "selected_use_case": "coding",
+          "signals": [
+            "coding vocabulary or code block",
+            "non-trivial implementation or verification",
+            "tool-assisted coding request",
+            "learned complexity level 5 using tier_risk",
+            "learned classifier confidence 0.34",
+            "normalized classifier entropy 0.89",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ]
+        },
+        {
+          "category": "medium_composition",
+          "classifier_confidence": 0.38035595351965784,
+          "expected_tier": 2,
+          "expected_use_case": "reasoning",
+          "id": "medium-02-2",
+          "selected_tier": 3,
+          "selected_use_case": "reasoning",
+          "signals": [
+            "multi-step reasoning vocabulary",
+            "learned complexity level 5 using tier_risk",
+            "learned classifier confidence 0.38",
+            "normalized classifier entropy 0.92",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ]
+        },
+        {
+          "category": "medium_composition",
+          "classifier_confidence": 0.4181104448202601,
+          "expected_tier": 2,
+          "expected_use_case": "reasoning",
+          "id": "medium-02-3",
+          "selected_tier": 3,
+          "selected_use_case": "reasoning",
+          "signals": [
+            "multi-step reasoning vocabulary",
+            "learned complexity level 5 using tier_risk",
+            "learned classifier confidence 0.42",
+            "normalized classifier entropy 0.69",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ]
+        },
+        {
+          "category": "medium_composition",
+          "classifier_confidence": 0.28350159632678373,
+          "expected_tier": 2,
+          "expected_use_case": "reasoning",
+          "id": "medium-03-0",
+          "selected_tier": 3,
+          "selected_use_case": "reasoning",
+          "signals": [
+            "multi-step reasoning vocabulary",
+            "learned complexity level 5 using tier_risk",
+            "learned classifier confidence 0.28",
+            "normalized classifier entropy 0.92",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ]
+        },
+        {
+          "category": "medium_composition",
+          "classifier_confidence": 0.29018673873154405,
+          "expected_tier": 2,
+          "expected_use_case": "reasoning",
+          "id": "medium-03-1",
+          "selected_tier": 3,
+          "selected_use_case": "reasoning",
+          "signals": [
+            "multi-step reasoning vocabulary",
+            "multiple constraints or subtasks",
+            "learned complexity level 5 using tier_risk",
+            "learned classifier confidence 0.29",
+            "normalized classifier entropy 0.92",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ]
+        },
+        {
+          "category": "medium_composition",
+          "classifier_confidence": 0.47118565428848086,
+          "expected_tier": 2,
+          "expected_use_case": "reasoning",
+          "id": "medium-03-3",
+          "selected_tier": 3,
+          "selected_use_case": "reasoning",
+          "signals": [
+            "multi-step reasoning vocabulary",
+            "learned complexity level 4 using argmax",
+            "learned classifier confidence 0.47",
+            "normalized classifier entropy 0.80",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ]
+        },
+        {
+          "category": "medium_composition",
+          "classifier_confidence": 0.4974130650303912,
+          "expected_tier": 2,
+          "expected_use_case": "general_qa",
+          "id": "medium-04-0",
+          "selected_tier": 3,
+          "selected_use_case": "general_qa",
+          "signals": [
+            "general question/answer pattern",
+            "learned complexity level 5 using argmax",
+            "learned classifier confidence 0.50",
+            "normalized classifier entropy 0.80",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ]
+        },
+        {
+          "category": "medium_composition",
+          "classifier_confidence": 0.3857864753459396,
+          "expected_tier": 2,
+          "expected_use_case": "general_qa",
+          "id": "medium-04-1",
+          "selected_tier": 3,
+          "selected_use_case": "reasoning",
+          "signals": [
+            "multi-step reasoning vocabulary",
+            "multiple constraints or subtasks",
+            "learned complexity level 5 using tier_risk",
+            "learned classifier confidence 0.39",
+            "normalized classifier entropy 0.78",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ]
+        },
+        {
+          "category": "medium_composition",
+          "classifier_confidence": 0.34455196003375094,
+          "expected_tier": 2,
+          "expected_use_case": "general_qa",
+          "id": "medium-04-2",
+          "selected_tier": 3,
+          "selected_use_case": "general_qa",
+          "signals": [
+            "general question/answer pattern",
+            "learned complexity level 5 using tier_risk",
+            "learned classifier confidence 0.34",
+            "normalized classifier entropy 0.87",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ]
+        },
+        {
+          "category": "medium_composition",
+          "classifier_confidence": 0.48343315530954534,
+          "expected_tier": 2,
+          "expected_use_case": "general_qa",
+          "id": "medium-04-3",
+          "selected_tier": 3,
+          "selected_use_case": "general_qa",
+          "signals": [
+            "general question/answer pattern",
+            "learned complexity level 5 using argmax",
+            "learned classifier confidence 0.48",
+            "normalized classifier entropy 0.74",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ]
+        },
+        {
+          "category": "medium_composition",
+          "classifier_confidence": 0.39764244667951626,
+          "expected_tier": 2,
+          "expected_use_case": "general_qa",
+          "id": "medium-05-0",
+          "selected_tier": 3,
+          "selected_use_case": "general_qa",
+          "signals": [
+            "general question/answer pattern",
+            "learned complexity level 5 using tier_risk",
+            "learned classifier confidence 0.40",
+            "normalized classifier entropy 0.92",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ]
+        },
+        {
+          "category": "medium_composition",
+          "classifier_confidence": 0.4793948744105531,
+          "expected_tier": 2,
+          "expected_use_case": "general_qa",
+          "id": "medium-05-1",
+          "selected_tier": 2,
+          "selected_use_case": "reasoning",
+          "signals": [
+            "multi-step reasoning vocabulary",
+            "multiple constraints or subtasks",
+            "learned complexity level 1 using argmax",
+            "learned classifier confidence 0.48",
+            "normalized classifier entropy 0.83",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.472"
+          ]
+        },
+        {
+          "category": "medium_composition",
+          "classifier_confidence": 0.44803279686646336,
+          "expected_tier": 2,
+          "expected_use_case": "general_qa",
+          "id": "medium-05-3",
+          "selected_tier": 3,
+          "selected_use_case": "general_qa",
+          "signals": [
+            "general question/answer pattern",
+            "learned complexity level 5 using tier_risk",
+            "learned classifier confidence 0.45",
+            "normalized classifier entropy 0.82",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ]
+        },
+        {
+          "category": "medium_composition",
+          "classifier_confidence": 0.47223287951101267,
+          "expected_tier": 2,
+          "expected_use_case": "coding",
+          "id": "medium-06-0",
+          "selected_tier": 2,
+          "selected_use_case": "general_qa",
+          "signals": [
+            "general question/answer pattern",
+            "non-trivial implementation or verification",
+            "learned complexity level 3 using argmax",
+            "learned classifier confidence 0.47",
+            "normalized classifier entropy 0.84",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.392"
+          ]
+        },
+        {
+          "category": "medium_composition",
+          "classifier_confidence": 0.688234953789712,
+          "expected_tier": 2,
+          "expected_use_case": "coding",
+          "id": "medium-06-1",
+          "selected_tier": 2,
+          "selected_use_case": "reasoning",
+          "signals": [
+            "multi-step reasoning vocabulary",
+            "non-trivial implementation or verification",
+            "multiple constraints or subtasks",
+            "learned complexity level 3 using argmax",
+            "learned classifier confidence 0.69",
+            "normalized classifier entropy 0.63",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.232"
+          ]
+        }
+      ],
+      "route_errors": 0,
+      "tier_accuracy": 0.75419,
+      "tier_overroute_rate": 0.22905,
+      "tier_underroute_rate": 0.01676,
+      "use_case_accuracy": 0.73743
+    },
+    "hybrid_argmax": {
+      "average_estimated_cost_usd": 0.00591002,
+      "categories": {
+        "concise_hard": {
+          "exact": 48
+        },
+        "high_stakes": {
+          "exact": 6
+        },
+        "lexical_trap_simple": {
+          "exact": 48
+        },
+        "medium_composition": {
+          "exact": 27,
+          "over": 18,
+          "under": 3
+        },
+        "multi_turn_shift": {
+          "exact": 11,
+          "over": 2,
+          "under": 5
+        },
+        "multilingual_simple": {
+          "exact": 8
+        },
+        "routing_injection": {
+          "exact": 2,
+          "over": 1
+        }
+      },
+      "count": 179,
+      "failure_examples": [
+        {
+          "category": "medium_composition",
+          "classifier_confidence": 0.3877937281932526,
+          "expected_tier": 2,
+          "expected_use_case": "coding",
+          "id": "medium-00-0",
+          "selected_tier": 3,
+          "selected_use_case": "coding",
+          "signals": [
+            "coding vocabulary or code block",
+            "non-trivial implementation or verification",
+            "learned complexity level 5 using argmax",
+            "learned classifier confidence 0.39",
+            "normalized classifier entropy 0.87",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ]
+        },
+        {
+          "category": "medium_composition",
+          "classifier_confidence": 0.568511425563002,
+          "expected_tier": 2,
+          "expected_use_case": "coding",
+          "id": "medium-00-3",
+          "selected_tier": 3,
+          "selected_use_case": "coding",
+          "signals": [
+            "coding vocabulary or code block",
+            "non-trivial implementation or verification",
+            "learned complexity level 5 using argmax",
+            "learned classifier confidence 0.57",
+            "normalized classifier entropy 0.76",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ]
+        },
+        {
+          "category": "medium_composition",
+          "classifier_confidence": 0.4181104448202601,
+          "expected_tier": 2,
+          "expected_use_case": "reasoning",
+          "id": "medium-02-3",
+          "selected_tier": 3,
+          "selected_use_case": "reasoning",
+          "signals": [
+            "multi-step reasoning vocabulary",
+            "learned complexity level 4 using argmax",
+            "learned classifier confidence 0.42",
+            "normalized classifier entropy 0.69",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ]
+        },
+        {
+          "category": "medium_composition",
+          "classifier_confidence": 0.47118565428848086,
+          "expected_tier": 2,
+          "expected_use_case": "reasoning",
+          "id": "medium-03-3",
+          "selected_tier": 3,
+          "selected_use_case": "reasoning",
+          "signals": [
+            "multi-step reasoning vocabulary",
+            "learned complexity level 4 using argmax",
+            "learned classifier confidence 0.47",
+            "normalized classifier entropy 0.80",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ]
+        },
+        {
+          "category": "medium_composition",
+          "classifier_confidence": 0.4974130650303912,
+          "expected_tier": 2,
+          "expected_use_case": "general_qa",
+          "id": "medium-04-0",
+          "selected_tier": 3,
+          "selected_use_case": "general_qa",
+          "signals": [
+            "general question/answer pattern",
+            "learned complexity level 5 using argmax",
+            "learned classifier confidence 0.50",
+            "normalized classifier entropy 0.80",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ]
+        },
+        {
+          "category": "medium_composition",
+          "classifier_confidence": 0.3857864753459396,
+          "expected_tier": 2,
+          "expected_use_case": "general_qa",
+          "id": "medium-04-1",
+          "selected_tier": 2,
+          "selected_use_case": "reasoning",
+          "signals": [
+            "multi-step reasoning vocabulary",
+            "multiple constraints or subtasks",
+            "learned complexity level 1 using argmax",
+            "learned classifier confidence 0.39",
+            "normalized classifier entropy 0.78",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.601"
+          ]
+        },
+        {
+          "category": "medium_composition",
+          "classifier_confidence": 0.48343315530954534,
+          "expected_tier": 2,
+          "expected_use_case": "general_qa",
+          "id": "medium-04-3",
+          "selected_tier": 3,
+          "selected_use_case": "general_qa",
+          "signals": [
+            "general question/answer pattern",
+            "learned complexity level 5 using argmax",
+            "learned classifier confidence 0.48",
+            "normalized classifier entropy 0.74",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ]
+        },
+        {
+          "category": "medium_composition",
+          "classifier_confidence": 0.4793948744105531,
+          "expected_tier": 2,
+          "expected_use_case": "general_qa",
+          "id": "medium-05-1",
+          "selected_tier": 2,
+          "selected_use_case": "reasoning",
+          "signals": [
+            "multi-step reasoning vocabulary",
+            "multiple constraints or subtasks",
+            "learned complexity level 1 using argmax",
+            "learned classifier confidence 0.48",
+            "normalized classifier entropy 0.83",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.472"
+          ]
+        },
+        {
+          "category": "medium_composition",
+          "classifier_confidence": 0.35469091416118137,
+          "expected_tier": 2,
+          "expected_use_case": "general_qa",
+          "id": "medium-05-2",
+          "selected_tier": 1,
+          "selected_use_case": "general_qa",
+          "signals": [
+            "general question/answer pattern",
+            "learned complexity level 1 using argmax",
+            "learned classifier confidence 0.35",
+            "normalized classifier entropy 0.86",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.338"
+          ]
+        },
+        {
+          "category": "medium_composition",
+          "classifier_confidence": 0.47223287951101267,
+          "expected_tier": 2,
+          "expected_use_case": "coding",
+          "id": "medium-06-0",
+          "selected_tier": 2,
+          "selected_use_case": "general_qa",
+          "signals": [
+            "general question/answer pattern",
+            "non-trivial implementation or verification",
+            "learned complexity level 3 using argmax",
+            "learned classifier confidence 0.47",
+            "normalized classifier entropy 0.84",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.392"
+          ]
+        },
+        {
+          "category": "medium_composition",
+          "classifier_confidence": 0.688234953789712,
+          "expected_tier": 2,
+          "expected_use_case": "coding",
+          "id": "medium-06-1",
+          "selected_tier": 2,
+          "selected_use_case": "reasoning",
+          "signals": [
+            "multi-step reasoning vocabulary",
+            "non-trivial implementation or verification",
+            "multiple constraints or subtasks",
+            "learned complexity level 3 using argmax",
+            "learned classifier confidence 0.69",
+            "normalized classifier entropy 0.63",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.232"
+          ]
+        },
+        {
+          "category": "medium_composition",
+          "classifier_confidence": 0.6563533332753108,
+          "expected_tier": 2,
+          "expected_use_case": "coding",
+          "id": "medium-06-2",
+          "selected_tier": 2,
+          "selected_use_case": "general_qa",
+          "signals": [
+            "general question/answer pattern",
+            "non-trivial implementation or verification",
+            "learned complexity level 3 using argmax",
+            "learned classifier confidence 0.66",
+            "normalized classifier entropy 0.65",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.111"
+          ]
+        },
+        {
+          "category": "medium_composition",
+          "classifier_confidence": 0.44068532398102467,
+          "expected_tier": 2,
+          "expected_use_case": "coding",
+          "id": "medium-06-3",
+          "selected_tier": 3,
+          "selected_use_case": "general_qa",
+          "signals": [
+            "general question/answer pattern",
+            "non-trivial implementation or verification",
+            "learned complexity level 4 using argmax",
+            "learned classifier confidence 0.44",
+            "normalized classifier entropy 0.70",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ]
+        },
+        {
+          "category": "medium_composition",
+          "classifier_confidence": 0.7005275502883711,
+          "expected_tier": 2,
+          "expected_use_case": "reasoning",
+          "id": "medium-07-0",
+          "selected_tier": 3,
+          "selected_use_case": "reasoning",
+          "signals": [
+            "multi-step reasoning vocabulary",
+            "fresh information requested",
+            "learned complexity level 5 using argmax",
+            "learned classifier confidence 0.70",
+            "normalized classifier entropy 0.62",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ]
+        },
+        {
+          "category": "medium_composition",
+          "classifier_confidence": 0.6957180842820629,
+          "expected_tier": 2,
+          "expected_use_case": "reasoning",
+          "id": "medium-07-1",
+          "selected_tier": 3,
+          "selected_use_case": "reasoning",
+          "signals": [
+            "multi-step reasoning vocabulary",
+            "multiple constraints or subtasks",
+            "fresh information requested",
+            "learned complexity level 5 using argmax",
+            "learned classifier confidence 0.70",
+            "normalized classifier entropy 0.62",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ]
+        },
+        {
+          "category": "medium_composition",
+          "classifier_confidence": 0.5624242094459413,
+          "expected_tier": 2,
+          "expected_use_case": "reasoning",
+          "id": "medium-07-2",
+          "selected_tier": 3,
+          "selected_use_case": "reasoning",
+          "signals": [
+            "multi-step reasoning vocabulary",
+            "fresh information requested",
+            "learned complexity level 5 using argmax",
+            "learned classifier confidence 0.56",
+            "normalized classifier entropy 0.74",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ]
+        },
+        {
+          "category": "medium_composition",
+          "classifier_confidence": 0.7040836917688295,
+          "expected_tier": 2,
+          "expected_use_case": "reasoning",
+          "id": "medium-07-3",
+          "selected_tier": 3,
+          "selected_use_case": "reasoning",
+          "signals": [
+            "multi-step reasoning vocabulary",
+            "fresh information requested",
+            "learned complexity level 5 using argmax",
+            "learned classifier confidence 0.70",
+            "normalized classifier entropy 0.52",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ]
+        },
+        {
+          "category": "medium_composition",
+          "classifier_confidence": 0.6873256996129897,
+          "expected_tier": 2,
+          "expected_use_case": "general_qa",
+          "id": "medium-08-0",
+          "selected_tier": 1,
+          "selected_use_case": "general_qa",
+          "signals": [
+            "general question/answer pattern",
+            "learned complexity level 2 using argmax",
+            "learned classifier confidence 0.69",
+            "normalized classifier entropy 0.56",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.143"
+          ]
+        },
+        {
+          "category": "medium_composition",
+          "classifier_confidence": 0.4223750345820316,
+          "expected_tier": 2,
+          "expected_use_case": "general_qa",
+          "id": "medium-08-1",
+          "selected_tier": 2,
+          "selected_use_case": "reasoning",
+          "signals": [
+            "multi-step reasoning vocabulary",
+            "multiple constraints or subtasks",
+            "learned complexity level 1 using argmax",
+            "learned classifier confidence 0.42",
+            "normalized classifier entropy 0.75",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.222"
+          ]
+        },
+        {
+          "category": "medium_composition",
+          "classifier_confidence": 0.8325155775371749,
+          "expected_tier": 2,
+          "expected_use_case": "general_qa",
+          "id": "medium-08-2",
+          "selected_tier": 1,
+          "selected_use_case": "general_qa",
+          "signals": [
+            "general question/answer pattern",
+            "learned complexity level 2 using argmax",
+            "learned classifier confidence 0.83",
+            "normalized classifier entropy 0.39",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.107"
+          ]
+        }
+      ],
+      "route_errors": 0,
+      "tier_accuracy": 0.837989,
+      "tier_overroute_rate": 0.117318,
+      "tier_underroute_rate": 0.044693,
+      "use_case_accuracy": 0.73743
+    },
+    "hybrid_tier_risk_p15": {
+      "average_estimated_cost_usd": 0.00684143,
+      "categories": {
+        "concise_hard": {
+          "exact": 48
+        },
+        "high_stakes": {
+          "exact": 6
+        },
+        "lexical_trap_simple": {
+          "exact": 48
+        },
+        "medium_composition": {
+          "exact": 4,
+          "over": 42,
+          "under": 2
+        },
+        "multi_turn_shift": {
+          "exact": 9,
+          "over": 8,
+          "under": 1
+        },
+        "multilingual_simple": {
+          "exact": 8
+        },
+        "routing_injection": {
+          "exact": 1,
+          "over": 2
+        }
+      },
+      "count": 179,
+      "failure_examples": [
+        {
+          "category": "medium_composition",
+          "classifier_confidence": 0.3877937281932526,
+          "expected_tier": 2,
+          "expected_use_case": "coding",
+          "id": "medium-00-0",
+          "selected_tier": 3,
+          "selected_use_case": "coding",
+          "signals": [
+            "coding vocabulary or code block",
+            "non-trivial implementation or verification",
+            "learned complexity level 5 using tier_risk",
+            "learned classifier confidence 0.39",
+            "normalized classifier entropy 0.87",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ]
+        },
+        {
+          "category": "medium_composition",
+          "classifier_confidence": 0.3161409217038015,
+          "expected_tier": 2,
+          "expected_use_case": "coding",
+          "id": "medium-00-1",
+          "selected_tier": 3,
+          "selected_use_case": "coding",
+          "signals": [
+            "coding vocabulary or code block",
+            "non-trivial implementation or verification",
+            "multiple constraints or subtasks",
+            "learned complexity level 5 using tier_risk",
+            "learned classifier confidence 0.32",
+            "normalized classifier entropy 0.88",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ]
+        },
+        {
+          "category": "medium_composition",
+          "classifier_confidence": 0.568511425563002,
+          "expected_tier": 2,
+          "expected_use_case": "coding",
+          "id": "medium-00-3",
+          "selected_tier": 3,
+          "selected_use_case": "coding",
+          "signals": [
+            "coding vocabulary or code block",
+            "non-trivial implementation or verification",
+            "learned complexity level 5 using tier_risk",
+            "learned classifier confidence 0.57",
+            "normalized classifier entropy 0.76",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ]
+        },
+        {
+          "category": "medium_composition",
+          "classifier_confidence": 0.3566226384562229,
+          "expected_tier": 2,
+          "expected_use_case": "coding",
+          "id": "medium-01-0",
+          "selected_tier": 3,
+          "selected_use_case": "coding",
+          "signals": [
+            "coding vocabulary or code block",
+            "non-trivial implementation or verification",
+            "tool-assisted coding request",
+            "learned complexity level 5 using tier_risk",
+            "learned classifier confidence 0.36",
+            "normalized classifier entropy 0.92",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ]
+        },
+        {
+          "category": "medium_composition",
+          "classifier_confidence": 0.5203164127039589,
           "expected_tier": 2,
           "expected_use_case": "coding",
           "id": "medium-01-1",
@@ -882,14 +924,34 @@
             "multiple constraints or subtasks",
             "tool-assisted coding request",
             "learned complexity level 5 using tier_risk",
-            "learned classifier confidence 0.55",
-            "normalized classifier entropy 0.79",
+            "learned classifier confidence 0.52",
+            "normalized classifier entropy 0.81",
+            "full-conversation and final-turn tiers agree",
             "posterior tier under-route probability 0.000"
           ]
         },
         {
           "category": "medium_composition",
-          "classifier_confidence": 0.3938337858419835,
+          "classifier_confidence": 0.42391970360228215,
+          "expected_tier": 2,
+          "expected_use_case": "coding",
+          "id": "medium-01-2",
+          "selected_tier": 3,
+          "selected_use_case": "coding",
+          "signals": [
+            "coding vocabulary or code block",
+            "non-trivial implementation or verification",
+            "tool-assisted coding request",
+            "learned complexity level 5 using tier_risk",
+            "learned classifier confidence 0.42",
+            "normalized classifier entropy 0.85",
+            "full-conversation and final-turn tiers agree",
+            "posterior tier under-route probability 0.000"
+          ]
+        },
+        {
+          "category": "medium_composition",
+          "classifier_confidence": 0.3411002262105377,
           "expected_tier": 2,
           "expected_use_case": "coding",
           "id": "medium-01-3",
@@ -900,14 +962,15 @@
             "non-trivial implementation or verification",
             "tool-assisted coding request",
             "learned complexity level 5 using tier_risk",
-            "learned classifier confidence 0.39",
-            "normalized classifier entropy 0.88",
+            "learned classifier confidence 0.34",
+            "normalized classifier entropy 0.89",
+            "full-conversation and final-turn tiers agree",
             "posterior tier under-route probability 0.000"
           ]
         },
         {
           "category": "medium_composition",
-          "classifier_confidence": 0.5830887489560179,
+          "classifier_confidence": 0.5581585047292845,
           "expected_tier": 2,
           "expected_use_case": "reasoning",
           "id": "medium-02-0",
@@ -916,14 +979,15 @@
           "signals": [
             "multi-step reasoning vocabulary",
             "learned complexity level 5 using tier_risk",
-            "learned classifier confidence 0.58",
-            "normalized classifier entropy 0.72",
+            "learned classifier confidence 0.56",
+            "normalized classifier entropy 0.73",
+            "full-conversation and final-turn tiers agree",
             "posterior tier under-route probability 0.000"
           ]
         },
         {
           "category": "medium_composition",
-          "classifier_confidence": 0.46824002018144506,
+          "classifier_confidence": 0.45037145119077165,
           "expected_tier": 2,
           "expected_use_case": "reasoning",
           "id": "medium-02-1",
@@ -933,14 +997,15 @@
             "multi-step reasoning vocabulary",
             "multiple constraints or subtasks",
             "learned complexity level 5 using tier_risk",
-            "learned classifier confidence 0.47",
+            "learned classifier confidence 0.45",
             "normalized classifier entropy 0.84",
+            "full-conversation and final-turn tiers agree",
             "posterior tier under-route probability 0.000"
           ]
         },
         {
           "category": "medium_composition",
-          "classifier_confidence": 0.39108156731041965,
+          "classifier_confidence": 0.38035595351965784,
           "expected_tier": 2,
           "expected_use_case": "reasoning",
           "id": "medium-02-2",
@@ -949,14 +1014,15 @@
           "signals": [
             "multi-step reasoning vocabulary",
             "learned complexity level 5 using tier_risk",
-            "learned classifier confidence 0.39",
-            "normalized classifier entropy 0.93",
+            "learned classifier confidence 0.38",
+            "normalized classifier entropy 0.92",
+            "full-conversation and final-turn tiers agree",
             "posterior tier under-route probability 0.000"
           ]
         },
         {
           "category": "medium_composition",
-          "classifier_confidence": 0.4277612204989172,
+          "classifier_confidence": 0.4181104448202601,
           "expected_tier": 2,
           "expected_use_case": "reasoning",
           "id": "medium-02-3",
@@ -965,14 +1031,15 @@
           "signals": [
             "multi-step reasoning vocabulary",
             "learned complexity level 5 using tier_risk",
-            "learned classifier confidence 0.43",
-            "normalized classifier entropy 0.71",
+            "learned classifier confidence 0.42",
+            "normalized classifier entropy 0.69",
+            "full-conversation and final-turn tiers agree",
             "posterior tier under-route probability 0.000"
           ]
         },
         {
           "category": "medium_composition",
-          "classifier_confidence": 0.2866875339575977,
+          "classifier_confidence": 0.28350159632678373,
           "expected_tier": 2,
           "expected_use_case": "reasoning",
           "id": "medium-03-0",
@@ -981,14 +1048,15 @@
           "signals": [
             "multi-step reasoning vocabulary",
             "learned complexity level 5 using tier_risk",
-            "learned classifier confidence 0.29",
+            "learned classifier confidence 0.28",
             "normalized classifier entropy 0.92",
+            "full-conversation and final-turn tiers agree",
             "posterior tier under-route probability 0.000"
           ]
         },
         {
           "category": "medium_composition",
-          "classifier_confidence": 0.28979222810744476,
+          "classifier_confidence": 0.29018673873154405,
           "expected_tier": 2,
           "expected_use_case": "reasoning",
           "id": "medium-03-1",
@@ -999,13 +1067,14 @@
             "multiple constraints or subtasks",
             "learned complexity level 5 using tier_risk",
             "learned classifier confidence 0.29",
-            "normalized classifier entropy 0.93",
+            "normalized classifier entropy 0.92",
+            "full-conversation and final-turn tiers agree",
             "posterior tier under-route probability 0.000"
           ]
         },
         {
           "category": "medium_composition",
-          "classifier_confidence": 0.518654491664255,
+          "classifier_confidence": 0.4885482339859949,
           "expected_tier": 2,
           "expected_use_case": "reasoning",
           "id": "medium-03-2",
@@ -1014,14 +1083,15 @@
           "signals": [
             "multi-step reasoning vocabulary",
             "learned complexity level 5 using tier_risk",
-            "learned classifier confidence 0.52",
-            "normalized classifier entropy 0.82",
+            "learned classifier confidence 0.49",
+            "normalized classifier entropy 0.84",
+            "full-conversation and final-turn tiers agree",
             "posterior tier under-route probability 0.000"
           ]
         },
         {
           "category": "medium_composition",
-          "classifier_confidence": 0.44819201542032644,
+          "classifier_confidence": 0.47118565428848086,
           "expected_tier": 2,
           "expected_use_case": "reasoning",
           "id": "medium-03-3",
@@ -1030,14 +1100,15 @@
           "signals": [
             "multi-step reasoning vocabulary",
             "learned complexity level 5 using tier_risk",
-            "learned classifier confidence 0.45",
-            "normalized classifier entropy 0.82",
+            "learned classifier confidence 0.47",
+            "normalized classifier entropy 0.80",
+            "full-conversation and final-turn tiers agree",
             "posterior tier under-route probability 0.000"
           ]
         },
         {
           "category": "medium_composition",
-          "classifier_confidence": 0.43752833558712656,
+          "classifier_confidence": 0.4974130650303912,
           "expected_tier": 2,
           "expected_use_case": "general_qa",
           "id": "medium-04-0",
@@ -1046,14 +1117,15 @@
           "signals": [
             "general question/answer pattern",
             "learned complexity level 5 using tier_risk",
-            "learned classifier confidence 0.44",
-            "normalized classifier entropy 0.83",
+            "learned classifier confidence 0.50",
+            "normalized classifier entropy 0.80",
+            "full-conversation and final-turn tiers agree",
             "posterior tier under-route probability 0.000"
           ]
         },
         {
           "category": "medium_composition",
-          "classifier_confidence": 0.42207042890749585,
+          "classifier_confidence": 0.3857864753459396,
           "expected_tier": 2,
           "expected_use_case": "general_qa",
           "id": "medium-04-1",
@@ -1063,14 +1135,15 @@
             "multi-step reasoning vocabulary",
             "multiple constraints or subtasks",
             "learned complexity level 5 using tier_risk",
-            "learned classifier confidence 0.42",
-            "normalized classifier entropy 0.79",
+            "learned classifier confidence 0.39",
+            "normalized classifier entropy 0.78",
+            "full-conversation and final-turn tiers agree",
             "posterior tier under-route probability 0.000"
           ]
         },
         {
           "category": "medium_composition",
-          "classifier_confidence": 0.3686085430873904,
+          "classifier_confidence": 0.34455196003375094,
           "expected_tier": 2,
           "expected_use_case": "general_qa",
           "id": "medium-04-2",
@@ -1079,14 +1152,15 @@
           "signals": [
             "general question/answer pattern",
             "learned complexity level 5 using tier_risk",
-            "learned classifier confidence 0.37",
-            "normalized classifier entropy 0.86",
+            "learned classifier confidence 0.34",
+            "normalized classifier entropy 0.87",
+            "full-conversation and final-turn tiers agree",
             "posterior tier under-route probability 0.000"
           ]
         },
         {
           "category": "medium_composition",
-          "classifier_confidence": 0.4206905369225169,
+          "classifier_confidence": 0.48343315530954534,
           "expected_tier": 2,
           "expected_use_case": "general_qa",
           "id": "medium-04-3",
@@ -1095,14 +1169,15 @@
           "signals": [
             "general question/answer pattern",
             "learned complexity level 5 using tier_risk",
-            "learned classifier confidence 0.42",
-            "normalized classifier entropy 0.79",
+            "learned classifier confidence 0.48",
+            "normalized classifier entropy 0.74",
+            "full-conversation and final-turn tiers agree",
             "posterior tier under-route probability 0.000"
           ]
         },
         {
           "category": "medium_composition",
-          "classifier_confidence": 0.43925980828161104,
+          "classifier_confidence": 0.39764244667951626,
           "expected_tier": 2,
           "expected_use_case": "general_qa",
           "id": "medium-05-0",
@@ -1111,34 +1186,18 @@
           "signals": [
             "general question/answer pattern",
             "learned complexity level 5 using tier_risk",
-            "learned classifier confidence 0.44",
-            "normalized classifier entropy 0.90",
-            "posterior tier under-route probability 0.000"
-          ]
-        },
-        {
-          "category": "medium_composition",
-          "classifier_confidence": 0.5005686198682711,
-          "expected_tier": 2,
-          "expected_use_case": "general_qa",
-          "id": "medium-05-1",
-          "selected_tier": 3,
-          "selected_use_case": "reasoning",
-          "signals": [
-            "multi-step reasoning vocabulary",
-            "multiple constraints or subtasks",
-            "learned complexity level 5 using tier_risk",
-            "learned classifier confidence 0.50",
-            "normalized classifier entropy 0.83",
+            "learned classifier confidence 0.40",
+            "normalized classifier entropy 0.92",
+            "full-conversation and final-turn tiers agree",
             "posterior tier under-route probability 0.000"
           ]
         }
       ],
       "route_errors": 0,
-      "tier_accuracy": 0.706587,
-      "tier_overroute_rate": 0.275449,
-      "tier_underroute_rate": 0.017964,
-      "use_case_accuracy": 0.736527
+      "tier_accuracy": 0.692737,
+      "tier_overroute_rate": 0.290503,
+      "tier_underroute_rate": 0.01676,
+      "use_case_accuracy": 0.73743
     }
   },
   "schema_version": "model-router-adversarial-eval-v1"

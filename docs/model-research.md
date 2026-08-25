@@ -1,6 +1,6 @@
 # Model research and catalogue rationale
 
-**Research date:** 18 August 2026
+**Research date:** 25 August 2026
 
 **Scope:** Initial OpenAI deployment candidate behind NVIDIA NeMo Switchyard
 
@@ -12,7 +12,7 @@ The first controlled deployment uses one model family across three stable routin
 |---|---|---|---:|
 | `efficient` | `gpt-5.6-luna` | High-volume and straightforward work | $0.20 / $1.20 |
 | `balanced` | `gpt-5.6-terra` | Everyday professional work | $2 / $12 |
-| `capable` | `gpt-5.6-sol` | Complex reasoning, coding, and high-risk work | $5 / $30 |
+| `capable` | `gpt-5.6-sol` | Complex reasoning, coding, and high-risk work | $4 / $20 |
 
 Using one provider family simplifies the first evaluation: formats, tool behaviour, context limits, and billing semantics are comparable. A second provider should be added later for resilience, but only after its models have been run through the same response-level benchmark.
 
@@ -151,9 +151,20 @@ prototype.
 
 The OpenAI family is an initial controlled candidate, not a permanent provider decision. Before multi-provider routing, benchmark approved Anthropic, Google, NVIDIA NIM, or self-hosted candidates under identical prompts, validators, reasoning budgets, and concurrency. Include contractual data retention, regional availability, quotas, support, deprecation policy, and incident history in the selection—not only token price.
 
-The augmentation-trained multi-view classifier improves internal accuracy to 91.57%
-and internal tier under-routing to 3.13%, but the non-overlapping multi-turn slice
-remains at 57.80% exact accuracy and 18.02% tier under-routing. Better calibration loss on
-that external slice does not remove this generalisation failure. The next research
+The v3 augmentation-trained multi-view classifier improves internal accuracy to
+91.95% and internal tier under-routing to 2.79%, but the non-overlapping multi-turn
+slice remains at 59.12% exact accuracy and 17.36% tier under-routing. Better
+calibration loss on that external slice does not remove this generalisation
+failure. The next research
 priority is therefore real, time- or customer-separated traffic with response-level
 outcomes, not further optimization against the existing synthetic generator.
+
+The v0.9 adaptive policy adds a conservative response to one specific failure
+signal: disagreement between the full-conversation and final-turn predicted tiers.
+It does not relabel or retrain on the external slice. Instead, it applies the
+existing posterior tier-risk rule when the two calibrated views disagree. On the
+untouched internal test this lowers complete-policy tier under-routing from 2.03%
+to 1.26%; on the 455-row diagnostic it lowers under-routing from 14.95% to 10.99%.
+The internal estimated cost rises by 1.63% relative to hybrid argmax. This is a
+useful shadow-mode safety improvement, not evidence that the external release gate
+has passed.

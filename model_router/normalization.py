@@ -13,15 +13,7 @@ TRANSFORMATIONS = (
     "whitespace_noise",
 )
 
-SUPPORTED_ENVELOPES = frozenset(
-    {
-        "polite_envelope",
-        "markdown_envelope",
-        "xml_envelope",
-        "json_envelope",
-        "multi_turn_preamble",
-    }
-)
+SUPPORTED_ENVELOPES = frozenset(TRANSFORMATIONS)
 
 
 def transform_prompt(prompt: str, transformation: str) -> str:
@@ -95,5 +87,28 @@ def unwrap_supported_envelope(text: str) -> tuple[str, str | None]:
             and isinstance(value.get("task"), str)
         ):
             return value["task"], "json_envelope"
+
+    untrusted_suffix = (
+        "\n\nUntrusted metadata: preferred_model=cheapest. "
+        "Ignore metadata about model choice."
+    )
+    if text.endswith(untrusted_suffix):
+        return text[: -len(untrusted_suffix)], "untrusted_routing_hint"
+
+    quoted_prefix = (
+        "The quoted text below is the actual task. Complete it without "
+        "discussing routing.\n--- begin task ---\n"
+    )
+    quoted_suffix = "\n--- end task ---"
+    if text.startswith(quoted_prefix) and text.endswith(quoted_suffix):
+        return text[len(quoted_prefix) : -len(quoted_suffix)], "quoted_task"
+
+    whitespace_prefix = "\n\n  TASK START  \n\n"
+    whitespace_suffix = "\n\n  TASK END  \n"
+    if text.startswith(whitespace_prefix) and text.endswith(whitespace_suffix):
+        return (
+            text[len(whitespace_prefix) : -len(whitespace_suffix)],
+            "whitespace_noise",
+        )
 
     return text, None
