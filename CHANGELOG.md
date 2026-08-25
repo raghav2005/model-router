@@ -1,5 +1,25 @@
 # Changelog
 
+## 0.9.0 — 2026-08-25
+
+- Added posterior-risk escalation when full-conversation and final-turn
+  predictions disagree on a model tier. Default adaptive tier under-routing fell
+  from 2.03% to 1.26% internally and from 14.95% to 10.99% on the isolated
+  multi-turn diagnostic slice.
+- Exposed the two view tiers and disagreement flag in route responses, privacy-safe
+  audit events, and bounded-cardinality Prometheus metrics.
+- Expanded multi-turn task-switch regression coverage from 6 to 18 cases. The
+  adversarial suite now has 179 cases and its eight-view metamorphic expansion has
+  1,432 cases with 100% model and tier invariance.
+- Corrected GPT-5.6 Sol pricing to the current official $4 input, $0.40 cached
+  input, $5 cache write, and $20 output rates per million tokens; refreshed the
+  source-bound verification report and all cost comparisons.
+- Regenerated the trained artifact and aggregate reports with exact catalogue,
+  policy, recipe, and implementation provenance. Source training prompts remain
+  private and are not included in the repository.
+- Expanded the credential-free suite to 83 tests while retaining shadow-only
+  status and all seven evidence/approval blockers.
+
 ## 0.8.0 — 2026-08-20
 
 - Added a prompt-free audit command and aggregate report for the private datagen

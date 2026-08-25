@@ -158,3 +158,13 @@ calibration loss on that external slice does not remove this generalisation
 failure. The next research
 priority is therefore real, time- or customer-separated traffic with response-level
 outcomes, not further optimization against the existing synthetic generator.
+
+The v0.9 adaptive policy adds a conservative response to one specific failure
+signal: disagreement between the full-conversation and final-turn predicted tiers.
+It does not relabel or retrain on the external slice. Instead, it applies the
+existing posterior tier-risk rule when the two calibrated views disagree. On the
+untouched internal test this lowers complete-policy tier under-routing from 2.03%
+to 1.26%; on the 455-row diagnostic it lowers under-routing from 14.95% to 10.99%.
+The internal estimated cost rises by 1.63% relative to hybrid argmax. This is a
+useful shadow-mode safety improvement, not evidence that the external release gate
+has passed.

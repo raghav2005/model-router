@@ -39,15 +39,18 @@ The multi-turn result is a release blocker. The internal result shows that the m
 The selected model combines complete-conversation and final-turn predictions with
 a validation-selected 0.05 final-turn weight and temperature 4.362. Training-only
 prompt-envelope augmentation improves robustness without changing validation, test,
-or external prompts. The default adaptive end-to-end policy has 2.03% internal tier
-under-routing and an estimated cost 41.62% below the always-capable reference. These
-are offline proxies, not measured production savings.
+or external prompts. The adaptive policy now treats disagreement between the full
+conversation and final-user-turn tiers as uncertainty and applies posterior-risk
+escalation. End-to-end tier under-routing is 1.26% internally and 10.99% on the
+455-prompt multi-turn diagnostic, compared with 2.03% and 14.95% before the guard.
+Its estimated internal cost is 34.45% below the newly repriced always-capable
+reference. These are offline proxies, not measured production savings.
 
-Classifier-only latency on this development machine was 112 µs median, 160 µs p95,
-and 197 µs p99 over 1,000 prompts. This is recorded for regression purposes and
+Classifier-only latency on this development machine was 116 µs median, 166 µs p95,
+and 191 µs p99 over 1,000 prompts. This is recorded for regression purposes and
 does not include Switchyard, network, or model-generation time.
 
-The current test suite contains 82 credential-free tests. Linting, formatting,
+The current test suite contains 83 credential-free tests. Linting, formatting,
 source compilation, CLI operation, wheel packaging, catalogue validation, API
 behaviour, resilience, audit privacy, drift detection, streaming parsing,
 evaluation resumability, adversarial regression, and release gates are covered.
@@ -155,14 +158,15 @@ model-router metamorphic-eval
 | `case-set-hash` | Compute the immutable live case-set digest | No |
 | `release-gates` | Evaluate production-enforcement evidence | No |
 | `verify-pricing` | Verify catalogue economics against official model pages | Provider docs only |
-| `adversarial-eval` | Run 167 deterministic routing regression cases | No |
-| `metamorphic-eval` | Run 1,336 meaning-preserving routing invariance cases | No |
+| `adversarial-eval` | Run 179 deterministic routing regression cases | No |
+| `metamorphic-eval` | Run 1,432 meaning-preserving routing invariance cases | No |
 | `drift-baseline` | Create an approved baseline from prompt-free audit events | No |
 | `drift-report` | Compare recent audit events with the approved baseline | No |
 
 The CLI defaults to hybrid classification with the adaptive policy. Adaptive mode
 uses ordinary argmax routing for confident, normal-risk work and posterior tier-risk
-routing for high-risk, quality-first, or sufficiently uncertain work. Use
+routing for high-risk, quality-first, low-confidence, or cross-view-disagreement
+work. Use
 `--classifier-mode heuristic` for the deterministic baseline or
 `--complexity-policy tier_risk` for a stronger under-routing bound at higher cost.
 The adaptive confidence threshold is configurable. Training evaluates 28 threshold
@@ -294,16 +298,17 @@ model-router benchmark --iterations 300
 ```
 
 The separate adversarial suite is deterministic and never enters training or the
-independent release gate. It exposed a keyword-driven over-routing pattern; the
-v3 default retains 2.99% under-routing, and all concise-hard/high-stakes cases
-remain on the capable tier. See
-`reports/experiments/adversarial_regression_v1.md`.
+independent release gate. It exposed keyword-driven over-routing and multi-turn
+task-switch failures. The expanded v3 default has 1.68% under-routing across 179
+cases, and all concise-hard/high-stakes cases remain on the capable tier. See
+`reports/experiments/adversarial_regression_v1.md` and
+`reports/experiments/multi_view_disagreement_v1.md`.
 
 The metamorphic suite applies eight meaning-preserving presentation changes to all
-167 adversarial cases. All eight exact, versioned application-envelope contracts
+179 adversarial cases. All eight exact, versioned application-envelope contracts
 are normalized before semantic classification while raw tokens remain available
 for cost estimation. On the promoted default policy, tier and model invariance are
-100%, tier under-routing is 2.99%, and exact tier accuracy is 75.45%. These
+100%, tier under-routing is 1.68%, and exact tier accuracy is 75.42%. These
 synthetic metrics are a regression gate, never a
 substitute for real workload outcomes.
 
@@ -368,10 +373,11 @@ independent judge rubric, blinded human review, or a combination.
 The Switchyard client includes timeouts, safe GET retries with exponential backoff and jitter, `Retry-After` handling, a circuit breaker, request IDs, and optional explicit fallback. Generation retries are off by default because a failed generation may still be billable.
 
 Prometheus output covers decisions, estimated spend, execution outcomes, tokens,
-latency histograms, classifier confidence, normalized entropy, and posterior tier
-risk. Audit events include prompt HMAC, model/catalog/policy/classifier versions,
-decision, estimate, latency, usage, and error type without prompt or response
-content.
+latency histograms, classifier confidence, normalized entropy, posterior tier
+risk, and full-conversation/final-turn tier disagreement. Audit events include the
+same structured disagreement evidence plus prompt HMAC, model/catalog/policy/
+classifier versions, decision, estimate, latency, usage, and error type without
+prompt or response content.
 
 After an approved shadow window, create and retain an immutable drift baseline,
 then compare each subsequent observation window:

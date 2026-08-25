@@ -4,11 +4,11 @@
 multinomial Naive Bayes model trained from the audited
 `routing_dataset_100k_valid_only.jsonl` snapshot.
 
-Artifact SHA-256: `61723945b1469461e6dc88484c5e2c0d88895501a4c240fc22e42e1e74849d9d`
+Artifact SHA-256: `39b8a46f2b88891587ec114e7f58c7cb4a42e8cfcb8c597404a9ea90c4f0191b`
 
-Training recipe SHA-256: `a73d4d4742623dd8bbb948174e2ed542fad890954a79f1fa550b20f9cd5be7ce`
+Training recipe SHA-256: `b81af54e1cfb0bcce94619217fb36d6dcd1fef50e5a7624d134c6a47cd5bcb77`
 
-Training implementation SHA-256: `8b297237157a6f215b4c00296337aa475d372c2d90d5e93e31ae055b120384ef`
+Training implementation SHA-256: `644ccd43e4ffcfd024f7c92ce9c4de06b4b5431767254526776c1e0e05b00c63`
 
 V1 and v2 are retained as frozen baselines. Git history and the matching
 `reports/complexity_router_v1.*` and `reports/complexity_router_v2.*` files
@@ -54,8 +54,8 @@ novel slice remains too small; the artifact therefore remains shadow-only.
 Use the artifact as one prompt-complexity signal behind capability, budget,
 latency, context, health, and governance gates. `hybrid` mode combines the
 learned estimate with deterministic risk and capability features. The default
-adaptive policy promotes uncertain or high-risk work while retaining the cheap
-tier for confident straightforward requests.
+adaptive policy promotes uncertain, high-risk, or cross-view-disagreement work
+while retaining the cheap tier for confident straightforward requests.
 
 ## Limitations
 
