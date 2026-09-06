@@ -56,6 +56,7 @@ MODEL_ROUTER_ARTIFACT=model_router/artifacts/complexity_router_v3.npz
 MODEL_ROUTER_PRICING_REPORT=reports/pricing_verification.json
 MODEL_ROUTER_WORKLOAD_EVIDENCE=reports/workload_evidence.json
 MODEL_ROUTER_EXTERNAL_DATASET_EVIDENCE=reports/external_dataset_evidence.json
+MODEL_ROUTER_LIVE_POLICY_COMPARISON=reports/live_policy_comparison.json
 SWITCHYARD_URL=http://switchyard:4000
 SWITCHYARD_REVISION=1fc9ab887d1c663b0048ae24d5f473d15ed8daaa
 ```
@@ -100,6 +101,19 @@ dataset evidence report only after data/license review and deduplication. Its da
 digest and novel-row count must match the training report, and it must state that the
 source is independent and approved for release. The checked-in report intentionally
 marks the current related synthetic multi-turn slice as non-independent.
+
+Run `model-router live-policy-comparison` over the frozen cases and live result file.
+Supply the generated workload-evidence artifact so the replay uses the same measured
+quality and latency overlay as enforcement. Review quality retention, cost saving,
+avoidable failures, latency, and the routing mix, then record the report's exact
+SHA-256 under `live_policy_comparison` in the release policy. This is a replay of the
+same candidate responses and creates no additional model spend. Any change to the
+live summary, overlay, catalogue, router artifact, or routing policy invalidates the
+comparison.
+
+Confirm the runtime classifier settings exactly match `router_configuration` in the
+release policy. The first release allows only `balanced` priority because that is the
+only paired arm currently specified; other client priority overrides fail closed.
 
 Create the drift baseline only after the shadow window and its traffic mix are
 approved. Store it with the release evidence:

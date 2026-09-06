@@ -140,6 +140,22 @@ independent and set `approved_for_release` to true. The current multi-turn data 
 explicitly marked `diagnostic_only` and cannot pass even if its numerical thresholds
 are relaxed.
 
+The live gate also evaluates the routing decision, not only the three candidate
+models in isolation. A paired replay selects the router's target for every frozen
+case and looks up that target's already-collected response. It compares this routed
+arm with the always-capable arm and fails unless the approved aggregate report meets
+quality-retention, cost-saving, and avoidable-failure thresholds. The report is
+computed with the measured workload overlay and bound to the exact cases, raw result
+digest, live summary, overlay, catalogue, trained artifact, and policy version. This
+comparison adds no provider calls and cannot be reused after any release input
+changes.
+
+The initial policy comparison covers the default `balanced` priority only. Enforced
+mode rejects other priority values and refuses to start if its classifier mode,
+decision policy, under-route tolerance, or adaptive confidence threshold differs
+from the release policy. Additional priorities can be enabled only after the report
+schema and approval contain corresponding paired measurements.
+
 Thresholds are initial release criteria and must be approved against business risk. Open-ended work also needs blinded human review or an approved judge model; deterministic validators alone are insufficient.
 
 ## Remaining production work

@@ -80,3 +80,16 @@ The generalisation blocker can no longer be cleared by generating more examples 
 the same process. Enforcement requires an approved aggregate provenance report bound
 to the external dataset's exact digest and novel-row count; the current report is
 explicitly non-independent and diagnostic-only.
+
+The live evaluation now proves the routing policy's business trade-off as well as
+each model's standalone score. Using the same paired responses, it measures whether
+the router retains at least 98% of the capable model's validated quality while
+saving at least 15% cost and keeping avoidable failures below 2%. These are initial
+thresholds for owner review, not claimed production results; the gate remains closed
+until the live run and its exact aggregate comparison report are approved.
+
+The first enforced configuration is deliberately narrow: only the benchmarked
+`balanced` priority is accepted, and startup is blocked if classifier or uncertainty
+settings differ from the approved replay. Cost-, quality-, and latency-priority
+overrides remain available in shadow testing but require their own paired evidence
+before production enablement.

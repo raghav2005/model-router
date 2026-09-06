@@ -158,6 +158,7 @@ model-router metamorphic-eval
 | `case-set-hash` | Compute the immutable live case-set digest | No |
 | `workload-evidence` | Create a prompt-free quality/latency approval artifact | No |
 | `release-gates` | Evaluate production-enforcement evidence | No |
+| `live-policy-comparison` | Compare routed outcomes with fixed-model live arms | No new calls |
 | `verify-pricing` | Verify catalogue economics against official model pages | Provider docs only |
 | `adversarial-eval` | Run 179 deterministic routing regression cases | No |
 | `metamorphic-eval` | Run 1,432 meaning-preserving routing invariance cases | No |
@@ -386,6 +387,34 @@ prompts or responses. Review it, then place its exact digest in
 unchanged live summary and catalogue, then overlays the approved per-use-case quality
 and p95 latency measurements at startup. This avoids changing the base catalogue and
 invalidating the benchmark that produced the measurements.
+
+Because every case is run against every role, the same paid responses can then test
+the router policy with that measured overlay and without another provider call:
+
+```bash
+model-router live-policy-comparison examples/live_eval_cases.jsonl \
+  --results reports/live_eval_results.jsonl \
+  --live-summary reports/live_eval_summary.json \
+  --workload-evidence reports/workload_evidence.json \
+  --output reports/live_policy_comparison.json
+shasum -a 256 reports/live_policy_comparison.json
+```
+
+This paired replay compares the selected role with always-efficient,
+always-balanced, and always-capable arms. It reports end-to-end validator quality,
+cost, latency, routing mix, avoidable failures where another role succeeded, and
+cost regret against the cheapest passing role. It contains no prompts or responses
+and is bound to the exact case set, result file, live summary, workload overlay,
+catalogue, router artifact, and policy version. The initial gate requires at least
+98% of the capable arm's quality, at least 15% cost savings, and no more than 2%
+avoidable validator failures; owners must approve those business thresholds and the
+exact report digest.
+
+For the first enforced release, the approved comparison covers only the `balanced`
+request priority. Enforcement therefore rejects `cost`, `quality`, or `latency`
+priority overrides until each is represented by an approved comparison. It also
+refuses startup if the runtime classifier mode, decision policy, under-route
+tolerance, or confidence threshold differs from the benchmarked configuration.
 
 Supported validators are exact text, required substrings, regular expression,
 valid JSON, required JSON keys, exact JSON values, and numeric tolerance. Open-ended

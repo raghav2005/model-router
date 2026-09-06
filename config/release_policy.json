@@ -27,6 +27,19 @@
   "minimum_live_call_success_wilson_lower_bound": 0.95,
   "maximum_live_response_model_mismatch_count": 0,
   "approved_live_case_set_sha256": null,
+  "router_configuration": {
+    "classifier_mode": "hybrid",
+    "decision_policy": "adaptive",
+    "underroute_tolerance": 0.15,
+    "adaptive_confidence_threshold": 0.45,
+    "allowed_request_priorities": ["balanced"]
+  },
+  "live_policy_comparison": {
+    "minimum_quality_retention_vs_capable": 0.98,
+    "minimum_cost_savings_vs_capable": 0.15,
+    "maximum_avoidable_validator_failure_rate": 0.02,
+    "approved_report_sha256": null
+  },
   "approved_workload_evidence_sha256": null,
   "require_workload_measured_quality": true,
   "require_workload_measured_latency": true,

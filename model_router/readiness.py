@@ -9,6 +9,7 @@ from typing import Any
 
 from .catalog import catalog_sha256, load_catalog, load_catalog_document
 from .learned import MODEL_SCHEMA_VERSION, default_artifact_path
+from .policy_comparison import validate_policy_comparison
 from .router import POLICY_VERSION
 from .workload_evidence import sha256_file, validate_workload_evidence
 
@@ -59,6 +60,7 @@ def evaluate_release_gates(
     metamorphic_report_path: str | Path = "reports/metamorphic_routing_eval.json",
     switchyard_contract_report_path: str | Path = "reports/switchyard_contract.json",
     workload_evidence_path: str | Path = "reports/workload_evidence.json",
+    live_policy_comparison_path: str | Path = ("reports/live_policy_comparison.json"),
     artifact_path: str | Path = default_artifact_path(),
     today: date | None = None,
 ) -> dict[str, object]:
@@ -491,12 +493,101 @@ def evaluate_release_gates(
                 if missing_slices:
                     reasons.append("use_case_slices=" + ",".join(missing_slices))
                 failures.append(f"{model.id} ({'; '.join(reasons)})")
-        live_passed = not failures
-        live_detail = (
+        role_thresholds_passed = not failures
+        role_detail = (
             "roles below live threshold: " + "; ".join(failures)
             if failures
             else "all roles meet live unique-case, slice, latency, and validator thresholds"
         )
+        comparison_policy = policy.get("live_policy_comparison", {})
+        if not isinstance(comparison_policy, dict):
+            raise ValueError("live_policy_comparison must be an object")
+        comparison_path = Path(live_policy_comparison_path)
+        if comparison_path.exists() and artifact.exists():
+            comparison_report = _read_json(comparison_path)
+            comparison_valid, comparison_validation_detail = validate_policy_comparison(
+                comparison_report,
+                live_summary_path=live_path,
+                workload_evidence_path=workload_path,
+                artifact_path=artifact,
+                catalog_path=catalog_path,
+            )
+            approved_comparison_sha = comparison_policy.get("approved_report_sha256")
+            comparison_digest_approved = bool(approved_comparison_sha) and (
+                approved_comparison_sha == sha256_file(comparison_path)
+            )
+            comparison = comparison_report.get("comparison_vs_capable", {})
+            oracle = comparison_report.get("oracle_diagnostics", {})
+            if not isinstance(comparison, dict):
+                comparison = {}
+            if not isinstance(oracle, dict):
+                oracle = {}
+            tested_router_config = comparison_report.get("policy", {})
+            approved_router_config = policy.get("router_configuration", {})
+            if not isinstance(tested_router_config, dict) or not isinstance(
+                approved_router_config, dict
+            ):
+                raise ValueError("router_configuration must be an object")
+            allowed_priorities = approved_router_config.get(
+                "allowed_request_priorities", []
+            )
+            if not isinstance(allowed_priorities, list):
+                raise ValueError("allowed_request_priorities must be an array")
+            router_configuration_matches = (
+                tested_router_config.get("classifier_mode")
+                == approved_router_config.get("classifier_mode")
+                and tested_router_config.get("decision_policy")
+                == approved_router_config.get("decision_policy")
+                and tested_router_config.get("underroute_tolerance")
+                == approved_router_config.get("underroute_tolerance")
+                and tested_router_config.get("adaptive_confidence_threshold")
+                == approved_router_config.get("adaptive_confidence_threshold")
+                and tested_router_config.get("priority") in allowed_priorities
+                and set(allowed_priorities) == {tested_router_config.get("priority")}
+            )
+            quality_retention = comparison.get("quality_retention")
+            cost_savings = comparison.get("cost_savings_rate")
+            avoidable_failure_rate = oracle.get("avoidable_validator_failure_rate")
+            minimum_quality_retention = float(
+                comparison_policy["minimum_quality_retention_vs_capable"]
+            )
+            minimum_cost_savings = float(
+                comparison_policy["minimum_cost_savings_vs_capable"]
+            )
+            maximum_avoidable_failure_rate = float(
+                comparison_policy["maximum_avoidable_validator_failure_rate"]
+            )
+            comparison_passed = (
+                comparison_valid
+                and comparison_digest_approved
+                and router_configuration_matches
+                and quality_retention is not None
+                and float(quality_retention) >= minimum_quality_retention
+                and cost_savings is not None
+                and float(cost_savings) >= minimum_cost_savings
+                and avoidable_failure_rate is not None
+                and float(avoidable_failure_rate) <= maximum_avoidable_failure_rate
+            )
+            comparison_detail = (
+                f"policy comparison valid={comparison_valid}, "
+                f"digest_approved={comparison_digest_approved}, "
+                f"router_config_matches={router_configuration_matches}, "
+                f"quality_retention={quality_retention}/{minimum_quality_retention:.3f}, "
+                f"cost_savings={cost_savings}/{minimum_cost_savings:.3f}, "
+                f"avoidable_failures={avoidable_failure_rate}/"
+                f"{maximum_avoidable_failure_rate:.3f} max"
+            )
+            if not comparison_valid:
+                comparison_detail += f" ({comparison_validation_detail})"
+        else:
+            comparison_passed = False
+            comparison_detail = (
+                f"policy comparison not found: {comparison_path}"
+                if not comparison_path.exists()
+                else f"router artifact not found: {artifact}"
+            )
+        live_passed = role_thresholds_passed and comparison_passed
+        live_detail = f"{role_detail}; {comparison_detail}"
     else:
         live_passed = False
         live_detail = f"live evaluation summary not found: {live_path}"

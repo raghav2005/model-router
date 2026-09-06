@@ -11,13 +11,20 @@
 - Added a prompt-free workload-evidence artifact and CLI workflow. Release approval
   pins its exact digest to the live summary and catalogue, while enforcement loads
   the approved empirical quality and p95 latency as a separate runtime overlay.
-- Expanded the credential-free suite to 88 tests.
+- Expanded the credential-free suite to 92 tests.
 - Reviewed current public routing datasets and Switchyard's Harbor benchmark. No
   external bundle was counted as production evidence because license or deployed-
   model/workload transfer requirements remain unresolved.
 - Bound the external-generalisation gate to an approved prompt-free provenance
   report, exact dataset digest, novel-row count, and an explicit independence
   decision. The current related synthetic slice is recorded as diagnostic-only.
+- Added a paired live-policy comparison that replays the router over responses from
+  every candidate role, measures quality retention, cost savings, latency, and
+  avoidable failures, applies the measured workload overlay, and binds the aggregate
+  report into the live release gate.
+- Locked enforced classifier settings to the benchmarked release configuration and
+  rejected unbenchmarked request-priority overrides; the initial approved surface is
+  `balanced` only.
 
 ## 0.9.0 — 2026-08-25
 

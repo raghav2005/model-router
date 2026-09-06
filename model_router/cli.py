@@ -26,6 +26,7 @@ from .messages import copy_messages, flatten_messages
 from .metamorphic import evaluate_metamorphic_suite
 from .metamorphic import write_cases as write_metamorphic_cases
 from .metamorphic import write_report as write_metamorphic_report
+from .policy_comparison import build_policy_comparison, write_policy_comparison
 from .pricing import verify_catalog_pricing
 from .pricing import write_report as write_pricing_report
 from .readiness import evaluate_release_gates
@@ -295,6 +296,10 @@ def build_parser() -> argparse.ArgumentParser:
     release_gates.add_argument(
         "--workload-evidence", default="reports/workload_evidence.json"
     )
+    release_gates.add_argument(
+        "--live-policy-comparison",
+        default="reports/live_policy_comparison.json",
+    )
     release_gates.add_argument("--model-artifact", default=str(default_artifact_path()))
 
     workload_evidence = subparsers.add_parser(
@@ -306,6 +311,44 @@ def build_parser() -> argparse.ArgumentParser:
     )
     workload_evidence.add_argument("--catalog")
     workload_evidence.add_argument("--output", default="reports/workload_evidence.json")
+
+    policy_comparison = subparsers.add_parser(
+        "live-policy-comparison",
+        help="Compare the router with fixed-model arms from a paired live benchmark",
+    )
+    policy_comparison.add_argument("cases")
+    policy_comparison.add_argument(
+        "--results", default="reports/live_eval_results.jsonl"
+    )
+    policy_comparison.add_argument(
+        "--live-summary", default="reports/live_eval_summary.json"
+    )
+    policy_comparison.add_argument(
+        "--workload-evidence", default="reports/workload_evidence.json"
+    )
+    policy_comparison.add_argument(
+        "--model-artifact", default=str(default_artifact_path())
+    )
+    policy_comparison.add_argument("--catalog")
+    policy_comparison.add_argument(
+        "--priority",
+        choices=["balanced", "cost", "quality", "latency"],
+        default="balanced",
+    )
+    policy_comparison.add_argument(
+        "--complexity-policy",
+        choices=["argmax", "expected", "conservative", "tier_risk", "adaptive"],
+        default="adaptive",
+    )
+    policy_comparison.add_argument("--underroute-tolerance", type=float, default=0.15)
+    policy_comparison.add_argument(
+        "--adaptive-confidence-threshold",
+        type=float,
+        default=DEFAULT_ADAPTIVE_CONFIDENCE_THRESHOLD,
+    )
+    policy_comparison.add_argument(
+        "--output", default="reports/live_policy_comparison.json"
+    )
 
     verify_pricing = subparsers.add_parser(
         "verify-pricing",
@@ -399,6 +442,25 @@ def main() -> None:
                 raise SystemExit(4)
             return
 
+        if args.command == "live-policy-comparison":
+            report = build_policy_comparison(
+                args.cases,
+                args.results,
+                args.live_summary,
+                workload_evidence_path=args.workload_evidence,
+                artifact_path=args.model_artifact,
+                catalog_path=args.catalog,
+                priority=args.priority,
+                decision_policy=args.complexity_policy,
+                underroute_tolerance=args.underroute_tolerance,
+                adaptive_confidence_threshold=args.adaptive_confidence_threshold,
+            )
+            write_policy_comparison(args.output, report)
+            print(json.dumps(report, indent=2))
+            if not report["complete"]:
+                raise SystemExit(4)
+            return
+
         if args.command == "drift-baseline":
             baseline = build_baseline(load_route_events(args.audit_log))
             write_drift_json(args.output, baseline)
@@ -443,6 +505,7 @@ def main() -> None:
                 metamorphic_report_path=args.metamorphic_report,
                 switchyard_contract_report_path=args.switchyard_contract_report,
                 workload_evidence_path=args.workload_evidence,
+                live_policy_comparison_path=args.live_policy_comparison,
                 artifact_path=args.model_artifact,
             )
             print(json.dumps(report, indent=2))

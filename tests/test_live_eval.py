@@ -15,6 +15,7 @@ from model_router.live_eval import (
     run_benchmark,
     summarize,
 )
+from model_router.workload_evidence import sha256_file
 
 
 class FakeClient:
@@ -115,6 +116,9 @@ class LiveEvaluationTests(unittest.TestCase):
                 second["provenance"]["benchmark_fingerprint"],
             )
             self.assertEqual(first["targets"]["efficient"]["unique_cases"], 1)
+            self.assertEqual(
+                first["provenance"]["results_sha256"], sha256_file(result_path)
+            )
             self.assertEqual(first["provenance"]["case_set_profile"]["unique_cases"], 1)
             self.assertFalse(
                 first["provenance"]["case_set_profile"]["contains_prompt_content"]

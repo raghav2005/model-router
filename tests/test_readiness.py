@@ -56,6 +56,19 @@ class ReleaseGateTests(unittest.TestCase):
                 "minimum_live_call_success_rate": 0.99,
                 "maximum_live_response_model_mismatch_count": 0,
                 "approved_live_case_set_sha256": "approved-cases",
+                "router_configuration": {
+                    "classifier_mode": "hybrid",
+                    "decision_policy": "adaptive",
+                    "underroute_tolerance": 0.15,
+                    "adaptive_confidence_threshold": 0.45,
+                    "allowed_request_priorities": ["balanced"],
+                },
+                "live_policy_comparison": {
+                    "minimum_quality_retention_vs_capable": 0.98,
+                    "minimum_cost_savings_vs_capable": 0.15,
+                    "maximum_avoidable_validator_failure_rate": 0.02,
+                    "approved_report_sha256": None,
+                },
                 "require_workload_measured_quality": True,
                 "require_workload_measured_latency": True,
                 "switchyard": {
@@ -181,6 +194,8 @@ class ReleaseGateTests(unittest.TestCase):
                             "schema_version": "switchyard-live-eval-provenance-v1",
                             "catalog_sha256": catalog_sha256(catalog_path),
                             "case_set_sha256": "approved-cases",
+                            "results_sha256": "live-results",
+                            "benchmark_fingerprint": "live-fingerprint",
                             "targets": ["efficient", "balanced", "capable"],
                             "switchyard_revision": "abc123",
                         },
@@ -205,6 +220,48 @@ class ReleaseGateTests(unittest.TestCase):
                 build_workload_evidence(live_path, catalog_path=catalog_path),
             )
             policy["approved_workload_evidence_sha256"] = sha256_file(workload_path)
+            policy_comparison_path = root / "policy-comparison.json"
+            policy_comparison_path.write_text(
+                json.dumps(
+                    {
+                        "schema_version": "model-router-live-policy-comparison-v1",
+                        "complete": True,
+                        "source": {
+                            "case_set_sha256": "approved-cases",
+                            "results_sha256": "live-results",
+                            "live_summary_sha256": sha256_file(live_path),
+                            "catalog_sha256": catalog_sha256(catalog_path),
+                            "artifact_sha256": artifact_digest,
+                            "workload_evidence_sha256": sha256_file(workload_path),
+                            "benchmark_fingerprint": "live-fingerprint",
+                        },
+                        "policy": {
+                            "version": POLICY_VERSION,
+                            "classifier_mode": "hybrid",
+                            "decision_policy": "adaptive",
+                            "underroute_tolerance": 0.15,
+                            "adaptive_confidence_threshold": 0.45,
+                            "priority": "balanced",
+                        },
+                        "comparison_vs_capable": {
+                            "quality_retention": 0.99,
+                            "cost_savings_rate": 0.25,
+                        },
+                        "oracle_diagnostics": {
+                            "avoidable_validator_failure_rate": 0.01
+                        },
+                        "privacy": {
+                            "contains_prompt_content": False,
+                            "contains_response_content": False,
+                            "contains_aggregate_measurements_only": True,
+                        },
+                    }
+                ),
+                encoding="utf-8",
+            )
+            policy["live_policy_comparison"]["approved_report_sha256"] = sha256_file(
+                policy_comparison_path
+            )
             policy_path.write_text(json.dumps(policy), encoding="utf-8")
             report = evaluate_release_gates(
                 policy_path=policy_path,
@@ -213,6 +270,7 @@ class ReleaseGateTests(unittest.TestCase):
                 live_summary_path=live_path,
                 pricing_report_path=pricing_path,
                 external_dataset_evidence_path=external_evidence_path,
+                live_policy_comparison_path=policy_comparison_path,
                 workload_evidence_path=workload_path,
                 artifact_path=artifact_path,
                 today=date(2026, 8, 25),

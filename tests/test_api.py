@@ -145,6 +145,38 @@ class APITests(unittest.TestCase):
         self.assertEqual(status, 200)
         self.assertTrue(json.loads(body)["release_gate_ready"])
 
+    def test_enforcement_rejects_unbenchmarked_router_configuration(self) -> None:
+        passed = {"ready_for_enforcement": True, "gates": []}
+        with patch("model_router.api.evaluate_release_gates", return_value=passed):
+            with self.assertRaisesRegex(RuntimeError, "configuration differs"):
+                RouterApplication(
+                    router=ModelRouter(),
+                    models=load_catalog(),
+                    client=self.client,  # type: ignore[arg-type]
+                    config=RuntimeConfig(mode="enforce", underroute_tolerance=0.2),
+                )
+
+    def test_enforcement_rejects_an_unbenchmarked_priority(self) -> None:
+        passed = {"ready_for_enforcement": True, "gates": []}
+        with patch("model_router.api.evaluate_release_gates", return_value=passed):
+            app = RouterApplication(
+                router=ModelRouter(),
+                models=load_catalog(),
+                client=self.client,  # type: ignore[arg-type]
+                config=RuntimeConfig(mode="enforce"),
+            )
+        status, _, body = invoke(
+            app,
+            "POST",
+            "/v1/route",
+            {
+                "messages": [{"role": "user", "content": "Hello"}],
+                "routing": {"priority": "cost"},
+            },
+        )
+        self.assertEqual(status, 400)
+        self.assertIn(b"not approved", body)
+
     def test_enforcement_rechecks_approved_workload_evidence_digest(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             evidence_path = Path(directory) / "workload.json"

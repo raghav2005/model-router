@@ -75,6 +75,14 @@ def case_set_sha256(cases: Sequence[EvaluationCase]) -> str:
     return sha256(canonical).hexdigest()
 
 
+def result_file_sha256(path: str | Path) -> str:
+    digest = sha256()
+    with Path(path).open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
 def _case_set_profile(cases: Sequence[EvaluationCase]) -> dict[str, object]:
     """Return prompt-free coverage metadata suitable for release evidence."""
     dimensions: dict[str, dict[str, int]] = {}
@@ -714,6 +722,7 @@ def run_benchmark(
         ),
         encoding="utf-8",
     )
+    provenance["results_sha256"] = result_file_sha256(result_path)
     summary = summarize(ordered)
     summary["provenance"] = provenance
     summary_file.parent.mkdir(parents=True, exist_ok=True)

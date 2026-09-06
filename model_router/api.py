@@ -41,13 +41,32 @@ class RuntimeConfig:
     metamorphic_report_path: str = "reports/metamorphic_routing_eval.json"
     switchyard_contract_report_path: str = "reports/switchyard_contract.json"
     workload_evidence_path: str = "reports/workload_evidence.json"
+    live_policy_comparison_path: str = "reports/live_policy_comparison.json"
     model_artifact_path: str = str(default_artifact_path())
+    classifier_mode: str = "hybrid"
+    decision_policy: str = "adaptive"
+    underroute_tolerance: float = 0.15
+    adaptive_confidence_threshold: float = DEFAULT_ADAPTIVE_CONFIDENCE_THRESHOLD
 
     def __post_init__(self) -> None:
         if self.mode not in {"shadow", "enforce"}:
             raise ValueError("mode must be shadow or enforce")
         if self.max_body_bytes < 1:
             raise ValueError("max_body_bytes must be positive")
+        if self.classifier_mode not in {"learned", "hybrid"}:
+            raise ValueError("classifier_mode must be learned or hybrid")
+        if self.decision_policy not in {
+            "argmax",
+            "expected",
+            "conservative",
+            "tier_risk",
+            "adaptive",
+        }:
+            raise ValueError("unsupported decision_policy")
+        if not 0 <= self.underroute_tolerance < 1:
+            raise ValueError("underroute_tolerance must be in [0, 1)")
+        if not 0 <= self.adaptive_confidence_threshold <= 1:
+            raise ValueError("adaptive_confidence_threshold must be in [0, 1]")
 
     @classmethod
     def from_environment(cls) -> RuntimeConfig:
@@ -86,8 +105,23 @@ class RuntimeConfig:
                 "MODEL_ROUTER_WORKLOAD_EVIDENCE",
                 "reports/workload_evidence.json",
             ),
+            live_policy_comparison_path=os.getenv(
+                "MODEL_ROUTER_LIVE_POLICY_COMPARISON",
+                "reports/live_policy_comparison.json",
+            ),
             model_artifact_path=os.getenv(
                 "MODEL_ROUTER_ARTIFACT", str(default_artifact_path())
+            ),
+            classifier_mode=os.getenv("MODEL_ROUTER_CLASSIFIER_MODE", "hybrid"),
+            decision_policy=os.getenv("MODEL_ROUTER_COMPLEXITY_POLICY", "adaptive"),
+            underroute_tolerance=float(
+                os.getenv("MODEL_ROUTER_UNDERROUTE_TOLERANCE", "0.15")
+            ),
+            adaptive_confidence_threshold=float(
+                os.getenv(
+                    "MODEL_ROUTER_ADAPTIVE_CONFIDENCE_THRESHOLD",
+                    str(DEFAULT_ADAPTIVE_CONFIDENCE_THRESHOLD),
+                )
             ),
         )
 
@@ -118,6 +152,9 @@ class RouterApplication:
     ) -> None:
         self.config = config or RuntimeConfig.from_environment()
         self.release_report: dict[str, object] | None = None
+        self.allowed_request_priorities = frozenset(
+            {"balanced", "cost", "quality", "latency"}
+        )
         if self.config.mode == "enforce":
             try:
                 self.release_report = evaluate_release_gates(
@@ -133,6 +170,9 @@ class RouterApplication:
                         self.config.switchyard_contract_report_path
                     ),
                     workload_evidence_path=self.config.workload_evidence_path,
+                    live_policy_comparison_path=(
+                        self.config.live_policy_comparison_path
+                    ),
                     artifact_path=self.config.model_artifact_path,
                 )
             except (OSError, KeyError, TypeError, ValueError) as error:
@@ -148,6 +188,44 @@ class RouterApplication:
                 raise RuntimeError(
                     f"enforcement mode refused: failed release gates: {failures}"
                 )
+            with open(self.config.release_policy_path, "r", encoding="utf-8") as handle:
+                release_policy = json.load(handle)
+            router_configuration = release_policy.get("router_configuration", {})
+            if not isinstance(router_configuration, Mapping):
+                raise RuntimeError(
+                    "enforcement mode refused: router configuration is missing"
+                )
+            configured_priorities = router_configuration.get(
+                "allowed_request_priorities", []
+            )
+            if (
+                not isinstance(configured_priorities, list)
+                or not configured_priorities
+                or any(
+                    value not in {"balanced", "cost", "quality", "latency"}
+                    for value in configured_priorities
+                )
+            ):
+                raise RuntimeError(
+                    "enforcement mode refused: allowed priorities are invalid"
+                )
+            runtime_configuration = {
+                "classifier_mode": self.config.classifier_mode,
+                "decision_policy": self.config.decision_policy,
+                "underroute_tolerance": self.config.underroute_tolerance,
+                "adaptive_confidence_threshold": (
+                    self.config.adaptive_confidence_threshold
+                ),
+            }
+            if any(
+                router_configuration.get(name) != value
+                for name, value in runtime_configuration.items()
+            ):
+                raise RuntimeError(
+                    "enforcement mode refused: runtime router configuration differs "
+                    "from the approved policy"
+                )
+            self.allowed_request_priorities = frozenset(configured_priorities)
         self.models = models or load_catalog()
         if self.config.mode == "enforce" and models is None:
             approved_workload_sha = self.release_report.get(
@@ -174,17 +252,10 @@ class RouterApplication:
         self.router = router or ModelRouter.from_artifact(
             self.config.model_artifact_path,
             models=self.models,
-            classifier_mode=os.getenv("MODEL_ROUTER_CLASSIFIER_MODE", "hybrid"),
-            decision_policy=os.getenv("MODEL_ROUTER_COMPLEXITY_POLICY", "adaptive"),
-            underroute_tolerance=float(
-                os.getenv("MODEL_ROUTER_UNDERROUTE_TOLERANCE", "0.15")
-            ),
-            adaptive_confidence_threshold=float(
-                os.getenv(
-                    "MODEL_ROUTER_ADAPTIVE_CONFIDENCE_THRESHOLD",
-                    str(DEFAULT_ADAPTIVE_CONFIDENCE_THRESHOLD),
-                )
-            ),
+            classifier_mode=self.config.classifier_mode,
+            decision_policy=self.config.decision_policy,
+            underroute_tolerance=self.config.underroute_tolerance,
+            adaptive_confidence_threshold=self.config.adaptive_confidence_threshold,
         )
         self.client = client or SwitchyardClient(
             os.getenv("SWITCHYARD_URL", "http://127.0.0.1:4000"),
@@ -269,6 +340,9 @@ class RouterApplication:
             else flatten_messages(body.get("messages"))
         )
         max_tokens = int(body.get("max_tokens", body.get("max_completion_tokens", 500)))
+        priority = str(routing.get("priority", "balanced"))
+        if priority not in self.allowed_request_priorities:
+            raise ValueError("routing priority is not approved for this release")
         return RoutingRequest(
             prompt=prompt,
             request_id=str(environ.get("HTTP_X_REQUEST_ID") or uuid.uuid4()),
@@ -288,7 +362,7 @@ class RouterApplication:
             required_capabilities=validate_string_array(
                 routing.get("required_capabilities", []), "required_capabilities"
             ),
-            priority=str(routing.get("priority", "balanced")),
+            priority=priority,
             max_cost_usd=(
                 float(routing["max_cost_usd"])
                 if routing.get("max_cost_usd") is not None
