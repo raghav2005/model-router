@@ -12,12 +12,18 @@
     "coding": 20,
     "reasoning": 20
   },
+  "minimum_live_all_validators_pass_rate_by_use_case": {
+    "general_qa": 0.85,
+    "coding": 0.85,
+    "reasoning": 0.85
+  },
   "minimum_live_all_validators_pass_rate": 0.9,
   "minimum_live_all_validators_pass_wilson_lower_bound": 0.85,
   "minimum_live_call_success_rate": 0.99,
   "minimum_live_call_success_wilson_lower_bound": 0.95,
   "maximum_live_response_model_mismatch_count": 0,
   "approved_live_case_set_sha256": null,
+  "approved_workload_evidence_sha256": null,
   "require_workload_measured_quality": true,
   "require_workload_measured_latency": true,
   "synthetic_regression": {

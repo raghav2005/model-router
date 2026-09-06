@@ -156,6 +156,7 @@ model-router metamorphic-eval
 | `train` | Validate data, train, calibrate, and report | No |
 | `live-eval` | Run frozen cases against direct model roles | Yes |
 | `case-set-hash` | Compute the immutable live case-set digest | No |
+| `workload-evidence` | Create a prompt-free quality/latency approval artifact | No |
 | `release-gates` | Evaluate production-enforcement evidence | No |
 | `verify-pricing` | Verify catalogue economics against official model pages | Provider docs only |
 | `adversarial-eval` | Run 179 deterministic routing regression cases | No |
@@ -348,7 +349,7 @@ It records:
 - finish reason;
 - p50/p95/p99 latency and TTFT;
 - end-to-end and generation output-token throughput;
-- Wilson 95% intervals for call success and validator pass rates; and
+- Wilson 95% intervals for call success and validator pass rates;
 - per-category, use-case, risk, and complexity slices; and
 - prompt-free case-set coverage, including unique cases, validator types, sources,
   and metadata distributions.
@@ -366,8 +367,25 @@ additionally requires the case-set digest to be explicitly approved in
 `config/release_policy.json` and the run to use the approved Switchyard revision.
 Repeated trials quantify nondeterminism, but they cannot inflate release coverage:
 the default gate requires 100 distinct cases per role, including at least 20 distinct
-cases in each of general Q&A, coding, and reasoning, plus a measured p95 completion
-latency.
+cases and an 85% validator pass rate in each of general Q&A, coding, and reasoning,
+plus a measured p95 completion latency.
+
+After the live summary is complete, create a public-safe aggregate approval artifact:
+
+```bash
+model-router workload-evidence \
+  --live-summary reports/live_eval_summary.json \
+  --output reports/workload_evidence.json
+shasum -a 256 reports/workload_evidence.json
+```
+
+The artifact contains role identities, unique-case counts, quality rates and
+confidence intervals, latency distributions, cost totals, and source digests—but no
+prompts or responses. Review it, then place its exact digest in
+`approved_workload_evidence_sha256`. Enforcement validates that digest against the
+unchanged live summary and catalogue, then overlays the approved per-use-case quality
+and p95 latency measurements at startup. This avoids changing the base catalogue and
+invalidating the benchmark that produced the measurements.
 
 Supported validators are exact text, required substrings, regular expression,
 valid JSON, required JSON keys, exact JSON values, and numeric tolerance. Open-ended

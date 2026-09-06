@@ -10,6 +10,7 @@ from typing import Any
 from .catalog import catalog_sha256, load_catalog, load_catalog_document
 from .learned import MODEL_SCHEMA_VERSION, default_artifact_path
 from .router import POLICY_VERSION
+from .workload_evidence import sha256_file, validate_workload_evidence
 
 
 @dataclass(frozen=True)
@@ -54,6 +55,7 @@ def evaluate_release_gates(
     pricing_report_path: str | Path = "reports/pricing_verification.json",
     metamorphic_report_path: str | Path = "reports/metamorphic_routing_eval.json",
     switchyard_contract_report_path: str | Path = "reports/switchyard_contract.json",
+    workload_evidence_path: str | Path = "reports/workload_evidence.json",
     artifact_path: str | Path = default_artifact_path(),
     today: date | None = None,
 ) -> dict[str, object]:
@@ -129,35 +131,55 @@ def evaluate_release_gates(
         )
     )
 
+    workload_path = Path(workload_evidence_path)
+    live_path = Path(live_summary_path)
+    approved_workload_sha = policy.get("approved_workload_evidence_sha256")
+    if workload_path.exists() and live_path.exists():
+        workload = _read_json(workload_path)
+        workload_valid, workload_detail = validate_workload_evidence(
+            workload,
+            live_summary_path=live_path,
+            catalog_path=catalog_path,
+        )
+        actual_workload_sha = sha256_file(workload_path)
+        workload_approved = (
+            bool(approved_workload_sha)
+            and approved_workload_sha == actual_workload_sha
+            and workload_valid
+        )
+        workload_approval_detail = (
+            workload_detail
+            if workload_approved
+            else (
+                "workload evidence is valid but its SHA-256 is not approved"
+                if workload_valid
+                else workload_detail
+            )
+        )
+    else:
+        workload_approved = False
+        missing_workload_inputs = [
+            str(path) for path in (workload_path, live_path) if not path.exists()
+        ]
+        workload_approval_detail = "missing workload evidence: " + ", ".join(
+            missing_workload_inputs
+        )
+
     require_quality = bool(policy["require_workload_measured_quality"])
-    unmeasured_quality = [
-        model.id for model in models if model.quality_evidence != "workload_measured"
-    ]
     gates.append(
         ReleaseGate(
             "model quality is workload-measured",
-            not require_quality or not unmeasured_quality,
-            (
-                "unmeasured roles: " + ", ".join(unmeasured_quality)
-                if unmeasured_quality
-                else "all roles have workload measurements"
-            ),
+            not require_quality or workload_approved,
+            workload_approval_detail,
         )
     )
 
     require_latency = bool(policy["require_workload_measured_latency"])
-    unmeasured_latency = [
-        model.id for model in models if model.latency_evidence != "workload_measured"
-    ]
     gates.append(
         ReleaseGate(
             "model latency is workload-measured",
-            not require_latency or not unmeasured_latency,
-            (
-                "unmeasured roles: " + ", ".join(unmeasured_latency)
-                if unmeasured_latency
-                else "all roles have workload measurements"
-            ),
+            not require_latency or workload_approved,
+            workload_approval_detail,
         )
     )
 
@@ -283,7 +305,6 @@ def evaluate_release_gates(
         )
     )
 
-    live_path = Path(live_summary_path)
     if live_path.exists():
         live = _read_json(live_path)
         targets = live.get("targets", {})
@@ -298,6 +319,13 @@ def evaluate_release_gates(
         )
         if not isinstance(required_use_case_slices, dict):
             raise ValueError("minimum_live_unique_cases_by_use_case must be an object")
+        required_use_case_quality = policy.get(
+            "minimum_live_all_validators_pass_rate_by_use_case", {}
+        )
+        if not isinstance(required_use_case_quality, dict):
+            raise ValueError(
+                "minimum_live_all_validators_pass_rate_by_use_case must be an object"
+            )
         minimum_pass = float(policy["minimum_live_all_validators_pass_rate"])
         minimum_call_success = float(policy["minimum_live_call_success_rate"])
         minimum_pass_lower = float(
@@ -365,6 +393,20 @@ def evaluate_release_gates(
                 if slice_unique_cases < int(raw_minimum):
                     missing_slices.append(
                         f"{slice_name}={slice_unique_cases}/{int(raw_minimum)}"
+                    )
+                slice_pass_rate = (
+                    slice_result.get("all_validators_pass_rate")
+                    if isinstance(slice_result, dict)
+                    else None
+                )
+                minimum_slice_pass_rate = required_use_case_quality.get(slice_name)
+                if minimum_slice_pass_rate is not None and (
+                    slice_pass_rate is None
+                    or float(slice_pass_rate) < float(minimum_slice_pass_rate)
+                ):
+                    missing_slices.append(
+                        f"{slice_name}_pass={slice_pass_rate}/"
+                        f"{float(minimum_slice_pass_rate):.3f}"
                     )
             if (
                 runs < minimum_cases
@@ -519,6 +561,9 @@ def evaluate_release_gates(
         "schema_version": "model-router-release-report-v1",
         "evaluated_at": datetime.now(UTC).isoformat(),
         "catalog_schema_version": catalog_document["schema_version"],
+        "approved_workload_evidence_sha256": (
+            actual_workload_sha if workload_approved else None
+        ),
         "ready_for_enforcement": all(gate.passed for gate in gates),
         "passed": sum(gate.passed for gate in gates),
         "total": len(gates),

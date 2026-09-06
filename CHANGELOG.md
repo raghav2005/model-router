@@ -6,7 +6,12 @@
   and per-slice unique-case counts, and mandatory p95 latency evidence.
 - Prevented benchmark repetitions from satisfying distinct-case release thresholds;
   the default policy now requires 100 unique cases per role and at least 20 unique
-  cases for each of general Q&A, coding, and reasoning.
+  cases with an 85% validator pass rate for each of general Q&A, coding, and
+  reasoning.
+- Added a prompt-free workload-evidence artifact and CLI workflow. Release approval
+  pins its exact digest to the live summary and catalogue, while enforcement loads
+  the approved empirical quality and p95 latency as a separate runtime overlay.
+- Expanded the credential-free suite to 87 tests.
 
 ## 0.9.0 — 2026-08-25
 

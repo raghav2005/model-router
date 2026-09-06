@@ -39,6 +39,7 @@ from .switchyard import (
 )
 from .training import TrainingConfig, train_and_evaluate
 from .types import RoutingRequest
+from .workload_evidence import build_workload_evidence, write_workload_evidence
 
 ROUTING_MODES = ("policy", *DELEGATED_PROFILES)
 
@@ -287,7 +288,20 @@ def build_parser() -> argparse.ArgumentParser:
     release_gates.add_argument(
         "--switchyard-contract-report", default="reports/switchyard_contract.json"
     )
+    release_gates.add_argument(
+        "--workload-evidence", default="reports/workload_evidence.json"
+    )
     release_gates.add_argument("--model-artifact", default=str(default_artifact_path()))
+
+    workload_evidence = subparsers.add_parser(
+        "workload-evidence",
+        help="Create a prompt-free approval artifact from a live benchmark summary",
+    )
+    workload_evidence.add_argument(
+        "--live-summary", default="reports/live_eval_summary.json"
+    )
+    workload_evidence.add_argument("--catalog")
+    workload_evidence.add_argument("--output", default="reports/workload_evidence.json")
 
     verify_pricing = subparsers.add_parser(
         "verify-pricing",
@@ -370,6 +384,17 @@ def main() -> None:
                 raise SystemExit(4)
             return
 
+        if args.command == "workload-evidence":
+            report = build_workload_evidence(
+                args.live_summary,
+                catalog_path=args.catalog,
+            )
+            write_workload_evidence(args.output, report)
+            print(json.dumps(report, indent=2))
+            if not report["complete"]:
+                raise SystemExit(4)
+            return
+
         if args.command == "drift-baseline":
             baseline = build_baseline(load_route_events(args.audit_log))
             write_drift_json(args.output, baseline)
@@ -412,6 +437,7 @@ def main() -> None:
                 pricing_report_path=args.pricing_report,
                 metamorphic_report_path=args.metamorphic_report,
                 switchyard_contract_report_path=args.switchyard_contract_report,
+                workload_evidence_path=args.workload_evidence,
                 artifact_path=args.model_artifact,
             )
             print(json.dumps(report, indent=2))

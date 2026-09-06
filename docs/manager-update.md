@@ -1,6 +1,6 @@
 # Model router: production-readiness update
 
-**Date:** 25 August 2026
+**Date:** 6 September 2026
 
 **Status:** Deployable for integration and shadow evaluation; blocked from enforced production routing
 
@@ -20,11 +20,16 @@ The first model set is OpenAI GPT-5.6 Luna, Terra, and Sol in efficient, balance
   diagnostic. It does not change the classifier-label metrics above.
 - Local classifier-only latency over 1,000 prompts: 116 µs median, 166 µs p95,
   and 191 µs p99. This excludes Switchyard and model-generation latency.
-- 83 passing credential-free tests, plus a native Switchyard runtime/configuration contract in CI.
+- 87 passing credential-free tests, plus a native Switchyard runtime/configuration contract in CI.
 - A live harness capable of measuring validator outcomes, p50/p95/p99 TTFT and completion latency, token throughput, Wilson confidence intervals, category/use-case/risk/complexity slices, cached tokens, estimated cost, errors, finish reason, and actual response model across repeated trials.
 - A frozen 120-case machine-checkable synthetic live baseline, sufficient to run
   the harness at release-scale sample counts but intentionally not approved as a
   substitute for representative workload evidence.
+- A prompt-free workload-evidence approval artifact that binds measured quality and
+  latency to the exact live summary and catalogue. Enforcement rechecks its approved
+  SHA-256 and loads those measurements without invalidating the source benchmark.
+- Release coverage now counts distinct cases rather than repeated trials and requires
+  minimum coverage in general Q&A, coding, and reasoning for every model role.
 - A 179-case adversarial regression suite that covers keyword traps and 18
   multi-turn task switches; it remains separate from release evidence.
 - A 1,432-case metamorphic suite. Exact normalization of all eight versioned

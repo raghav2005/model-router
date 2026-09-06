@@ -19,7 +19,9 @@ docker build -f Dockerfile.switchyard \
   -t model-router-switchyard:<immutable-version> .
 ```
 
-Record the source commit, image digest, model-artifact SHA-256, catalogue SHA-256, Switchyard commit/version, release-gate report, and live-evaluation report in the release ticket.
+Record the source commit, image digest, model-artifact SHA-256, catalogue SHA-256,
+Switchyard commit/version, release-gate report, live-evaluation report, and approved
+workload-evidence SHA-256 in the release ticket.
 
 ## 2. Prepare Switchyard
 
@@ -52,6 +54,7 @@ MODEL_ROUTER_UNDERROUTE_TOLERANCE=0.15
 MODEL_ROUTER_ADAPTIVE_CONFIDENCE_THRESHOLD=0.45
 MODEL_ROUTER_ARTIFACT=model_router/artifacts/complexity_router_v3.npz
 MODEL_ROUTER_PRICING_REPORT=reports/pricing_verification.json
+MODEL_ROUTER_WORKLOAD_EVIDENCE=reports/workload_evidence.json
 SWITCHYARD_URL=http://switchyard:4000
 SWITCHYARD_REVISION=1fc9ab887d1c663b0048ae24d5f473d15ed8daaa
 ```
@@ -83,7 +86,13 @@ general Q&A, coding, and reasoning coverage for every role. Review the prompt-fr
 `case_set_profile` in the summary before approving its digest; a large repetition
 count is not a substitute for representative cases.
 
-Update the catalogue evidence markers and release report only after approval of the underlying data.
+Create `reports/workload_evidence.json` from the accepted summary with
+`model-router workload-evidence`. The generated file is aggregate-only and can be
+reviewed separately from the sensitive benchmark checkpoint. After quality and
+latency owners approve it, record its exact SHA-256 as
+`approved_workload_evidence_sha256`. Any edit to either the live summary or evidence
+artifact invalidates the approval. Enforcement loads this separate overlay instead
+of rewriting the base catalogue.
 
 Create the drift baseline only after the shadow window and its traffic mix are
 approved. Store it with the release evidence:

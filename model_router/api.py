@@ -19,7 +19,8 @@ from .observability import RoutingMetrics
 from .readiness import evaluate_release_gates
 from .router import ModelRouter, NoEligibleModel
 from .switchyard import SwitchyardClient, SwitchyardError, SwitchyardExecutor
-from .types import RoutingRequest
+from .types import ModelProfile, RoutingRequest
+from .workload_evidence import apply_workload_evidence, sha256_file
 
 StartResponse = Callable[[str, list[tuple[str, str]]], None]
 
@@ -38,6 +39,7 @@ class RuntimeConfig:
     pricing_report_path: str = "reports/pricing_verification.json"
     metamorphic_report_path: str = "reports/metamorphic_routing_eval.json"
     switchyard_contract_report_path: str = "reports/switchyard_contract.json"
+    workload_evidence_path: str = "reports/workload_evidence.json"
     model_artifact_path: str = str(default_artifact_path())
 
     def __post_init__(self) -> None:
@@ -75,6 +77,10 @@ class RuntimeConfig:
                 "MODEL_ROUTER_SWITCHYARD_CONTRACT_REPORT",
                 "reports/switchyard_contract.json",
             ),
+            workload_evidence_path=os.getenv(
+                "MODEL_ROUTER_WORKLOAD_EVIDENCE",
+                "reports/workload_evidence.json",
+            ),
             model_artifact_path=os.getenv(
                 "MODEL_ROUTER_ARTIFACT", str(default_artifact_path())
             ),
@@ -99,6 +105,7 @@ class RouterApplication:
         self,
         *,
         router: ModelRouter | None = None,
+        models: list[ModelProfile] | None = None,
         client: SwitchyardClient | None = None,
         metrics: RoutingMetrics | None = None,
         audit_logger: DecisionAuditLogger | None = None,
@@ -117,6 +124,7 @@ class RouterApplication:
                     switchyard_contract_report_path=(
                         self.config.switchyard_contract_report_path
                     ),
+                    workload_evidence_path=self.config.workload_evidence_path,
                     artifact_path=self.config.model_artifact_path,
                 )
             except (OSError, KeyError, TypeError, ValueError) as error:
@@ -132,12 +140,32 @@ class RouterApplication:
                 raise RuntimeError(
                     f"enforcement mode refused: failed release gates: {failures}"
                 )
-        self.models = load_catalog()
+        self.models = models or load_catalog()
+        if self.config.mode == "enforce" and models is None:
+            approved_workload_sha = self.release_report.get(
+                "approved_workload_evidence_sha256"
+            )
+            if not approved_workload_sha:
+                raise RuntimeError(
+                    "enforcement mode refused: approved workload evidence is missing"
+                )
+            if sha256_file(self.config.workload_evidence_path) != approved_workload_sha:
+                raise RuntimeError(
+                    "enforcement mode refused: workload evidence changed after gate evaluation"
+                )
+            with open(
+                self.config.workload_evidence_path, "r", encoding="utf-8"
+            ) as handle:
+                evidence = json.load(handle)
+            if not isinstance(evidence, Mapping):
+                raise RuntimeError("approved workload evidence must be a JSON object")
+            self.models = apply_workload_evidence(self.models, evidence)
         self.model_by_id = {model.id: model for model in self.models}
         if self.config.shadow_target not in self.model_by_id:
             raise ValueError("shadow_target must be a catalog role")
         self.router = router or ModelRouter.from_artifact(
             self.config.model_artifact_path,
+            models=self.models,
             classifier_mode=os.getenv("MODEL_ROUTER_CLASSIFIER_MODE", "hybrid"),
             decision_policy=os.getenv("MODEL_ROUTER_COMPLEXITY_POLICY", "adaptive"),
             underroute_tolerance=float(

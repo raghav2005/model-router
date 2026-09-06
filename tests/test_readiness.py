@@ -10,6 +10,11 @@ from pathlib import Path
 from model_router.catalog import catalog_sha256, load_catalog_document
 from model_router.readiness import evaluate_release_gates
 from model_router.router import POLICY_VERSION
+from model_router.workload_evidence import (
+    build_workload_evidence,
+    sha256_file,
+    write_workload_evidence,
+)
 
 
 class ReleaseGateTests(unittest.TestCase):
@@ -124,7 +129,15 @@ class ReleaseGateTests(unittest.TestCase):
                                 "unique_cases": 20,
                                 "validator_scored_runs": 20,
                                 "call_success_rate": 1.0,
+                                "call_success_rate_wilson_95": {
+                                    "lower": 0.9,
+                                    "upper": 1.0,
+                                },
                                 "all_validators_pass_rate": 0.95,
+                                "all_validators_pass_rate_wilson_95": {
+                                    "lower": 0.8,
+                                    "upper": 1.0,
+                                },
                                 "response_model_mismatch_count": 0,
                                 "latency_ms": {"p50": 100, "p95": 200, "p99": 250},
                                 "slices": {
@@ -151,16 +164,35 @@ class ReleaseGateTests(unittest.TestCase):
                 ),
                 encoding="utf-8",
             )
+            live_document = json.loads(live_path.read_text(encoding="utf-8"))
+            for target in live_document["targets"].values():
+                for use_case in target["slices"]["use_case"].values():
+                    use_case.update(
+                        {
+                            "validator_scored_runs": 5,
+                            "all_validators_pass_rate": 1.0,
+                            "all_validators_pass_rate_wilson_95": {"lower": 0.5},
+                        }
+                    )
+            live_path.write_text(json.dumps(live_document), encoding="utf-8")
+            workload_path = root / "workload.json"
+            write_workload_evidence(
+                workload_path,
+                build_workload_evidence(live_path, catalog_path=catalog_path),
+            )
+            policy["approved_workload_evidence_sha256"] = sha256_file(workload_path)
+            policy_path.write_text(json.dumps(policy), encoding="utf-8")
             report = evaluate_release_gates(
                 policy_path=policy_path,
                 catalog_path=catalog_path,
                 training_report_path=training_path,
                 live_summary_path=live_path,
                 pricing_report_path=pricing_path,
+                workload_evidence_path=workload_path,
                 artifact_path=artifact_path,
                 today=date(2026, 8, 25),
             )
-        self.assertTrue(report["ready_for_enforcement"])
+        self.assertTrue(report["ready_for_enforcement"], report)
 
     def test_router_evidence_rejects_a_different_artifact(self) -> None:
         with tempfile.TemporaryDirectory() as directory:

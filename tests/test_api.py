@@ -2,13 +2,17 @@ from __future__ import annotations
 
 import io
 import json
+import tempfile
 import unittest
+from pathlib import Path
 from typing import Any
 from unittest.mock import patch
 
 from model_router.api import RouterApplication, RuntimeConfig
+from model_router.catalog import load_catalog
 from model_router.messages import flatten_messages
 from model_router.router import ModelRouter
+from model_router.workload_evidence import sha256_file
 
 
 class FakeClient:
@@ -133,12 +137,34 @@ class APITests(unittest.TestCase):
         with patch("model_router.api.evaluate_release_gates", return_value=passed):
             app = RouterApplication(
                 router=ModelRouter(),
+                models=load_catalog(),
                 client=self.client,  # type: ignore[arg-type]
                 config=RuntimeConfig(mode="enforce"),
             )
         status, _, body = invoke(app, "GET", "/readyz")
         self.assertEqual(status, 200)
         self.assertTrue(json.loads(body)["release_gate_ready"])
+
+    def test_enforcement_rechecks_approved_workload_evidence_digest(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            evidence_path = Path(directory) / "workload.json"
+            evidence_path.write_text("{}", encoding="utf-8")
+            passed = {
+                "ready_for_enforcement": True,
+                "approved_workload_evidence_sha256": "stale-digest",
+                "gates": [],
+            }
+            with patch("model_router.api.evaluate_release_gates", return_value=passed):
+                with self.assertRaisesRegex(RuntimeError, "changed after gate"):
+                    RouterApplication(
+                        router=ModelRouter(),
+                        client=self.client,  # type: ignore[arg-type]
+                        config=RuntimeConfig(
+                            mode="enforce",
+                            workload_evidence_path=str(evidence_path),
+                        ),
+                    )
+            self.assertNotEqual(sha256_file(evidence_path), "stale-digest")
 
     def test_router_classifies_the_complete_conversation(self) -> None:
         prompt = flatten_messages(

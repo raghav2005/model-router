@@ -116,14 +116,22 @@ The default release policy requires:
    tier-invariance thresholds;
 8. a training report matching the exact router artifact, catalogue, and policy version;
 9. at least 100 distinct scored live cases per role, at least 20 distinct cases for
-   each supported use case, a measured p95 completion latency, at least a 99%
-   call-success rate, at least a 90% all-validator pass rate, required Wilson-
-   interval lower bounds, and no unexpected response-model substitutions;
+   each supported use case, at least an 85% validator pass rate within each use-case
+   slice, a measured p95 completion latency, at least a 99% call-success rate, at
+   least a 90% all-validator pass rate, required Wilson-interval lower bounds, and
+   no unexpected response-model substitutions;
 10. live evidence matching the exact catalogue, approved Switchyard revision, and
    an explicitly approved case-set digest;
 11. an approved, pinned Switchyard release or commit;
 12. a passing Switchyard native runtime/configuration contract; and
 13. a trusted direct-provider bypass.
+
+Quality and latency approval is represented by a separate prompt-free workload-
+evidence artifact, not by editing the base model catalogue. The release policy pins
+the artifact's exact SHA-256, and enforcement rechecks that it matches the unchanged
+live summary and catalogue before loading its measured per-use-case quality and p95
+latency values. This removes a prior circularity where marking the catalogue as
+measured invalidated the benchmark's catalogue digest.
 
 Thresholds are initial release criteria and must be approved against business risk. Open-ended work also needs blinded human review or an approved judge model; deterministic validators alone are insufficient.
 
@@ -136,7 +144,9 @@ Thresholds are initial release criteria and must be approved against business ri
 - Run all three models on every eligible response-level case. Repetitions measure
   nondeterminism but never count as additional workload coverage.
 - Measure quality, TTFT, completion latency, output rate, tokens, price, errors, and refusal rate by slice.
-- Replace every `heuristic_prior_pending_workload_eval` and `unmeasured_bootstrap_prior` marker only after the underlying report is reviewed and versioned.
+- Generate and approve the aggregate workload-evidence artifact only after the
+  underlying report is reviewed and versioned; keep the base catalogue's bootstrap
+  markers as an honest record of its standalone state.
 - Continue retraining or recalibration because the promoted augmentation model
   improves the novel multi-turn slice but remains below the release threshold.
 

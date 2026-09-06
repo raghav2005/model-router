@@ -80,6 +80,11 @@ deterministic validators where an objectively correct outcome exists and reserve
 open-ended work for an approved [grader](https://developers.openai.com/api/docs/guides/graders),
 executable task outcome, or blinded human rubric.
 
+The approval workflow produces a separate aggregate workload-evidence artifact. It
+contains no prompts or responses, is bound to the exact live summary and catalogue,
+and must be approved by SHA-256 in the release policy. This lets measured values be
+loaded without rewriting the catalogue that the benchmark already identified.
+
 The initial 120-case synthetic live baseline is large enough to exercise repeated
 quality, latency, throughput, and cost measurement, but it is deliberately not the
 approved production case set. Representative coding, reasoning, tool-use, refusal,
