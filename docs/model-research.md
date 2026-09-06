@@ -104,6 +104,11 @@ rate, error rate, and concurrency behaviour can establish this service's SLO.
 Recent preprints reinforce the direction of the prototype while also showing why
 the current evidence is insufficient for enforcement:
 
+The separate [external dataset review](external-dataset-review.md) evaluates
+RouterBench, RouteLLM, LLMRouterBench, and Switchyard's Harbor path against commercial
+licensing, provenance, model-match, and independence requirements. None has been
+silently imported or counted as production evidence.
+
 - [UCCI](https://arxiv.org/abs/2605.18796) calibrates an uncertainty score to a
   per-query failure probability and chooses an escalation threshold through
   constrained cost minimisation. Importantly, its reported cascade evidence uses

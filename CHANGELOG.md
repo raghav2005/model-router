@@ -12,6 +12,9 @@
   pins its exact digest to the live summary and catalogue, while enforcement loads
   the approved empirical quality and p95 latency as a separate runtime overlay.
 - Expanded the credential-free suite to 87 tests.
+- Reviewed current public routing datasets and Switchyard's Harbor benchmark. No
+  external bundle was counted as production evidence because license or deployed-
+  model/workload transfer requirements remain unresolved.
 
 ## 0.9.0 — 2026-08-25
 

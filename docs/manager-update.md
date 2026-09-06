@@ -47,6 +47,9 @@ The first model set is OpenAI GPT-5.6 Luna, Terra, and Sol in efficient, balance
 - A corrected, official-source-verified Sol price of $4 input and $20 output per
   million tokens; cost comparisons and release provenance were regenerated.
 - A prompt-free drift detector for workload, route, complexity, uncertainty, tier-risk, and cost changes.
+- A documented external-data review covering RouterBench, RouteLLM, LLMRouterBench,
+  and Switchyard's Harbor benchmark. No public bundle was imported because its data
+  rights or model/workload transferability still needs approval.
 
 ## Why production enforcement remains blocked
 
