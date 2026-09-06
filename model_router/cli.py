@@ -283,6 +283,10 @@ def build_parser() -> argparse.ArgumentParser:
         "--pricing-report", default="reports/pricing_verification.json"
     )
     release_gates.add_argument(
+        "--external-dataset-evidence",
+        default="reports/external_dataset_evidence.json",
+    )
+    release_gates.add_argument(
         "--metamorphic-report", default="reports/metamorphic_routing_eval.json"
     )
     release_gates.add_argument(
@@ -435,6 +439,7 @@ def main() -> None:
                 training_report_path=args.training_report,
                 live_summary_path=args.live_summary,
                 pricing_report_path=args.pricing_report,
+                external_dataset_evidence_path=args.external_dataset_evidence,
                 metamorphic_report_path=args.metamorphic_report,
                 switchyard_contract_report_path=args.switchyard_contract_report,
                 workload_evidence_path=args.workload_evidence,

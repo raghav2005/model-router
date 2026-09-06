@@ -5,6 +5,10 @@
   "minimum_external_examples": 1000,
   "minimum_external_accuracy": 0.75,
   "maximum_external_tier_underroute_rate": 0.05,
+  "external_dataset_evidence": {
+    "require_independent": true,
+    "approved_evidence_sha256": null
+  },
   "minimum_live_cases_per_target": 100,
   "minimum_live_unique_cases_per_target": 100,
   "minimum_live_unique_cases_by_use_case": {

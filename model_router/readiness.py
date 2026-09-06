@@ -53,6 +53,9 @@ def evaluate_release_gates(
     training_report_path: str | Path = "reports/complexity_router_v3.json",
     live_summary_path: str | Path = "reports/live_eval_summary.json",
     pricing_report_path: str | Path = "reports/pricing_verification.json",
+    external_dataset_evidence_path: str | Path = (
+        "reports/external_dataset_evidence.json"
+    ),
     metamorphic_report_path: str | Path = "reports/metamorphic_routing_eval.json",
     switchyard_contract_report_path: str | Path = "reports/switchyard_contract.json",
     workload_evidence_path: str | Path = "reports/workload_evidence.json",
@@ -194,15 +197,66 @@ def evaluate_release_gates(
         minimum_examples = int(policy["minimum_external_examples"])
         minimum_accuracy = float(policy["minimum_external_accuracy"])
         maximum_underroute = float(policy["maximum_external_tier_underroute_rate"])
+        external_source_sha = (
+            str(external.get("source_sha256", "")) if isinstance(external, dict) else ""
+        )
+        external_policy = policy.get("external_dataset_evidence", {})
+        if not isinstance(external_policy, dict):
+            raise ValueError("external_dataset_evidence must be an object")
+        require_independent = bool(external_policy.get("require_independent", True))
+        approved_external_evidence_sha = external_policy.get("approved_evidence_sha256")
+        external_evidence_path = Path(external_dataset_evidence_path)
+        if external_evidence_path.exists():
+            external_evidence = _read_json(external_evidence_path)
+            dataset = external_evidence.get("dataset", {})
+            evidence_novel_rows = (
+                dataset.get("novel_rows") if isinstance(dataset, dict) else None
+            )
+            evidence_digest_matches = bool(
+                approved_external_evidence_sha
+            ) and approved_external_evidence_sha == sha256_file(external_evidence_path)
+            evidence_dataset_matches = (
+                isinstance(dataset, dict)
+                and bool(external_source_sha)
+                and dataset.get("sha256") == external_source_sha
+                and isinstance(evidence_novel_rows, int)
+                and not isinstance(evidence_novel_rows, bool)
+                and evidence_novel_rows == count
+            )
+            evidence_independent = external_evidence.get("independent") is True
+            evidence_review_approved = (
+                external_evidence.get("approved_for_release") is True
+            )
+            external_provenance_passed = (
+                external_evidence.get("schema_version")
+                == "model-router-external-dataset-evidence-v1"
+                and external_evidence.get("contains_prompt_content") is False
+                and evidence_digest_matches
+                and evidence_dataset_matches
+                and evidence_review_approved
+                and (not require_independent or evidence_independent)
+            )
+            provenance_detail = (
+                f"evidence_digest={'approved' if evidence_digest_matches else 'unapproved'}, "
+                f"dataset={'matches' if evidence_dataset_matches else 'differs'}, "
+                f"review_approved={evidence_review_approved}, "
+                f"independent={evidence_independent}"
+            )
+        else:
+            external_provenance_passed = False
+            provenance_detail = (
+                f"external dataset evidence not found: {external_evidence_path}"
+            )
         external_passed = (
             count >= minimum_examples
             and accuracy >= minimum_accuracy
             and underroute <= maximum_underroute
+            and external_provenance_passed
         )
         detail = (
             f"count={count}/{minimum_examples}, accuracy={accuracy:.3f}/"
             f"{minimum_accuracy:.3f}, tier_underroute={underroute:.3f}/"
-            f"{maximum_underroute:.3f} max"
+            f"{maximum_underroute:.3f} max, {provenance_detail}"
         )
     else:
         external_passed = False

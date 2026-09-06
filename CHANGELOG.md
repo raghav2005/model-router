@@ -11,10 +11,13 @@
 - Added a prompt-free workload-evidence artifact and CLI workflow. Release approval
   pins its exact digest to the live summary and catalogue, while enforcement loads
   the approved empirical quality and p95 latency as a separate runtime overlay.
-- Expanded the credential-free suite to 87 tests.
+- Expanded the credential-free suite to 88 tests.
 - Reviewed current public routing datasets and Switchyard's Harbor benchmark. No
   external bundle was counted as production evidence because license or deployed-
   model/workload transfer requirements remain unresolved.
+- Bound the external-generalisation gate to an approved prompt-free provenance
+  report, exact dataset digest, novel-row count, and an explicit independence
+  decision. The current related synthetic slice is recorded as diagnostic-only.
 
 ## 0.9.0 — 2026-08-25
 

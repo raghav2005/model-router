@@ -55,6 +55,7 @@ MODEL_ROUTER_ADAPTIVE_CONFIDENCE_THRESHOLD=0.45
 MODEL_ROUTER_ARTIFACT=model_router/artifacts/complexity_router_v3.npz
 MODEL_ROUTER_PRICING_REPORT=reports/pricing_verification.json
 MODEL_ROUTER_WORKLOAD_EVIDENCE=reports/workload_evidence.json
+MODEL_ROUTER_EXTERNAL_DATASET_EVIDENCE=reports/external_dataset_evidence.json
 SWITCHYARD_URL=http://switchyard:4000
 SWITCHYARD_REVISION=1fc9ab887d1c663b0048ae24d5f473d15ed8daaa
 ```
@@ -93,6 +94,12 @@ latency owners approve it, record its exact SHA-256 as
 `approved_workload_evidence_sha256`. Any edit to either the live summary or evidence
 artifact invalidates the approval. Enforcement loads this separate overlay instead
 of rewriting the base catalogue.
+
+For the classifier generalisation gate, approve the exact SHA-256 of an external-
+dataset evidence report only after data/license review and deduplication. Its dataset
+digest and novel-row count must match the training report, and it must state that the
+source is independent and approved for release. The checked-in report intentionally
+marks the current related synthetic multi-turn slice as non-independent.
 
 Create the drift baseline only after the shadow window and its traffic mix are
 approved. Store it with the release evidence:

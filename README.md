@@ -441,7 +441,8 @@ Current expected failures are:
 
 - enforcement mode has not been approved;
 - quality and latency are not workload-measured;
-- only 455 truly novel multi-turn examples are available and performance is below threshold;
+- only 455 related synthetic multi-turn examples are novel, performance is below
+  threshold, and the aggregate independence evidence is deliberately unapproved;
 - no paid live response benchmark has been run;
 - no live case-set digest has been approved;
 - a direct-provider bypass has not been configured.

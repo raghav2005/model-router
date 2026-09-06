@@ -75,3 +75,8 @@ Switchyard runtime/configuration contract. It fails closed on the remaining seve
 3. Budget and approval to run every candidate model on the frozen benchmark, plus owners for human review, security approval, and production operations.
 
 Once those inputs exist, the included harness and release policy provide a direct path through live evaluation, recalibration, shadow traffic, guarded enforcement, and rollback testing.
+
+The generalisation blocker can no longer be cleared by generating more examples from
+the same process. Enforcement requires an approved aggregate provenance report bound
+to the external dataset's exact digest and novel-row count; the current report is
+explicitly non-independent and diagnostic-only.

@@ -41,6 +41,10 @@ class ReleaseGateTests(unittest.TestCase):
                 "minimum_external_examples": 100,
                 "minimum_external_accuracy": 0.75,
                 "maximum_external_tier_underroute_rate": 0.05,
+                "external_dataset_evidence": {
+                    "require_independent": True,
+                    "approved_evidence_sha256": None,
+                },
                 "minimum_live_cases_per_target": 10,
                 "minimum_live_unique_cases_per_target": 10,
                 "minimum_live_unique_cases_by_use_case": {
@@ -59,6 +63,25 @@ class ReleaseGateTests(unittest.TestCase):
                     "trusted_direct_provider_fallback_configured": True,
                 },
             }
+            external_evidence_path = root / "external-evidence.json"
+            external_evidence_path.write_text(
+                json.dumps(
+                    {
+                        "schema_version": "model-router-external-dataset-evidence-v1",
+                        "independent": True,
+                        "approved_for_release": True,
+                        "contains_prompt_content": False,
+                        "dataset": {
+                            "sha256": "external-source",
+                            "novel_rows": 500,
+                        },
+                    }
+                ),
+                encoding="utf-8",
+            )
+            policy["external_dataset_evidence"]["approved_evidence_sha256"] = (
+                sha256_file(external_evidence_path)
+            )
             policy_path = root / "policy.json"
             policy_path.write_text(json.dumps(policy), encoding="utf-8")
 
@@ -71,11 +94,12 @@ class ReleaseGateTests(unittest.TestCase):
                     {
                         "schema_version": "router-training-report-v2",
                         "external_context_slice": {
+                            "source_sha256": "external-source",
                             "metrics": {
                                 "count": 500,
                                 "accuracy": 0.9,
                                 "tier_underroute_rate": 0.02,
-                            }
+                            },
                         },
                         "provenance": {
                             "artifact": {
@@ -188,6 +212,7 @@ class ReleaseGateTests(unittest.TestCase):
                 training_report_path=training_path,
                 live_summary_path=live_path,
                 pricing_report_path=pricing_path,
+                external_dataset_evidence_path=external_evidence_path,
                 workload_evidence_path=workload_path,
                 artifact_path=artifact_path,
                 today=date(2026, 8, 25),
@@ -312,6 +337,49 @@ class ReleaseGateTests(unittest.TestCase):
         )
         self.assertFalse(gate["passed"])
         self.assertIn("unique=1/100", gate["detail"])
+
+    def test_related_synthetic_external_data_cannot_pass_as_independent(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            evidence_path = root / "external.json"
+            evidence_path.write_text(
+                json.dumps(
+                    {
+                        "schema_version": "model-router-external-dataset-evidence-v1",
+                        "independent": False,
+                        "approved_for_release": False,
+                        "contains_prompt_content": False,
+                        "dataset": {
+                            "sha256": (
+                                "71c9b9c521a12fbf7675430f938b9559eb6a1a40e96762a16f99b72b6c08fddd"
+                            ),
+                            "novel_rows": 455,
+                        },
+                    }
+                ),
+                encoding="utf-8",
+            )
+            policy = json.loads(Path("config/release_policy.json").read_text())
+            policy["minimum_external_examples"] = 1
+            policy["minimum_external_accuracy"] = 0.0
+            policy["maximum_external_tier_underroute_rate"] = 1.0
+            policy["external_dataset_evidence"]["approved_evidence_sha256"] = (
+                sha256_file(evidence_path)
+            )
+            policy_path = root / "policy.json"
+            policy_path.write_text(json.dumps(policy), encoding="utf-8")
+            report = evaluate_release_gates(
+                policy_path=policy_path,
+                external_dataset_evidence_path=evidence_path,
+                today=date(2026, 8, 25),
+            )
+        gate = next(
+            gate
+            for gate in report["gates"]
+            if gate["name"] == "router generalises to external data"
+        )
+        self.assertFalse(gate["passed"])
+        self.assertIn("independent=False", gate["detail"])
 
 
 if __name__ == "__main__":

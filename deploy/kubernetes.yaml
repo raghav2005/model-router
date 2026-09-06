@@ -9,6 +9,7 @@ data:
   MODEL_ROUTER_FALLBACK_ON_ERROR: "0"
   MODEL_ROUTER_AUDIT_PATH: "-"
   MODEL_ROUTER_WORKLOAD_EVIDENCE: "reports/workload_evidence.json"
+  MODEL_ROUTER_EXTERNAL_DATASET_EVIDENCE: "reports/external_dataset_evidence.json"
   SWITCHYARD_URL: "http://switchyard:4000"
   SWITCHYARD_TIMEOUT_SECONDS: "120"
   SWITCHYARD_REVISION: "1fc9ab887d1c663b0048ae24d5f473d15ed8daaa"

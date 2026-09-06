@@ -133,6 +133,13 @@ live summary and catalogue before loading its measured per-use-case quality and 
 latency values. This removes a prior circularity where marking the catalogue as
 measured invalidated the benchmark's catalogue digest.
 
+The external-generalisation gate similarly requires a prompt-free provenance report
+whose exact SHA-256 is approved in policy. The report's dataset digest and novel-row
+count must match the training report, and the reviewer must classify the dataset as
+independent and set `approved_for_release` to true. The current multi-turn data is
+explicitly marked `diagnostic_only` and cannot pass even if its numerical thresholds
+are relaxed.
+
 Thresholds are initial release criteria and must be approved against business risk. Open-ended work also needs blinded human review or an approved judge model; deterministic validators alone are insufficient.
 
 ## Remaining production work
