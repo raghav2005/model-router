@@ -37,6 +37,12 @@ class ReleaseGateTests(unittest.TestCase):
                 "minimum_external_accuracy": 0.75,
                 "maximum_external_tier_underroute_rate": 0.05,
                 "minimum_live_cases_per_target": 10,
+                "minimum_live_unique_cases_per_target": 10,
+                "minimum_live_unique_cases_by_use_case": {
+                    "general_qa": 2,
+                    "coding": 2,
+                    "reasoning": 2,
+                },
                 "minimum_live_all_validators_pass_rate": 0.9,
                 "minimum_live_call_success_rate": 0.99,
                 "maximum_live_response_model_mismatch_count": 0,
@@ -115,10 +121,22 @@ class ReleaseGateTests(unittest.TestCase):
                         "targets": {
                             role: {
                                 "runs": 20,
+                                "unique_cases": 20,
                                 "validator_scored_runs": 20,
                                 "call_success_rate": 1.0,
                                 "all_validators_pass_rate": 0.95,
                                 "response_model_mismatch_count": 0,
+                                "latency_ms": {"p50": 100, "p95": 200, "p99": 250},
+                                "slices": {
+                                    "use_case": {
+                                        use_case: {"runs": 5, "unique_cases": 5}
+                                        for use_case in (
+                                            "general_qa",
+                                            "coding",
+                                            "reasoning",
+                                        )
+                                    }
+                                },
                             }
                             for role in ("efficient", "balanced", "capable")
                         },
@@ -212,6 +230,56 @@ class ReleaseGateTests(unittest.TestCase):
             if gate["name"] == "pricing verification matches catalogue"
         )
         self.assertFalse(gate["passed"])
+
+    def test_repetitions_cannot_substitute_for_unique_live_cases(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            live_path = Path(directory) / "live.json"
+            live_path.write_text(
+                json.dumps(
+                    {
+                        "schema_version": "switchyard-live-eval-summary-v3",
+                        "targets": {
+                            role: {
+                                "runs": 100,
+                                "unique_cases": 1,
+                                "validator_scored_runs": 100,
+                                "call_success_rate": 1.0,
+                                "call_success_rate_wilson_95": {"lower": 0.99},
+                                "all_validators_pass_rate": 1.0,
+                                "all_validators_pass_rate_wilson_95": {"lower": 0.99},
+                                "response_model_mismatch_count": 0,
+                                "latency_ms": {"p50": 100, "p95": 200, "p99": 250},
+                                "slices": {
+                                    "use_case": {
+                                        use_case: {
+                                            "runs": 100,
+                                            "unique_cases": 1,
+                                        }
+                                        for use_case in (
+                                            "general_qa",
+                                            "coding",
+                                            "reasoning",
+                                        )
+                                    }
+                                },
+                            }
+                            for role in ("efficient", "balanced", "capable")
+                        },
+                    }
+                ),
+                encoding="utf-8",
+            )
+            report = evaluate_release_gates(
+                live_summary_path=live_path,
+                today=date(2026, 8, 25),
+            )
+        gate = next(
+            gate
+            for gate in report["gates"]
+            if gate["name"] == "live response benchmark passes"
+        )
+        self.assertFalse(gate["passed"])
+        self.assertIn("unique=1/100", gate["detail"])
 
 
 if __name__ == "__main__":

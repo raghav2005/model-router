@@ -6,6 +6,12 @@
   "minimum_external_accuracy": 0.75,
   "maximum_external_tier_underroute_rate": 0.05,
   "minimum_live_cases_per_target": 100,
+  "minimum_live_unique_cases_per_target": 100,
+  "minimum_live_unique_cases_by_use_case": {
+    "general_qa": 20,
+    "coding": 20,
+    "reasoning": 20
+  },
   "minimum_live_all_validators_pass_rate": 0.9,
   "minimum_live_all_validators_pass_wilson_lower_bound": 0.85,
   "minimum_live_call_success_rate": 0.99,

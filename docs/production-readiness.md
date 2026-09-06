@@ -115,9 +115,10 @@ The default release policy requires:
 7. a passing 1,000+ case metamorphic regression with bounded under-routing and
    tier-invariance thresholds;
 8. a training report matching the exact router artifact, catalogue, and policy version;
-9. at least 100 scored live responses per role, at least a 99% call-success rate,
-   at least a 90% all-validator pass rate, required Wilson-interval lower bounds,
-   and no unexpected response-model substitutions;
+9. at least 100 distinct scored live cases per role, at least 20 distinct cases for
+   each supported use case, a measured p95 completion latency, at least a 99%
+   call-success rate, at least a 90% all-validator pass rate, required Wilson-
+   interval lower bounds, and no unexpected response-model substitutions;
 10. live evidence matching the exact catalogue, approved Switchyard revision, and
    an explicitly approved case-set digest;
 11. an approved, pinned Switchyard release or commit;
@@ -132,7 +133,8 @@ Thresholds are initial release criteria and must be approved against business ri
 
 - Collect a privacy-reviewed sample of real intended traffic.
 - Create frozen train, calibration, test, and out-of-distribution sets by customer or time boundary—not random row split alone.
-- Run all three models on every eligible response-level case.
+- Run all three models on every eligible response-level case. Repetitions measure
+  nondeterminism but never count as additional workload coverage.
 - Measure quality, TTFT, completion latency, output rate, tokens, price, errors, and refusal rate by slice.
 - Replace every `heuristic_prior_pending_workload_eval` and `unmeasured_bootstrap_prior` marker only after the underlying report is reviewed and versioned.
 - Continue retraining or recalibration because the promoted augmentation model

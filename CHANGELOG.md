@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+- Hardened live-evaluation evidence with prompt-free case-set coverage, per-target
+  and per-slice unique-case counts, and mandatory p95 latency evidence.
+- Prevented benchmark repetitions from satisfying distinct-case release thresholds;
+  the default policy now requires 100 unique cases per role and at least 20 unique
+  cases for each of general Q&A, coding, and reasoning.
+
 ## 0.9.0 — 2026-08-25
 
 - Added posterior-risk escalation when full-conversation and final-turn

@@ -290,6 +290,14 @@ def evaluate_release_gates(
         if not isinstance(targets, dict):
             targets = {}
         minimum_cases = int(policy["minimum_live_cases_per_target"])
+        minimum_unique_cases = int(
+            policy.get("minimum_live_unique_cases_per_target", minimum_cases)
+        )
+        required_use_case_slices = policy.get(
+            "minimum_live_unique_cases_by_use_case", {}
+        )
+        if not isinstance(required_use_case_slices, dict):
+            raise ValueError("minimum_live_unique_cases_by_use_case must be an object")
         minimum_pass = float(policy["minimum_live_all_validators_pass_rate"])
         minimum_call_success = float(policy["minimum_live_call_success_rate"])
         minimum_pass_lower = float(
@@ -301,10 +309,13 @@ def evaluate_release_gates(
         maximum_model_mismatches = int(
             policy["maximum_live_response_model_mismatch_count"]
         )
-        missing = []
+        failures: list[str] = []
         for model in models:
             result = targets.get(model.switchyard_target, {})
             runs = int(result.get("runs", 0)) if isinstance(result, dict) else 0
+            unique_cases = (
+                int(result.get("unique_cases", 0)) if isinstance(result, dict) else 0
+            )
             pass_rate = (
                 result.get("all_validators_pass_rate")
                 if isinstance(result, dict)
@@ -333,8 +344,31 @@ def evaluate_release_gates(
                 if isinstance(result, dict)
                 else maximum_model_mismatches + 1
             )
+            latency = result.get("latency_ms", {}) if isinstance(result, dict) else {}
+            latency_p95 = latency.get("p95") if isinstance(latency, dict) else None
+            slices = result.get("slices", {}) if isinstance(result, dict) else {}
+            use_case_slices = (
+                slices.get("use_case", {}) if isinstance(slices, dict) else {}
+            )
+            missing_slices: list[str] = []
+            for slice_name, raw_minimum in required_use_case_slices.items():
+                slice_result = (
+                    use_case_slices.get(slice_name, {})
+                    if isinstance(use_case_slices, dict)
+                    else {}
+                )
+                slice_unique_cases = (
+                    int(slice_result.get("unique_cases", 0))
+                    if isinstance(slice_result, dict)
+                    else 0
+                )
+                if slice_unique_cases < int(raw_minimum):
+                    missing_slices.append(
+                        f"{slice_name}={slice_unique_cases}/{int(raw_minimum)}"
+                    )
             if (
                 runs < minimum_cases
+                or unique_cases < minimum_unique_cases
                 or scored_runs < minimum_cases
                 or pass_rate is None
                 or float(pass_rate) < minimum_pass
@@ -348,13 +382,24 @@ def evaluate_release_gates(
                     and call_success_lower < minimum_call_success_lower
                 )
                 or model_mismatches > maximum_model_mismatches
+                or latency_p95 is None
+                or missing_slices
             ):
-                missing.append(model.id)
-        live_passed = not missing
+                reasons = [
+                    f"runs={runs}/{minimum_cases}",
+                    f"unique={unique_cases}/{minimum_unique_cases}",
+                    f"scored={scored_runs}/{minimum_cases}",
+                ]
+                if latency_p95 is None:
+                    reasons.append("latency_p95=missing")
+                if missing_slices:
+                    reasons.append("use_case_slices=" + ",".join(missing_slices))
+                failures.append(f"{model.id} ({'; '.join(reasons)})")
+        live_passed = not failures
         live_detail = (
-            "roles below live threshold: " + ", ".join(missing)
-            if missing
-            else "all roles meet live case and validator thresholds"
+            "roles below live threshold: " + "; ".join(failures)
+            if failures
+            else "all roles meet live unique-case, slice, latency, and validator thresholds"
         )
     else:
         live_passed = False

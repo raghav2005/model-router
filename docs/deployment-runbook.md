@@ -78,6 +78,11 @@ Freeze the live case set before the paid benchmark, run
 Do not reuse results after cases, targets, catalogue, repetition count, or streaming
 settings change; the harness enforces this by refusing an incompatible resume.
 
+The release report counts distinct case IDs separately from repeated runs and checks
+general Q&A, coding, and reasoning coverage for every role. Review the prompt-free
+`case_set_profile` in the summary before approving its digest; a large repetition
+count is not a substitute for representative cases.
+
 Update the catalogue evidence markers and release report only after approval of the underlying data.
 
 Create the drift baseline only after the shadow window and its traffic mix are

@@ -349,7 +349,9 @@ It records:
 - p50/p95/p99 latency and TTFT;
 - end-to-end and generation output-token throughput;
 - Wilson 95% intervals for call success and validator pass rates; and
-- per-category, use-case, risk, and complexity slices.
+- per-category, use-case, risk, and complexity slices; and
+- prompt-free case-set coverage, including unique cases, validator types, sources,
+  and metadata distributions.
 
 Compute and approve the frozen case digest before spending on a live run:
 
@@ -362,6 +364,10 @@ targets, repetition count, streaming mode, and content-retention setting. Resume
 refused when any of those inputs or the Switchyard revision changed. Enforcement
 additionally requires the case-set digest to be explicitly approved in
 `config/release_policy.json` and the run to use the approved Switchyard revision.
+Repeated trials quantify nondeterminism, but they cannot inflate release coverage:
+the default gate requires 100 distinct cases per role, including at least 20 distinct
+cases in each of general Q&A, coding, and reasoning, plus a measured p95 completion
+latency.
 
 Supported validators are exact text, required substrings, regular expression,
 valid JSON, required JSON keys, exact JSON values, and numeric tolerance. Open-ended

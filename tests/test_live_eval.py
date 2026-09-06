@@ -62,6 +62,7 @@ class LiveEvaluationTests(unittest.TestCase):
             summary["targets"]["efficient"]["all_validators_pass_rate"], 1.0
         )
         target = summary["targets"]["efficient"]
+        self.assertEqual(target["unique_cases"], 1)
         self.assertLess(target["all_validators_pass_rate_wilson_95"]["lower"], 1.0)
         self.assertIsNotNone(target["latency_ms"]["p99"])
         self.assertEqual(target["slices"]["category"]["math"]["runs"], 1)
@@ -112,6 +113,11 @@ class LiveEvaluationTests(unittest.TestCase):
             self.assertEqual(
                 first["provenance"]["benchmark_fingerprint"],
                 second["provenance"]["benchmark_fingerprint"],
+            )
+            self.assertEqual(first["targets"]["efficient"]["unique_cases"], 1)
+            self.assertEqual(first["provenance"]["case_set_profile"]["unique_cases"], 1)
+            self.assertFalse(
+                first["provenance"]["case_set_profile"]["contains_prompt_content"]
             )
             self.assertEqual(first["schema_version"], "switchyard-live-eval-summary-v3")
 

@@ -75,6 +75,33 @@ def case_set_sha256(cases: Sequence[EvaluationCase]) -> str:
     return sha256(canonical).hexdigest()
 
 
+def _case_set_profile(cases: Sequence[EvaluationCase]) -> dict[str, object]:
+    """Return prompt-free coverage metadata suitable for release evidence."""
+    dimensions: dict[str, dict[str, int]] = {}
+    for dimension in ("category", "use_case", "risk", "complexity", "source"):
+        counts = Counter(
+            str(case.metadata[dimension])
+            for case in cases
+            if case.metadata.get(dimension) is not None
+            and not isinstance(case.metadata.get(dimension), (dict, list))
+        )
+        if counts:
+            dimensions[dimension] = dict(sorted(counts.items()))
+    validator_types = Counter(
+        str(validator.get("type", "unknown"))
+        for case in cases
+        for validator in case.validators
+    )
+    return {
+        "unique_cases": len({case.id for case in cases}),
+        "cases_with_validators": sum(bool(case.validators) for case in cases),
+        "cases_without_validators": sum(not case.validators for case in cases),
+        "validator_types": dict(sorted(validator_types.items())),
+        "metadata_dimensions": dimensions,
+        "contains_prompt_content": False,
+    }
+
+
 def _benchmark_provenance(
     cases: Sequence[EvaluationCase],
     targets: Sequence[str],
@@ -92,6 +119,7 @@ def _benchmark_provenance(
         "stream": stream,
         "store_content": store_content,
         "switchyard_revision": switchyard_revision,
+        "case_set_profile": _case_set_profile(cases),
     }
     fingerprint = sha256(
         json.dumps(inputs, separators=(",", ":"), sort_keys=True).encode("utf-8")
@@ -435,6 +463,7 @@ def _slice_summary(runs: list[CandidateRun]) -> dict[str, object]:
     perfect = sum(run.score == 1.0 for run in scored)
     return {
         "runs": len(runs),
+        "unique_cases": len({run.case_id for run in runs}),
         "successful_calls": len(successful),
         "call_success_rate": round(len(successful) / len(runs), 6),
         "call_success_rate_wilson_95": _wilson_95(len(successful), len(runs)),
@@ -510,6 +539,7 @@ def summarize(runs: Sequence[CandidateRun]) -> dict[str, object]:
         perfect = sum(run.score == 1.0 for run in scored)
         by_target[target] = {
             "runs": len(selected),
+            "unique_cases": len({run.case_id for run in selected}),
             "successful_calls": len(successful),
             "call_success_rate": round(len(successful) / len(selected), 6),
             "call_success_rate_wilson_95": _wilson_95(len(successful), len(selected)),
